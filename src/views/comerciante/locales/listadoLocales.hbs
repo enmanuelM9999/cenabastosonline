@@ -1,0 +1,28 @@
+
+
+<div class="container pt-3">
+    <h3>Locales</h3>
+    <br>
+    <div class="row locales d-flex flex-wrap">
+        {{#each rowsLocalesImprimibles}}
+        <div class="list-group">
+            <a href="/comerciante/locales/local/{{pkIdLocalComercial}}" class="list-group-item list-group-item-action m-0 p-0 border-0">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{nombreLocal}}</h5>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">{{mayoMino}}</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {{else}}
+        No hay locales <button type="button" class="btn btn-success">Crea uno</button>
+        {{/each}}
+
+        
+    </div>
+</div>
+
+{{>navegacionComerciante}}
