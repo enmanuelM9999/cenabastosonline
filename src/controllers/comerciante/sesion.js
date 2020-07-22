@@ -69,4 +69,9 @@ router.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
+router.get("/updatelogout", (req, res) => {
+  req.logOut();
+  res.redirect("/comerciante/login");
+});
+
 module.exports = router;

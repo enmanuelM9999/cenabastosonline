@@ -1,10 +1,12 @@
-<div class="container  mb-5 pb-5
+<div class="container mb-5 pb-5
      justify-content-center">
 
-    <div class="card shadow m-4 ">
+    <div class="card shadow mt-4 ">
         <div class="card-body">
             <div class="card-title">
                 <h3 class="mb-3">Registro comerciante</h3>
+                <small class="text-muted"><i class="far fa-clock"></i> Tu solicitud tomará tiempo en ser
+                    aprobada</small>
             </div>
             <div class="card-text">
                 <form action="/comerciante/logup" method="POST">
@@ -22,7 +24,7 @@
                         <input type="text" class="form-control" id="lastname" name="lastname">
                     </div>
 
-                
+
                     <div class="form-group">
                         <label for="tipoDoc">Tipo de documento</label>
                         <select name="tipoDoc" id="tipoDoc" class="form-control">
@@ -46,7 +48,8 @@
                         <label for="password">Crear contraseña</label>
                         <input type="password" class="form-control" id="password" name="password">
                     </div>
-
+                    <small class="text-muted"><i class="far fa-clock"></i> Tu solicitud tomará tiempo en ser
+                        aprobada</small> <br> <br>
                     <button type="submit" class="btn btn-success">Registrarse</button>
                 </form>
             </div>
