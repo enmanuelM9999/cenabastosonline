@@ -1,133 +1,78 @@
 <div class="container mt-4">
+    <h3> Crear un local</h3>
 
+    <form method="POST" action="/comerciante/crearLocal" class="mt-4" name="form" id="form">
 
-    <nav class="border-0">
-        <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link text-success active" id="nav-home-tab" data-toggle="tab" href="#nav-home"
-                role="tab" aria-controls="nav-home" aria-selected="true">Minoristas</a>
-            <a class="nav-item nav-link text-success" id="nav-profile-tab" data-toggle="tab" href="#nav-profile"
-                role="tab" aria-controls="nav-profile" aria-selected="false">Mayoristas</a>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
+        <nav class="border-0">
+            <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link text-success active" id="nav-home-tab" data-toggle="tab" href="#nav-home"
+                    role="tab" aria-controls="nav-home" aria-selected="true"><i class="fas fa-store"></i> Datos del
+                    local</a>
+                <a class="nav-item nav-link text-success" id="nav-profile-tab" data-toggle="tab" href="#nav-profile"
+                    role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fas fa-apple-alt"></i>
+                    Productos</a>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
 
-        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home">
-            <div class="card shadow border-0 p-1">
-                ipsum
-                dolor sit amet consectetur adipisicing elit. Aspernatur est suscipit vitae inventore enim autem
-                architecto
-                praesentium. Facere ea a commodi minus modi iste perspiciatis dolorum ab praesentium qui? Provident!
-                Lorem
-                ipsum, dolor sit amet consectetur adipisicing elit. Mollitia necessitatibus odio aperiam laborum ipsam
-                quos?
-                Architecto sed recusandae illum quibusdam minima, obcaecati, aliquid cum quas adipisci saepe facilis!
-                Maiores, ea.
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home">
 
-                <div class="accordion" id="accordionExample">
-                    <div class="card">
-                        <div class="" id="headingOne">
-                            <h2 class="mb-0">
-                                <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
-                                    type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
-                                    aria-controls="collapseOne">
-                                    <h5><i class="far fa-angry"></i>
-                                        Collapsible Item #1</h5>
-                                </button>
-                            </h2>
+                <div class="card shadow border-top-0">
+                    <div class="container pt-3">
+                        <div class="form-group">
+                            <label for="name">¿Cómo se llama el local?</label>
+                            <input class="form-control" type="text" placeholder="Ejemplo: Fruver Don jacinto"
+                                name="name" id="name">
                         </div>
+                        <div class="form-group">
+                            <label for="descripcion">Descripcion al público</label>
+                            <textarea name="descripcion" id="descripcion" class="form-control"
+                                placeholder="Ejemplo: Las mejores frutas y verduras de la ciudad" form="forsm"> </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoLocal">¿Qué tipo de local es?</label>
+                            <select name="tipoLocal" id="tipoLocal" class="form-control">
 
-                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
-                            data-parent="#accordionExample">
-                            <div class="card-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad
-                                squid.
-                                3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa
-                                nesciunt
-                                laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid
-                                single-origin
-                                coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore
-                                wes
-                                anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo.
-                                Leggings
-                                occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably
-                                haven't heard
-                                of them accusamus labore sustainable VHS.
-                            </div>
+                                <option value="1">Minorista</option>
+                                <option value="2">Mayorista</option>
+
+                            </select>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="" id="headingTwo">
-                            <h2 class="mb-0">
-                                <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
-                                    type="
-                                    button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
-                                    aria-controls="collapseTwo">
-                                    <h5><i class="far fa-angry"></i>
-                                        Collapsible Item #2</h5>
-                                </button>
-                            </h2>
-                        </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-                            data-parent="#accordionExample">
-                            <div class="card-body">
-                                <div class="jumbotron mt-3">
-                                    <h1>Bottom Navbar example</h1>
-                                    <p class="lead">This example is a quick exercise to illustrate how the bottom navbar
-                                        works.</p>
-                                    <a class="btn btn-lg btn-primary" href="/docs/4.5/components/navbar/"
-                                        role="button">View
-                                        navbar docs »</a>
-                                </div>
+                </div>
+
+            </div>
+
+
+            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile">
+                <div class="card shadow border-top-0">
+                    <div class="container pt-3">
+                        <h5>Selecciona los productos que vendes</h5>
+                        <small class="text-muted">Las variantes de tu producto se añadirán después</small>
+                        <div class="productos row mt-2">
+                            <div class="form-control border-0 col-sm-12 col-lg-3">
+                                <label><input   type="checkbox"  value="1" name="productos"> Arándano</label>
+                            </div>
+                            <div class="form-control border-0 col-sm-12 col-lg-3">
+                                <label><input   type="checkbox"  value="5" name="productos"> Coco</label>
+                            </div>
+                            <div class="form-control border-0 col-sm-12 col-lg-3">
+                                <label><input   type="checkbox"  value="2" name="productos"> Fresa</label>
+                            </div>
+                            <div class="form-control border-0 col-sm-12 col-lg-3">
+                                <label><input   type="checkbox"  value="3" name="productos"> Manzana</label>
+                            </div>
+                            <div class="form-control border-0 col-sm-12 col-lg-3">
+                                <label><input   type="checkbox"  value="4" name="productos"> Zanahoria</label>
                             </div>
                         </div>
+                        
                     </div>
-                    <div class="card">
-                        <div class="" id="headingThree">
-                            <h2 class="mb-0">
-                                <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
-                                    type="
-                                    button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false"
-                                    aria-controls="collapseThree">
-                                    <h5><i class="far fa-angry"></i>
-                                        Collapsible Item #3</h5>
-                                </button>
-                            </h2>
-                        </div>
-                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
-                            data-parent="#accordionExample">
-                            <div class="card-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad
-                                squid.
-                                3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa
-                                nesciunt
-                                laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid
-                                single-origin
-                                coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore
-                                wes
-                                anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo.
-                                Leggings
-                                occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably
-                                haven't heard
-                                of them accusamus labore sustainable VHS.
-                            </div>
-                        </div>
-                    </div>
-
-
-
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile">
-            <div class="card shadow border-0 p-1">hi</div>
-        </div>
-
-
-    </div>
-
-
-
-
+        <button type="submit" class="btn btn-success mt-3"><i class="fas fa-check"></i> Crear local</button>
+    </form>
 </div>
 
 

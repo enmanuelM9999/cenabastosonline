@@ -59,6 +59,7 @@ app.use((req, res, next) => {
 app.use(require('./controllers/index'));
 //comerciante
 app.use('/comerciante', require('./controllers/comerciante/index'));
+app.use('/comerciante', require('./controllers/comerciante/locales'));
 app.use('/comerciante', require('./controllers/comerciante/sesion'));
 
 
