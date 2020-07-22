@@ -9,14 +9,14 @@ auth.esComercianteAprobado = (req, res, next) => {
             return res.redirect('/comerciante/noAprobado');
         }
     }
-    return res.redirect('/comerciante/signin');
+    return res.redirect('/comerciante/login');
 };
 
 auth.esComerciante = (req, res, next) => {
     if (req.isAuthenticated() && req.session.tipoUsuario == 2) {
         return next();
     }
-    return res.redirect('/comerciante/signin');
+    return res.redirect('/comerciante/login');
 };
 
 module.exports = auth;

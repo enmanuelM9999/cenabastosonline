@@ -11,7 +11,7 @@ const multer = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v4');
 
-// SIGNUP
+// logup
 router.get("/registro", (req, res) => {
   res.render("estudiante/registro");
 });
@@ -25,7 +25,7 @@ router.post(
   })
 );
 
-//SIGNIN
+//login
 router.get("/login", (req, res) => {
   res.render("estudiante/login");
 });

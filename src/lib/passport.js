@@ -6,7 +6,7 @@ const helpers = require('./helpers');
 
 //---- Comerciante ----//
 
-passport.use('comerciante.signup', new LocalStrategy({
+passport.use('comerciante.logup', new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password',
   passReqToCallback: true
@@ -72,7 +72,7 @@ passport.use('comerciante.signup', new LocalStrategy({
 }));
 
 
-passport.use('comerciante.signin', new LocalStrategy({
+passport.use('comerciante.login', new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password',
   passReqToCallback: true

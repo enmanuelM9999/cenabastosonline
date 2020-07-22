@@ -11,7 +11,7 @@ const multer = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v4');
 
-// SIGNUP
+// logup
 router.get("/registro", async (req, res) => {
   try {
     const rowsCiudad = await pool.query("SELECT pkIdCiudad, descripcionCiudad FROM ciudad");
@@ -31,7 +31,7 @@ router.post(
   })
 );
 
-//SIGNIN
+//login
 router.get("/login", (req, res) => {
   res.render("empresa/login");
 });

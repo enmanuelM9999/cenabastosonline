@@ -3,21 +3,24 @@ const router = express.Router();
 const pool = require("../../database");
 const passport = require("passport");
 
-router.get('/signup', async (req, res) => {
+
+//---- logup
+
+router.get('/logup', async (req, res) => {
   //Buscar los tipos de docs para la vista
   const rowsTipoDoc = await pool.query("SELECT pkIdTipoDocumento,descripcionTipoDocumento FROM tipodocumento");
-  res.render('comerciante/sesion/signup', { rowsTipoDoc });
+  res.render('comerciante/sesion/logup', { rowsTipoDoc });
 });
 
-router.post("/signup",
-  passport.authenticate("comerciante.signup", {
+router.post("/logup",
+  passport.authenticate("comerciante.logup", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/signup",
+    failureRedirect: "/comerciante/logup",
     failureFlash: true
   })
 );
 
-router.post("/signup", (req, res, next) => {
+router.post("/logup", (req, res, next) => {
   req.check("email", "Campo vacío").notEmpty();
   req.check("password", "Campo vacío").notEmpty();
   req.check("name", "Campo vacío").notEmpty();
@@ -28,43 +31,42 @@ router.post("/signup", (req, res, next) => {
   const errors = req.validationErrors();
   if (errors.length > 0) {
     req.flash("message", errors[0].msg);
-    res.redirect("/comerciante/signup");
+    res.redirect("/comerciante/logup");
   }
-  passport.authenticate("comerciante.signup", {
+  passport.authenticate("comerciante.logup", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/signup",
+    failureRedirect: "/comerciante/logup",
     failureFlash: true
   })(req, res, next);
 });
 
-router.get('/signin', async (req, res) => {
-  res.render('comerciante/sesion/signin');
+//---- login
+
+router.get('/login', async (req, res) => {
+  res.render('comerciante/sesion/login');
 });
 
-/*router.post(
-  "/signin",
-  passport.authenticate("comerciante.signin", {
-    successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/signin",
-    failureFlash: true
-  })
-);
-*/
-
-router.post("/signin", (req, res, next) => {
+router.post("/login", (req, res, next) => {
   req.check("email", "Campo vacío").notEmpty();
   req.check("password", "Campo vacío").notEmpty();
 
   const errors = req.validationErrors();
   if (errors.length > 0) {
     req.flash("message", errors[0].msg);
-    res.redirect("/comerciante/signin");
+    res.redirect("/comerciante/login");
   }
-  passport.authenticate("comerciante.signin", {
+  passport.authenticate("comerciante.login", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/signin",
+    failureRedirect: "/comerciante/login",
     failureFlash: true
   })(req, res, next);
+});
+
+//---- logout
+
+router.get("/logout", (req, res) => {
+  req.logOut();
+  res.redirect("/");
 });
 
 module.exports = router;
