@@ -1,28 +1,85 @@
-
-
 <div class="container pt-3">
-    <h3>Locales</h3>
-    <br>
-    <div class="row locales d-flex flex-wrap">
-        {{#each rowsLocalesImprimibles}}
-        <div class="list-group">
-            <a href="/comerciante/locales/local/{{pkIdLocalComercial}}" class="list-group-item list-group-item-action m-0 p-0 border-0">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{nombreLocal}}</h5>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">{{mayoMino}}</small>
+    <a href="/comerciante/crearLocal" class="btn btn-success" data-toggle="tooltip" data-placement="bottom"
+        title="Crear local"><i class="fas fa-plus"></i></a>
+    <br> <br>
+    <div class="accordion shadow" id="listadoLocalesAcordion1">
+        <div class="card">
+            <div class="" id="listadoLocalesCabecera1">
+                <h2 class="mb-0">
+                    <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
+                        type="button" data-toggle="collapse" data-target="#listadoLocalesCollapse1" aria-expanded="true"
+                        aria-controls="listadoLocalesCollapse1">
+                        <h4> Locales <i class="fas fa-caret-down"></i></h4>
+                    </button>
+                </h2>
+            </div>
+
+            <div id="listadoLocalesCollapse1" class="collapse show" aria-labelledby="listadoLocalesCabecera1"
+                data-parent="#listadoLocalesAcordion1">
+                <div class="card-body">
+                    <div class="list-group">
+                        {{#each rowsLocalesImprimibles}}
+                        <a href="/comerciante/locales/local/{{pkIdLocalComercial}}"
+                            class="list-group-item list-group-item-action">{{nombreLocal}} <small
+                                class="text-muted">({{mayoMino}})</small></a>
+                        {{else}}
+                        No hay locales creados.<a href="/comerciante/crearLocal" class=""> Crea uno</a>
+                        {{/each}}
+
+
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
-        {{else}}
-        No hay locales <button type="button" class="btn btn-success">Crea uno</button>
-        {{/each}}
+    </div>
 
-        
+    {{#each primerLocal}}
+    <div class="card mt-3 shadow">
+        <div class="container pt-3 pb-3">
+            <div class="row">
+                <b class="col-12">Nombre del local</b>
+                <div class="col-12">{{nombreLocal}} <small class="text-muted">({{mayoMino}})</small></div>
+            </div>
+            <div class="row">
+                <b class="col-12">Descripción al público</b>
+                <textarea class="form-control " disabled>{{descripcionLocal}}</textarea>
+            </div>
+             <div class="row">
+            <b class="col-12">Calificación promedio</b>
+            <div class="col-12">
+                {{calificacionPromedio}}
+            </div>
+        </div>
+        <div class="row">
+            <b class="col-12">Cantidad de personas que han calificado el local</b>
+            <div class="col-12">
+                {{calificacionContadorCliente}}
+            </div>
+        </div>
+        <div class="row">
+            <b class="col-12">ID local en Cenabastos</b>
+            <div class="col-12">{{idLocalEnCenabastos}}
+            </div>
+        </div>
+        <div class="row">
+            <b class="col-12">Total vendido</b>
+            <div class="col-12">${{totalVendido}}
+            </div>
+        </div>
+        <div class="row">
+            <b class="col-12">Parcial vendido desde el último cierre de caja</b>
+            <div class="col-12">${{parcialVendido}}
+            </div>
+        </div>
+        </div>
+       
     </div>
 </div>
+{{else}}
+
+{{/each}}
+
+</div>
+
 
 {{>navegacionComerciante}}

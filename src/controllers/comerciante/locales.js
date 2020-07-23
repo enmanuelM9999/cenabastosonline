@@ -6,7 +6,7 @@ const pool = require("../../database");
 router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
     try {
         //Obtener locales de la base de datos
-        var rowsLocales = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista FROM localcomercial WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        var rowsLocales = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
         //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
         const rowsLocalesImprimibles = rowsLocales.map(function (local) {
             const mayomino = local.esMayorista;
@@ -17,7 +17,11 @@ router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
             }
             return local;
         });
-        res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles });
+        //Enviar el primer local
+        const tempLocal=rowsLocalesImprimibles[0];
+        const primerLocal= [tempLocal];
+        console.log(primerLocal);
+        res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles,primerLocal});
     } catch (error) {
         console.log(error);
     }
@@ -26,7 +30,7 @@ router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
 router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
         const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
-        req.render("comerciante/locales/crearLocal", { rowsProductos });
+        res.render("comerciante/locales/crearLocal", { rowsProductos });
     } catch (error) {
         console.log(error);
     }
@@ -69,9 +73,10 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             i++;
         }
 
-        res.redirect('/comerciante/index');
+        res.redirect('/comerciante/listadoLocales');
     } catch (error) {
         console.log(error);
+        res.redirect('/comerciante/listadoLocales');
     }
 });
 
