@@ -18,14 +18,47 @@ router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        const tempLocal=rowsLocalesImprimibles[0];
-        const primerLocal= [tempLocal];
+        const tempLocal = rowsLocalesImprimibles[0];
+        const primerLocal = [tempLocal];
         console.log(primerLocal);
-        res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles,primerLocal});
+        res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles, primerLocal });
     } catch (error) {
         console.log(error);
     }
 });
+
+router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
+    try {
+        const { id } = req.params;
+        //Obtener locales de la base de datos
+        var rowsLocales = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
+        const rowsLocalesImprimibles = rowsLocales.map(function (local) {
+            const mayomino = local.esMayorista;
+            if (mayomino == 0) {
+                local.mayoMino = "Minorista";
+            } else if (mayomino == 1) {
+                local.mayoMino = "Mayorista";
+            }
+            return local;
+        });
+        //Enviar el primer local
+        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=?", [id]);
+        var tempLocal = primerLocal[0];
+        const mayomino = primerLocal.esMayorista;
+        if (mayomino == 0) {
+            primerLocal.mayoMino = "Minorista";
+        } else if (mayomino == 1) {
+            primerLocal.mayoMino = "Mayorista";
+        }
+        primeroLocal=[tempLocal];
+        res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles, primerLocal });
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
 
 router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
@@ -80,6 +113,21 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     }
 });
 
+router.get('/locales/pedidos', esComercianteAprobado, async (req, res) => {
+    try {
+     res.render("comerciante/locales/pedidos");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+router.get('/locales/buzon', esComercianteAprobado, async (req, res) => {
+    try {
+     res.render("comerciante/locales/buzon");
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 module.exports = router;
 

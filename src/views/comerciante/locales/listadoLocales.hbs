@@ -19,14 +19,12 @@
                 <div class="card-body">
                     <div class="list-group">
                         {{#each rowsLocalesImprimibles}}
-                        <a href="/comerciante/locales/local/{{pkIdLocalComercial}}"
+                        <a href="/comerciante/listadoLocales/{{pkIdLocalComercial}}"
                             class="list-group-item list-group-item-action">{{nombreLocal}} <small
                                 class="text-muted">({{mayoMino}})</small></a>
                         {{else}}
                         No hay locales creados.<a href="/comerciante/crearLocal" class=""> Crea uno</a>
                         {{/each}}
-
-
                     </div>
                 </div>
             </div>
@@ -34,50 +32,26 @@
     </div>
 
     {{#each primerLocal}}
-    <div class="card mt-3 shadow">
-        <div class="container pt-3 pb-3">
-            <div class="row">
-                <b class="col-12">Nombre del local</b>
-                <div class="col-12">{{nombreLocal}} <small class="text-muted">({{mayoMino}})</small></div>
-            </div>
-            <div class="row">
-                <b class="col-12">Descripción al público</b>
-                <textarea class="form-control " disabled>{{descripcionLocal}}</textarea>
-            </div>
-             <div class="row">
-            <b class="col-12">Calificación promedio</b>
-            <div class="col-12">
-                {{calificacionPromedio}}
-            </div>
+    <div class="card mt-3">
+        <img src="/img/Tiendas-de-barrio.jpg" class="card-img-top" alt="Img de local">
+        <div class="card-body">
+            <h5 class="card-title">Nombre del local: {{nombreLocal}}</h5>
+            <p class="card-text">Descripción al público:{{descripcionLocal}}</p>
         </div>
-        <div class="row">
-            <b class="col-12">Cantidad de personas que han calificado el local</b>
-            <div class="col-12">
-                {{calificacionContadorCliente}}
-            </div>
+        <div class="card-footer">
+            <small class="text-muted">
+                Calificación promedio:{{calificacionPromedio}} <br>
+                Cantidad de personas que han calificado el local: {{calificacionContadorCliente}} <br>
+                ID local en Cenabastos: {{idLocalEnCenabastos}} <br>
+                Total vendido: ${{totalVendido}} <br>
+                Parcial vendido desde el último cierre de caja: ${{parcialVendido}}
+            </small>
         </div>
-        <div class="row">
-            <b class="col-12">ID local en Cenabastos</b>
-            <div class="col-12">{{idLocalEnCenabastos}}
-            </div>
-        </div>
-        <div class="row">
-            <b class="col-12">Total vendido</b>
-            <div class="col-12">${{totalVendido}}
-            </div>
-        </div>
-        <div class="row">
-            <b class="col-12">Parcial vendido desde el último cierre de caja</b>
-            <div class="col-12">${{parcialVendido}}
-            </div>
-        </div>
-        </div>
-       
     </div>
-</div>
-{{else}}
+    {{else}}
 
-{{/each}}
+
+    {{/each}}
 
 </div>
 
