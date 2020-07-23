@@ -59,8 +59,8 @@ app.use((req, res, next) => {
 app.use(require('./controllers/index'));
 //comerciante
 app.use('/comerciante', require('./controllers/comerciante/index'));
-app.use('/comerciante', require('./controllers/comerciante/locales'));
-app.use('/comerciante', require('./controllers/comerciante/sesion'));
+app.use('/comerciante/locales', require('./controllers/comerciante/locales'));
+app.use('/comerciante/sesion', require('./controllers/comerciante/sesion'));
 
 
 // Public

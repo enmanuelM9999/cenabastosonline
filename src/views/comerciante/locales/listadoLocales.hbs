@@ -1,5 +1,5 @@
 <div class="container pt-3">
-    <a href="/comerciante/crearLocal" class="btn btn-success" data-toggle="tooltip" data-placement="bottom"
+    <a href="/comerciante/locales/crearLocal" class="btn btn-success" data-toggle="tooltip" data-placement="bottom"
         title="Crear local"><i class="fas fa-plus"></i></a>
     <br> <br>
     <div class="accordion shadow" id="listadoLocalesAcordion1">
@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <div class="list-group">
                         {{#each rowsLocalesImprimibles}}
-                        <a href="/comerciante/listadoLocales/{{pkIdLocalComercial}}"
+                        <a href="/comerciante/locales/listadoLocales/{{pkIdLocalComercial}}"
                             class="list-group-item list-group-item-action">{{nombreLocal}} <small
                                 class="text-muted">({{mayoMino}})</small></a>
                         {{else}}
@@ -32,7 +32,7 @@
     </div>
 
     {{#each primerLocal}}
-    <div class="card mt-3">
+    <div class="card shadow mt-3">
         <img src="/img/Tiendas-de-barrio.jpg" class="card-img-top" alt="Img de local">
         <div class="card-body">
             <h5 class="card-title">Nombre del local: {{nombreLocal}}</h5>

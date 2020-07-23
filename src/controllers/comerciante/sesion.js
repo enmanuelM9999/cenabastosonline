@@ -15,7 +15,7 @@ router.get('/logup', async (req, res) => {
 router.post("/logup",
   passport.authenticate("comerciante.logup", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/logup",
+    failureRedirect: "/comerciante/sesion/logup",
     failureFlash: true
   })
 );
@@ -31,11 +31,11 @@ router.post("/logup", (req, res, next) => {
   const errors = req.validationErrors();
   if (errors.length > 0) {
     req.flash("message", errors[0].msg);
-    res.redirect("/comerciante/logup");
+    res.redirect("/comerciante/sesion/logup");
   }
   passport.authenticate("comerciante.logup", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/logup",
+    failureRedirect: "/comerciante/sesion/logup",
     failureFlash: true
   })(req, res, next);
 });
@@ -53,11 +53,11 @@ router.post("/login", (req, res, next) => {
   const errors = req.validationErrors();
   if (errors.length > 0) {
     req.flash("message", errors[0].msg);
-    res.redirect("/comerciante/login");
+    res.redirect("/comerciante/sesion/login");
   }
   passport.authenticate("comerciante.login", {
     successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/login",
+    failureRedirect: "/comerciante/sesion/login",
     failureFlash: true
   })(req, res, next);
 });
@@ -71,7 +71,7 @@ router.get("/logout", (req, res) => {
 
 router.get("/updatelogout", (req, res) => {
   req.logOut();
-  res.redirect("/comerciante/login");
+  res.redirect("/comerciante/sesion/login");
 });
 
 module.exports = router;

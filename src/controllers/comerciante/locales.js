@@ -113,7 +113,7 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     }
 });
 
-router.get('/locales/pedidos', esComercianteAprobado, async (req, res) => {
+router.get('/pedidos', esComercianteAprobado, async (req, res) => {
     try {
      res.render("comerciante/locales/pedidos");
     } catch (error) {
@@ -121,9 +121,25 @@ router.get('/locales/pedidos', esComercianteAprobado, async (req, res) => {
     }
 });
 
-router.get('/locales/buzon', esComercianteAprobado, async (req, res) => {
+router.get('/buzon', esComercianteAprobado, async (req, res) => {
     try {
      res.render("comerciante/locales/buzon");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+router.get('/ajustes', esComercianteAprobado, async (req, res) => {
+    try {
+     res.render("comerciante/locales/ajustes");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
+    try {
+     res.render("comerciante/locales/actualizarProductos");
     } catch (error) {
         console.log(error);
     }
