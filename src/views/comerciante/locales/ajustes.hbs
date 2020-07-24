@@ -1,6 +1,6 @@
 <div class="container mt-3">
     <h4>Chorizos</h4>
-    <nav class="border-0">
+    <nav class="mt-4 border-0">
         <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
             <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/comerciante/locales/pedidos"
                 role="tab" aria-controls="nav-home" aria-selected="false"><i class="far fa-clipboard"></i> Pedidos</a>
@@ -16,19 +16,104 @@
 
         <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
 
-            <div class="card shadow border-top-0">
-                <div class="list-group">
-                    <a href="/comerciante/locales/actualizarProductos" class="list-group-item list-group-item-action d-flex justify-content-between">
-                        <div class="">Actualizar productos</div>
-                        <div class=""><i class="fas fa-chevron-right"></i></div>
-                    </a>
-                    <a href="/comerciante/locales/actualizarDatos" class="list-group-item list-group-item-action d-flex justify-content-between">
-                        <div class="">Actualizar datos del local</div>
-                        <div class=""><i class="fas fa-chevron-right"></i></div>
-                    </a>
+
+            <div class="accordion shadow" id="accordionLocalesAjustes">
+                <div class="card">
+                    <div class="" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
+                                type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+                                aria-controls="collapseOne">
+                                <div class="d-flex justify-content-between">
+                                    <b class="" style="font-size: 15px;">Actualizar productos</b>
+                                    <div class=""><i class="fas fa-angle-down"></i></div>
+                                </div>
+                            </button>
+                        </h2>
+                    </div>
+
+                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+                        data-parent="#accordionLocalesAjustes">
+                        <div class="card-body">
+                            nad anadita nada
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
+                                type="
+                                    button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
+                                aria-controls="collapseTwo">
+                                <div class="d-flex justify-content-between">
+                                    <b class="" style="font-size: 15px;">Actualizar datos del local</b>
+                                    <div class=""><i class="fas fa-angle-down"></i></div>
+                                </div>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                        data-parent="#accordionLocalesAjustes">
+                        <div class="card-body">
+                            <div class="border-top-0">
+                                <div class="container">
+                                    <form method="POST" action="/comerciante/locales/actualizarDatos" class=""
+                                        name="form" id="form">
+                                        {{#each rowsDatosLocal}}
+                                        <div class="form-group">
+                                            <label for="idlocal">ID Local en Cenabastos</label>
+                                            <input class="form-control" type="text" value="{{idLocalEnCenabastos}}"
+                                                name="idlocal" id="idlocal">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name">¿Cómo se llama el local?</label>
+                                            <input class="form-control" type="text" value="{{nombreLocal}}" name="name"
+                                                id="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="descripcion">Descripcion al público</label>
+                                            <textarea name="descripcion" id="descripcion" class="form-control"
+                                                form="form">{{descripcionLocal}}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="domicilio">Precio del domicilio (se puede modificar
+                                                después)</label>
+                                            <input class="form-control" type="number" step="50"
+                                                value="{{precioDomicilio}}" name="domicilio" id="domicilio">
+                                        </div>
+                                        {{/each}}
+                                        <button type="submit" class="btn btn-success mt-3"><i class="fas fa-check"></i>
+                                            Actualizar datos</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
 </div>
 

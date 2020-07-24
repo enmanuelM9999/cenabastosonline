@@ -3,6 +3,16 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
+router.get('/local/:id', esComercianteAprobado, async (req, res) => {
+    try {
+        const { id } = req.params;
+        req.session.idLocalActual = id;
+        res.redirect("/comerciante/locales/pedidos");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
     try {
         //Obtener locales de la base de datos
@@ -18,8 +28,7 @@ router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        const tempLocal = rowsLocalesImprimibles[0];
-        const primerLocal = [tempLocal];
+        const primerLocal = [rowsLocalesImprimibles[0]];
         console.log(primerLocal);
         res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles, primerLocal });
     } catch (error) {
@@ -51,7 +60,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
         } else if (mayomino == 1) {
             primerLocal.mayoMino = "Mayorista";
         }
-        primeroLocal=[tempLocal];
+        primeroLocal = [tempLocal];
         res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles, primerLocal });
     } catch (error) {
         console.log(error);
@@ -115,7 +124,7 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
 
 router.get('/pedidos', esComercianteAprobado, async (req, res) => {
     try {
-     res.render("comerciante/locales/pedidos");
+        res.render("comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
     }
@@ -123,7 +132,7 @@ router.get('/pedidos', esComercianteAprobado, async (req, res) => {
 
 router.get('/buzon', esComercianteAprobado, async (req, res) => {
     try {
-     res.render("comerciante/locales/buzon");
+        res.render("comerciante/locales/buzon");
     } catch (error) {
         console.log(error);
     }
@@ -131,7 +140,10 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
 
 router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     try {
-     res.render("comerciante/locales/ajustes");
+        const pkIdLocalComercial = req.session.idLocalActual;
+        const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        
+        res.render("comerciante/locales/ajustes",{rowsDatosLocal});
     } catch (error) {
         console.log(error);
     }
@@ -139,9 +151,30 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
 
 router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
     try {
-     res.render("comerciante/locales/actualizarProductos");
+        res.render("comerciante/locales/actualizarProductos");
     } catch (error) {
         console.log(error);
+    }
+});
+
+router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
+    try {
+        const pkIdLocalComercial = req.session.idLocalActual;
+        const { idlocal, name, descripcion, domicilio } = req.body;
+
+        //Recolectar y actualizar los datos en la BD
+        const newLocalComercial = {
+            nombreLocal: name,
+            precioDomicilio: domicilio,
+            descripcionLocal: descripcion,
+            idLocalEnCenabastos: idlocal
+        };
+        await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
+
+        res.redirect('/comerciante/locales/ajustes');
+    } catch (error) {
+        console.log(error);
+        res.redirect('/comerciante/locales/ajustes');
     }
 });
 
