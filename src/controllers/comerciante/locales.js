@@ -218,6 +218,19 @@ router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
     }
 });
 
+
+router.get('/local/borrarProducto/:id', esComercianteAprobado, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        res.redirect("/comerciante/locales/ajustes");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
+
 router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
