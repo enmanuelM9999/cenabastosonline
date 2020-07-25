@@ -52,7 +52,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=?", [id]);
+        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=? WHERE fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
         var tempLocal = primerLocal[0];
         const mayomino = primerLocal.esMayorista;
         if (mayomino == 0) {
@@ -122,6 +122,15 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     }
 });
 
+router.get('/local/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
+    try {
+        res.render("comerciante/locales/pedidos");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
 router.get('/pedidos', esComercianteAprobado, async (req, res) => {
     try {
         res.render("comerciante/locales/pedidos");
@@ -141,9 +150,17 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
 router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     try {
         const pkIdLocalComercial = req.session.idLocalActual;
-        const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        //ajuste de los productos
+        var rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        for (let index = 0; index < rowsProductosLocal.length; index++) {
+            const idProductoLocal = rowsProductosLocal[index].pkIdProductoLocal;
+            const rowsPresentaciones = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productoLocal.pkIdProductoLocal WHERE pkIdProductoLocal = ?", [idProductoLocal]);
+            rowsProductosLocal[index].presentaciones = rowsPresentaciones;
+        }
         
-        res.render("comerciante/locales/ajustes",{rowsDatosLocal});
+        //ajuste de actualizar datos del local
+        const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        res.render("comerciante/locales/ajustes", { rowsDatosLocal, rowsProductosLocal });
     } catch (error) {
         console.log(error);
     }
@@ -152,6 +169,16 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
 router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
     try {
         res.render("comerciante/locales/actualizarProductos");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async (req, res) => {
+    try{
+        const { id } = req.params;
+        await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
     }
@@ -177,6 +204,28 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
         res.redirect('/comerciante/locales/ajustes');
     }
 });
+
+/*
+async function validarProductoLocal(fkIdPropietario, pkIdPresentacionProducto) {
+    //DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?
+    let esValido = false;
+    const rowsValidar = await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [pkIdPresentacionProducto, fkIdPropietario]);
+    if (rowsValidar.length == 1) {
+        esValido = true;
+    }
+    return esValido;
+};
+
+async function validarPresentacionProductoLocal () {
+    let esValido = false;
+    const rowsValidar = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto FROM presentacionproducto INNER JOIN productolocal ON productolocal.pkIdProductoLocal = presentacionproducto.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE presentacionproducto.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [pkIdPresentacionProducto, fkIdPropietario]);
+    if (rowsValidar.length == 1) {
+        esValido = true;
+    }
+    return esValido;
+};
+*/
+
 
 module.exports = router;
 
