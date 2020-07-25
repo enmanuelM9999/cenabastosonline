@@ -6,8 +6,13 @@ const pool = require("../../database");
 router.get('/local/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
-        req.session.idLocalActual = id;
-        res.redirect("/comerciante/locales/pedidos");
+        const rowsLocalComercial = await pool.query("SELECT pkIdLocalComercial FROM localcomercial WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
+        if (rowsLocalComercial.length == 1) {
+            req.session.idLocalActual = id;
+            res.redirect("/comerciante/locales/pedidos");
+        } else {
+            res.redirect("/comerciante/locales/listadoLocales");
+        }
     } catch (error) {
         console.log(error);
     }
@@ -52,7 +57,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=? WHERE fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
+        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
         var tempLocal = primerLocal[0];
         const mayomino = primerLocal.esMayorista;
         if (mayomino == 0) {
@@ -67,8 +72,6 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
     }
 });
 
-
-
 router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
         const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
@@ -80,7 +83,6 @@ router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
 
 router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
-
         const { name, descripcion, tipoLocal, productos, idlocal, domicilio } = req.body;
         //console.log(req.body);
 
@@ -109,8 +111,7 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
 
         //Algoritmo para Insertar en la BD los productoLocal de un localComercial
         let i = 0;
-        const tamanio = productos.length;
-        while (i < tamanio) {
+        while (i < productos.length) {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [idLocalComercial, productos[i]]);
             i++;
         }
@@ -124,12 +125,54 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
 
 router.get('/local/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
-        res.render("comerciante/locales/pedidos");
+        const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
+        const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]);
+        //checked
+        const productosImprimibles = rowsProductos.map(function (producto) {
+            const esProductoLocal = false;
+            producto.checked = "";
+            for (let index = 0; index < rowsProductosLocal.length; index++) {
+                if (rowsProductosLocal[index].fkIdProducto == producto.pkIdProducto) {
+                    esProductoLocal = true;
+                    break;
+                }
+            }
+            if (esProductoLocal) {
+                producto.checked = "checked";
+            }
+            return producto;
+        });
+        res.render("comerciante/locales/agregarProductoLocal", { productosImprimibles });
     } catch (error) {
         console.log(error);
     }
 });
 
+router.post('/local/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
+    try {
+        const { productosAAgregar } = req.body;
+        const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]); let i = 0;
+        //filtrar
+        const productosAgregables = productosAAgregar.filter(function (productoAAgregar) {
+            const esAgregable = true;
+            for (let index = 0; index < rowsProductosLocal.length; index++) {
+                if (rowsProductosLocal[index].fkIdProducto == productoAAgregar) {
+                    esAgregable = false;
+                    break;
+                }
+            }
+            return esAgregable;
+        });
+
+        var index = 0;
+        while (index < productosAgregables.length) {
+            await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [req.session.idLocalActual, productosAgregables[index]]);
+        }
+        res.redirect("comerciante/locales/listadoLocales");
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 router.get('/pedidos', esComercianteAprobado, async (req, res) => {
     try {
@@ -157,7 +200,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
             const rowsPresentaciones = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productoLocal.pkIdProductoLocal WHERE pkIdProductoLocal = ?", [idProductoLocal]);
             rowsProductosLocal[index].presentaciones = rowsPresentaciones;
         }
-        
+
         //ajuste de actualizar datos del local
         const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
         res.render("comerciante/locales/ajustes", { rowsDatosLocal, rowsProductosLocal });
@@ -166,6 +209,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     }
 });
 
+//pendiente
 router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
     try {
         res.render("comerciante/locales/actualizarProductos");
@@ -175,7 +219,7 @@ router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
 });
 
 router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async (req, res) => {
-    try{
+    try {
         const { id } = req.params;
         await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
         res.redirect("/comerciante/locales/ajustes");
