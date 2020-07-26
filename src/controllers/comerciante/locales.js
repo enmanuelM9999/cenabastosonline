@@ -34,7 +34,6 @@ router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
         });
         //Enviar el primer local
         const primerLocal = [rowsLocalesImprimibles[0]];
-        console.log(primerLocal);
         res.render("comerciante/locales/listadoLocales", { rowsLocalesImprimibles, primerLocal });
     } catch (error) {
         console.log(error);
@@ -84,8 +83,9 @@ router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
 router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
         const { name, descripcion, tipoLocal, productos, idlocal, domicilio } = req.body;
-        //console.log(req.body);
-
+        if (!Array.isArray(productos)) {
+            productos = [productos];
+        }
         //Insertar en la BD una Nueva Persona Juridica
         const resultPersonaJuridica = await pool.query("INSERT INTO personaJuridica VALUES ()");
         const idPersonaJuridica = resultPersonaJuridica.insertId;
@@ -123,13 +123,14 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     }
 });
 
-router.get('/local/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
+router.get('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
+        console.log("paso 1")
         const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]);
         //checked
         const productosImprimibles = rowsProductos.map(function (producto) {
-            const esProductoLocal = false;
+            var esProductoLocal = false;
             producto.checked = "";
             for (let index = 0; index < rowsProductosLocal.length; index++) {
                 if (rowsProductosLocal[index].fkIdProducto == producto.pkIdProducto) {
@@ -142,19 +143,25 @@ router.get('/local/agregarProductoLocal', esComercianteAprobado, async (req, res
             }
             return producto;
         });
+        console.log("paso 2")
         res.render("comerciante/locales/agregarProductoLocal", { productosImprimibles });
     } catch (error) {
         console.log(error);
     }
 });
 
-router.post('/local/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
+router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
-        const { productosAAgregar } = req.body;
+        console.log("paso 3")
+        var { productosAAgregar } = req.body;
+        if (!Array.isArray(productosAAgregar)) {
+            productosAAgregar = [productosAAgregar];
+        }
+        console.log(productosAAgregar);
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]); let i = 0;
         //filtrar
         const productosAgregables = productosAAgregar.filter(function (productoAAgregar) {
-            const esAgregable = true;
+            var esAgregable = true;
             for (let index = 0; index < rowsProductosLocal.length; index++) {
                 if (rowsProductosLocal[index].fkIdProducto == productoAAgregar) {
                     esAgregable = false;
@@ -167,8 +174,9 @@ router.post('/local/agregarProductoLocal', esComercianteAprobado, async (req, re
         var index = 0;
         while (index < productosAgregables.length) {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [req.session.idLocalActual, productosAgregables[index]]);
+            index++;
         }
-        res.redirect("comerciante/locales/listadoLocales");
+        res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
     }
@@ -194,18 +202,57 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     try {
         const pkIdLocalComercial = req.session.idLocalActual;
         //ajuste de los productos
-        var rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        var rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ? ORDER BY producto.nombreProducto ASC", [pkIdLocalComercial]);
         for (let index = 0; index < rowsProductosLocal.length; index++) {
             const idProductoLocal = rowsProductosLocal[index].pkIdProductoLocal;
             const rowsPresentaciones = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productoLocal.pkIdProductoLocal WHERE pkIdProductoLocal = ?", [idProductoLocal]);
             rowsProductosLocal[index].presentaciones = rowsPresentaciones;
+            rowsProductosLocal[index].cantPresentaciones = rowsPresentaciones.length;
+            
         }
+        const cantProductos = rowsProductosLocal.length;
 
         //ajuste de actualizar datos del local
         const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
-        res.render("comerciante/locales/ajustes", { rowsDatosLocal, rowsProductosLocal });
+        res.render("comerciante/locales/ajustes", { rowsDatosLocal, rowsProductosLocal, cantProductos });
     } catch (error) {
         console.log(error);
+    }
+});
+
+router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) => {
+    try {
+        const { idProductoLocal, detallesProductoLocal } = req.body;
+
+        //Recolectar y actualizar los datos en la BD
+        const newProductoLocal = {
+            detallesProductoLocal: detallesProductoLocal
+        };
+        await pool.query("UPDATE productolocal SET ? WHERE pkIdProductoLocal = ?", [newProductoLocal, idProductoLocal]);
+
+        res.redirect('/comerciante/locales/ajustes');
+    } catch (error) {
+        console.log(error);
+        res.redirect('/comerciante/locales/ajustes');
+    }
+});
+
+router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req, res) => {
+    try {
+        const { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
+
+        //Recolectar y actualizar los datos en la BD
+        const newPresentacionProducto = {
+            nombrePresentacion: nombrePresentacion,
+            precioUnitarioPresentacion: precioUnitario,
+            detallesPresentacionProducto: detallesPresentacion
+        };
+        await pool.query("UPDATE presentacionproducto SET ? WHERE pkIdPresentacionProducto = ?", [newPresentacionProducto, idPresentacionProducto]);
+
+        res.redirect('/comerciante/locales/ajustes');
+    } catch (error) {
+        console.log(error);
+        res.redirect('/comerciante/locales/ajustes');
     }
 });
 
@@ -222,14 +269,14 @@ router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
 router.get('/local/borrarProducto/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
-        await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.fkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        await pool.query("DELETE pl FROM productolocal pl INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = pl.fkIdLocalComercial WHERE pl.pkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario", [id, req.session.idComerciante]);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
+        res.redirect("/comerciante/locales/ajustes");
     }
 });
-
-
 
 router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async (req, res) => {
     try {
@@ -238,6 +285,7 @@ router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
+        res.redirect("/comerciante/locales/ajustes");
     }
 });
 
@@ -262,27 +310,14 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
     }
 });
 
-/*
-async function validarProductoLocal(fkIdPropietario, pkIdPresentacionProducto) {
-    //DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?
-    let esValido = false;
-    const rowsValidar = await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [pkIdPresentacionProducto, fkIdPropietario]);
-    if (rowsValidar.length == 1) {
-        esValido = true;
+router.get('/agregarPresentacionProductoLocal/:id', esComercianteAprobado, async (req, res) => {
+    try {
+        res.render("comerciante/locales/agregarPresentacionProductoLocal");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/comerciante/locales/ajustes");
     }
-    return esValido;
-};
-
-async function validarPresentacionProductoLocal () {
-    let esValido = false;
-    const rowsValidar = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto FROM presentacionproducto INNER JOIN productolocal ON productolocal.pkIdProductoLocal = presentacionproducto.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE presentacionproducto.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [pkIdPresentacionProducto, fkIdPropietario]);
-    if (rowsValidar.length == 1) {
-        esValido = true;
-    }
-    return esValido;
-};
-*/
-
+});
 
 module.exports = router;
 

@@ -1,9 +1,9 @@
-<div class="container">
+<div class="container mt-3">
     <div class="card shadow border-top-0 pb-3">
         <div class="container pt-3">
             <h5>Selecciona los productos que vendes</h5>
             <small class="text-muted">Las presentaciones de tus productos se añadirán después</small>
-            <form action="/comerciante/locales/local/agregarProductoLocal" method="POST" name="form">
+            <form action="/comerciante/locales/agregarProductoLocal" method="POST" name="form">
                 <div class="productos row mt-2">
                     {{#each productosImprimibles}}
                     <div class="form-control border-0 col-sm-12 col-lg-3">
@@ -12,9 +12,8 @@
                     </div>
                     {{/each}}
                 </div>
-                <button type="submit" class="btn btn-success">Agregar productos</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Agregar productos</button>
             </form>
-
         </div>
     </div>
 </div>

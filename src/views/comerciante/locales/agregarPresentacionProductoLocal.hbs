@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="card m-3 p-3 border-0 shadow">
+        <form action="/comerciante/locales/agregarPresentacionProducto" method="POST">
+            <input type="hidden" name="idPresentacionProducto" value="">
+            <h5>Nueva presentación</h5>
+            <div class="mr-2 form-group">
+                <label for="nombrePresentacion"><small><b>-Nombre
+                            presentación</b></small></label>
+                <input class="form-control input-presentacion-producto-local" type="text" value=""
+                    name="nombrePresentacion" id="nombrePresentacion" style="">
+            </div>
+            <div class="form-group">
+                <label for="precioUnitario"><small><b>- Precio Unitario
+                            $:</b></small></label>
+                <input class="form-control input-presentacion-producto-local" type="number" step="50"
+                    value="{{precioUnitarioPresentacion}}" name="precioUnitario" id="precioUnitario">
+            </div>
+            <div class="form-group">
+                <label for="detallesPresentacion"><small><b>-Detalles:</b></small></label>
+                <input class="form-control input-presentacion-producto-local" type="text"
+                    value="" name="detallesPresentacion" id="detallesPresentacion">
+            </div>
+            <div>
+
+                <button type="submit" class="btn btn-success" id="btn-input-presentacion-producto-local"
+                    style="font-size: auto;"><i class="fas fa-check"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{>navegacionComerciante}}
