@@ -61,8 +61,8 @@ app.use(require('./controllers/index'));
 app.use('/comerciante', require('./controllers/comerciante/index'));
 app.use('/comerciante/locales', require('./controllers/comerciante/locales'));
 app.use('/comerciante/sesion', require('./controllers/comerciante/sesion'));
-
-
+//cliente
+app.use('/cliente/explorar', require('./controllers/cliente/explorar'));
 // Public
 app.use(express.static(path.join(__dirname, 'public')));
 

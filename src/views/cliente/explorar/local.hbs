@@ -1,0 +1,520 @@
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        position: relative;
+        transition: 0.2s;
+    }
+
+    /*Variables*/
+
+    :root {
+        /*Longitudes*/
+        --header-height: 70px;
+        --nav-bar-height: 50px;
+        --icon-size: 30px;
+        --nav-icon-size: 25px;
+        --banner-height: 150px;
+        --stories-space-height: 85px;
+        --storie-height: 60px;
+        --product-height: 100px;
+        --product-width: 150px;
+        /*Colores*/
+        --mega-green: rgb(102, 211, 116);
+        --mega-orange: rgb(255, 153, 0);
+        --white: rgb(255, 255, 255);
+    }
+
+    /* ----------- Mobile First------------------*/
+
+    body {
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header {
+        width: 100%;
+        height: var(--header-height);
+        background-color: var(--white);
+        position: fixed;
+        top: 0;
+        box-shadow: 2px 26px 28px -6px rgba(0, 0, 0, 0.05);
+        display: flex;
+        z-index: 10000;
+        padding-left: 35px;
+        align-items: center;
+        border-bottom: 5px solid var(--mega-orange);
+        overflow: hidden;
+    }
+
+    .header .title {
+
+        align-self: flex-start;
+        min-width: 20px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+    }
+
+    .header .search-icon {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        background-image: url("../icons/search.svg");
+        background-repeat: no-repeat, repeat;
+        background-size: cover;
+        margin-left: auto;
+        margin-right: 20px;
+    }
+
+    .no-header {
+        width: 100%;
+        min-height: 90vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .banner {
+        width: 100%;
+        margin-top: var(--header-height);
+        overflow: hidden;
+        box-shadow: inset -18px -157px 103px -169px rgba(0, 0, 0, 0.51);
+        flex: 0 0 var(--banner-height);
+    }
+
+    .banner .state {
+        position: absolute;
+        bottom: 0;
+        left: 5px;
+        color: white;
+
+        font-size: 20px;
+        z-index: 5000;
+    }
+
+    .banner img {
+        max-width: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2500;
+    }
+
+    .seller-space {
+        width: 100%;
+        min-height: 200px;
+        margin-bottom: var(--nav-bar-height);
+        padding-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .stories-space {
+        min-width: 100%;
+        height: var(--stories-space-height);
+        display: flex;
+        padding: 5px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-left: 30px;
+    }
+
+    .stories-space .storie {
+        width: var(--storie-height);
+        height: var(--storie-height);
+        border-radius: 100%;
+        border: 3px solid var(--mega-green);
+        overflow: hidden;
+        cursor: pointer;
+        margin-right: 10px;
+        flex: 0 0 var(--storie-height)
+    }
+
+    .storie img {
+        width: 200%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .stories-space::-webkit-scrollbar {
+        height: 10px;
+    }
+
+
+    /*.stories-space::-webkit-scrollbar-track {}*/
+
+    .stories-space::-webkit-scrollbar-thumb {
+        background: rgb(245, 245, 245);
+        height: 3px;
+        border-radius: 5px;
+    }
+
+    .seller-space .title {
+
+        color: var(--mega-green);
+        width: 100%;
+        font-size: 20px;
+        padding-left: 10px;
+    }
+
+    .seller-space .store-data {
+        width: 100%;
+        min-height: 60px;
+        padding-top: 5px;
+        font-size: 12px;
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
+        padding-left: 30px;
+        padding-right: 5px;
+    }
+
+    .delivery {
+        width: 100%;
+        height: 15px;
+        display: flex;
+        color: var(--mega-green);
+    }
+
+    .delivery .delivery-icon {
+        background-image: url("../icons/truck.png");
+        background-repeat: no-repeat, repeat;
+        background-size: cover;
+        height: 15px;
+        width: 15px;
+        margin-left: 5px;
+    }
+
+    .seller-info {
+        width: 100%;
+        display: flex;
+        max-height: 60px;
+        overflow-y: auto;
+        background-color: white;
+        margin-bottom: 30px;
+
+    }
+
+    .seller-info::-webkit-scrollbar {
+        width: 3px;
+        background: var(--mega-orange);
+    }
+
+    .score {
+        width: 100%;
+        height: 15px;
+        display: flex;
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 5px;
+    }
+
+    .score .score-icon {
+        width: 15px;
+        height: 15px;
+        background-image: url("../icons/star.png");
+        background-repeat: no-repeat, repeat;
+        background-size: cover;
+    }
+
+    .score .score-value {
+
+        color: var(--mega-orange);
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .seller-space .store-products {
+        width: 100%;
+        min-height: 100px;
+    }
+
+    .store-products .products {
+        width: 100%;
+        min-height: var(--product-height);
+        display: flex;
+        flex-wrap: wrap;
+        padding-top: 15px;
+        padding-left: 10px;
+        margin-bottom: var(--header-height);
+    }
+
+    .store-products .products .product {
+        flex: 0 0 var(--product-width);
+        height: var(--product-height);
+        box-shadow: 11px 26px 33px 3px rgba(0, 0, 0, 0.15);
+        border-radius: 15px;
+        overflow: hidden;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .store-products .products .product:hover {
+        transform: scale(1.1);
+    }
+
+    .store-products .products .product.tomate {
+        background: rgb(255, 152, 152);
+        background: linear-gradient(to left, rgb(255, 119, 119), #ff9966);
+    }
+
+    .store-products .products .product.zanahoria {
+        background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    }
+
+    .store-products .products .product.papa {
+        background-color: #e8c99b;
+        background-image: linear-gradient(315deg, #e8c99b 0%, #e8bc85 74%);
+    }
+
+    .store-products .products .product.banano {
+        background-image: linear-gradient(to right top, #f4f464, #baf252);
+    }
+
+    .store-products .products .product.aguacate {
+        background-image: linear-gradient(120deg, #d9fc79 0%, #4da759 100%);
+    }
+
+    .store-products .products .product.uva {
+        background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+    }
+
+    .store-products .products .product.cebolla {
+        background-image: linear-gradient(to right top, #98f88f, #dff8b1);
+    }
+
+    .store-products .products .product.sandia {
+        background-image: linear-gradient(to right top, #f88f8f, #93ffb4);
+    }
+
+    .store-products .products .product.mandarina {
+        background-image: linear-gradient(to right top, #fda23f, #ffd993);
+    }
+
+    .products .product .product-img {
+        position: absolute;
+        top: 0;
+    }
+
+    .products .product .product-img img {
+        width: var(--product-height);
+        height: var(--product-height);
+        transform: scale(1.2) translateX(50%);
+    }
+
+    .products .product .product-info {
+        height: 50%;
+        width: 50%;
+        color: white;
+        font-size: 15px;
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+
+        display: flex;
+        align-items: flex-end;
+    }
+
+    /*Swiper JS*/
+    .swiper-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    .swiper-slide {
+        overflow: hidden;
+    }
+
+    .stories-swiper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgb(56, 56, 56);
+        z-index: 15000;
+    }
+
+
+    .div-stories-swiper-btn-close-esconder {
+        position: fixed;
+        top: 100vh;
+    }
+
+    .div-stories-swiper-btn-close-mostrar {
+        position: fixed;
+        top: 0;
+        left: 20px;
+        font-size: 35px;
+        z-index: 30000;
+        cursor: pointer;
+        color: black;
+    }
+
+    .esconder {
+        top: 100vh;
+
+    }
+
+    .mostrar {
+        top: 0;
+    }
+</style>
+
+
+<header class="header">
+    <div class="title">
+        <h1>Don David</h1>
+    </div>
+
+    <div class="search-icon"></div>
+
+</header>
+
+<div class="no-header">
+    <div class="banner">
+        <div class="state">Abierto</div>
+        <img src="https://res.cloudinary.com/megaplaza/image/upload/v1595817698/screenshot20190314at24807pm-af3ef74748f44fb77ca0fea86873723e-600x400_fttqm8.jpg"
+            class="img-banner">
+
+    </div>
+    <div class="seller-space">
+        <div class="title">
+            <h4>Informacion</h4>
+        </div>
+
+        <div class="stories-space" id="stories-space">
+            <div class="storie">
+                <img
+                    src="https://res.cloudinary.com/megaplaza/image/upload/v1595817698/screenshot20190314at24807pm-af3ef74748f44fb77ca0fea86873723e-600x400_fttqm8.jpg">
+            </div>
+            <div class="storie">
+                <img src="https://static-cse.canva.com/image/41237/banner.9432179e.jpg">
+            </div>
+            <div class="storie">
+                <img src="https://i.pinimg.com/564x/93/90/7c/93907c034fd00259d6afac112e9ddda6.jpg">
+            </div>
+
+
+
+        </div>
+        <div class="stories-swiper esconder" id="stories-swiper">
+            <div class="div-stories-swiper-btn-close div-stories-swiper-btn-close-esconder"
+                id="div-stories-swiper-btn-close"><i class="fas fa-times stories-swiper-btn-close"></i></div>
+
+            <!-- Swiper -->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="swiper-zoom-container">
+                            <img
+                                src="https://res.cloudinary.com/megaplaza/image/upload/v1595817698/screenshot20190314at24807pm-af3ef74748f44fb77ca0fea86873723e-600x400_fttqm8.jpg">
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="swiper-zoom-container">
+                            <img src="https://static-cse.canva.com/image/41237/banner.9432179e.jpg">
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="swiper-zoom-container">
+                            <img src="https://i.pinimg.com/564x/93/90/7c/93907c034fd00259d6afac112e9ddda6.jpg">
+                        </div>
+                    </div>
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination swiper-pagination-white"></div>
+            </div>
+        </div>
+
+
+        <div class="store-data">
+            <div class="delivery">$
+                <div class="delivery-value">4000</div>
+                <div class="delivery-icon"></div>
+            </div>
+            <div class="seller-info">
+                <p>Bienvenido al local </p>
+            </div>
+            <div class="score">
+                <div class="score-icon"></div>
+                <div class="score-value">4.3</div>
+            </div>
+        </div>
+
+        <div class="store-products">
+            <div class="title">
+                <h4>Alimentos</h4>
+            </div>
+            <div class="products">
+                <a class="product tomate" href="tomate.html">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806197/tomate_xi6jyn.png"
+                            alt="Tomate"></div>
+                    <div class="product-info">$1200 /kg</div>
+                </a>
+                <a class="product banano" href="banano.html">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806188/banano_wfutos.png"
+                            alt=""></div>
+                    <div class="product-info">$2200 /racimo</div>
+                </a>
+                <a class="product aguacate" href="aguacate.html">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806180/aguacate_ezz3ad.png"
+                            alt=""></div>
+                    <div class="product-info">$1200 c/u</div>
+                </a>
+                <div class="product papa">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806194/papa_jzlwzm.png"
+                            alt="Tomate"></div>
+                    <div class="product-info">$1200 /kg</div>
+                </div>
+                <div class="product zanahoria" hidden=true>
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806202/zanahoria_y3xnf5.png"
+                            alt=""></div>
+                    <div class="product-info">$2200 /racimo</div>
+                </div>
+                <div class="product cebolla">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806191/cebolla_z9949y.png"
+                            alt=""></div>
+                    <div class="product-info">$1200 c/u</div>
+                </div>
+                <a class="product uva" href="../html/product.html">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806201/uva_zol9mo.png"
+                            alt="Tomate"></div>
+                    <div class="product-info">$1200 /kg</div>
+                </a>
+                <div class="product sandia">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806196/sandia_ajk4zg.png"
+                            alt=""></div>
+                    <div class="product-info">$2200 /racimo</div>
+                </div>
+                <div class="product mandarina">
+                    <div class="product-img"><img
+                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806162/mandarina_le51uv.png"
+                            alt=""></div>
+                    <div class="product-info">$1200 c/u</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{{>navegacionComerciante}}

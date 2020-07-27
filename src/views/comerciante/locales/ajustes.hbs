@@ -1,5 +1,5 @@
 <div class="container mt-3">
-    <h4>Chorizos</h4>
+    <h4>{{nombreLocalActual}}</h4>
     <nav class="mt-4 border-0">
         <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
             <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/comerciante/locales/pedidos"
@@ -40,104 +40,113 @@
                                 class="btn btn-outline-success">
                                 <i class="fas fa-plus"></i> <i class="fas fa-apple-alt"></i>
                             </a>
+                            <div class="row justify-content-around">
+                                {{#each rowsProductosLocal}}
+                                <div class="card p-3 mt-4 shadow border-0 col-sm-12 col-lg-5 pr-2 pl-2">
+                                    <img src="{{rutaImagen}}" width="70px" height="70px" class="align-self-start mr-3"
+                                        alt="...">
+                                    <div class="media-body">
+                                        <div class="card-title">
+                                            <h5>{{nombreProducto}}</h5>
 
-                            {{#each rowsProductosLocal}}
-                            <div class="card p-3 mt-4 shadow border-0">
-                                <img src="{{rutaImagen}}" width="70px" height="70px" class="align-self-start mr-3"
-                                    alt="...">
-                                <div class="media-body">
-                                    <div class="card-title">
-                                        <h5>{{nombreProducto}}</h5>
+                                            <form action="/comerciante/locales/actualizarProductoLocal" method="POST"
+                                                id="form-producto-local">
+                                                <input type="hidden" name="idProductoLocal"
+                                                    value="{{pkIdProductoLocal}}">
+                                                <div class="card-text">
+                                                    <div class="form-group">
 
-                                        <form action="/comerciante/locales/actualizarProductoLocal" method="POST"
-                                            id="form-producto-local">
-                                            <input type="hidden" name="idProductoLocal" value="{{pkIdProductoLocal}}">
-                                            <div class="card-text">
-                                                <div class="form-group">
-
-                                                    <textarea name="detallesProductoLocal" id="detallesProductoLocal"
-                                                        class="form-control input-producto-local"
-                                                        form="form-producto-local"
-                                                        cols="1">{{detallesProductoLocal}}</textarea>
+                                                        <textarea name="detallesProductoLocal"
+                                                            id="detallesProductoLocal"
+                                                            class="form-control input-producto-local"
+                                                            form="form-producto-local"
+                                                            cols="1">{{detallesProductoLocal}}</textarea>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <a href="/comerciante/locales/local/borrarProducto/{{pkIdProductoLocal}}"
-                                                    class="btn btn-danger" data-toggle="tooltip" data-placement="bottom"
-                                                    title="Borrar producto"><i class="far fa-trash-alt"></i></a>
-                                                <button type="submit" class="btn btn-success"
-                                                    id="btn-input-producto-local" style="font-size: auto;"
-                                                    data-toggle="tooltip" data-placement="bottom"
-                                                    title="Guardar cambios"><i class="fas fa-save"></i></button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <h5>Presentaciones ({{cantPresentaciones}})</h5>
-                                        <div>
-                                            <a href="/comerciante/locales/infoPresentacion" class="btn btn-light"
-                                                data-toggle="tooltip" data-placement="bottom"
-                                                title="¿Qué son las presentaciones?"><i
-                                                    class="far fa-question-circle"></i>
-                                            </a>
-                                            <a href="/comerciante/locales/agregarPresentacionProductoLocal/{{pkIdProductoLocal}}"
-                                                class="btn btn-light" data-toggle="tooltip" data-placement="bottom"
-                                                title="Nueva presentación"><i class="fas fa-plus"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    {{#each presentaciones}}
-                                    <div class="card m-3 p-3 border-dark">
-                                        <form action="/comerciante/locales/actualizarPresentacionProducto"
-                                            method="POST">
-                                            <input type="hidden" name="idPresentacionProducto"
-                                                value="{{pkIdPresentacionProducto}}">
-                                            <div class="mr-2 form-group">
-                                                <label for="nombrePresentacion"><small><b>Nombre
-                                                            presentación</b></small></label>
-                                                <input class="form-control input-presentacion-producto-local"
-                                                    type="text" value="{{nombrePresentacion}}" name="nombrePresentacion"
-                                                    id="nombrePresentacion" style="">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="precioUnitario"><small><b>Precio Unitario
-                                                            $:</b></small></label>
-                                                <input class="form-control input-presentacion-producto-local"
-                                                    type="number" step="50" value="{{precioUnitarioPresentacion}}"
-                                                    name="precioUnitario" id="precioUnitario">
-                                            </div>
-                                            <div class="form-group">
-                                                <label
-                                                    for="detallesPresentacion"><small><b>Detalles:</b></small></label>
-                                                <input class="form-control input-presentacion-producto-local"
-                                                    type="text" value="{{detallesPresentacionProducto}}"
-                                                    name="detallesPresentacion" id="detallesPresentacion">
-                                            </div>
-                                            <div>
-                                                <a href="/comerciante/locales/local/borrarPresentacionProducto/{{pkIdPresentacionProducto}}"
-                                                    class="btn btn-danger" data-toggle="tooltip" data-placement="bottom"
-                                                    title="Borrar presentacion"><i class="far fa-trash-alt"></i></a>
-
-                                                <button type="submit" class="btn btn-success"
-                                                    id="btn-input-presentacion-producto-local"
-                                                    style="font-size: auto;"><i class="fas fa-save"
+                                                <div>
+                                                    <a href="/comerciante/locales/local/borrarProducto/{{pkIdProductoLocal}}"
+                                                        class="btn btn-danger" data-toggle="tooltip"
+                                                        data-placement="bottom" title="Borrar producto"><i
+                                                            class="far fa-trash-alt"></i></a>
+                                                    <button type="submit" class="btn btn-success"
+                                                        id="btn-input-producto-local" style="font-size: auto;"
                                                         data-toggle="tooltip" data-placement="bottom"
-                                                        title="Guardar cambios"></i></button>
+                                                        title="Guardar cambios"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <h5>Presentaciones ({{cantPresentaciones}})</h5>
+                                            <div>
+                                                <a href="/comerciante/locales/infoPresentacion" class="btn btn-light"
+                                                    data-toggle="tooltip" data-placement="bottom"
+                                                    title="¿Qué son las presentaciones?"><i
+                                                        class="far fa-question-circle"></i>
+                                                </a>
+                                                <a href="/comerciante/locales/agregarPresentacionProductoLocal/{{pkIdProductoLocal}}"
+                                                    class="btn btn-light" data-toggle="tooltip" data-placement="bottom"
+                                                    title="Nueva presentación"><i class="fas fa-plus"></i>
+                                                </a>
                                             </div>
-                                        </form>
-                                    </div>
-                                    {{else}}
-                                    Aún no hay presentaciones para este producto. <a
-                                        href="/comerciante/locales/agregarPresentacionProductoLocal/{{pkIdProductoLocal}}">Agregar
-                                        presentación.</a>
-                                    {{/each}}
-                                </div>
-                            </div>
-                            {{else}}
+                                        </div>
+                                        {{#each presentaciones}}
+                                        <div class="card m-3 p-3 border-dark">
+                                            <form action="/comerciante/locales/actualizarPresentacionProducto"
+                                                method="POST">
+                                                <input type="hidden" name="idPresentacionProducto"
+                                                    value="{{pkIdPresentacionProducto}}">
+                                                <div class="mr-2 form-group">
+                                                    <label for="nombrePresentacion"><small><b>Nombre
+                                                                presentación</b></small></label>
+                                                    <input class="form-control input-presentacion-producto-local"
+                                                        type="text" value="{{nombrePresentacion}}"
+                                                        name="nombrePresentacion" id="nombrePresentacion" style="">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="precioUnitario"><small><b>Precio Unitario
+                                                                $:</b></small></label>
+                                                    <input class="form-control input-presentacion-producto-local"
+                                                        type="number" step="50" value="{{precioUnitarioPresentacion}}"
+                                                        name="precioUnitario" id="precioUnitario">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label
+                                                        for="detallesPresentacion"><small><b>Detalles:</b></small></label>
+                                                    <input class="form-control input-presentacion-producto-local"
+                                                        type="text" value="{{detallesPresentacionProducto}}"
+                                                        name="detallesPresentacion" id="detallesPresentacion">
+                                                </div>
+                                                <div>
+                                                    <a href="/comerciante/locales/local/borrarPresentacionProducto/{{pkIdPresentacionProducto}}"
+                                                        class="btn btn-danger" data-toggle="tooltip"
+                                                        data-placement="bottom" title="Borrar presentacion"><i
+                                                            class="far fa-trash-alt"></i></a>
 
-                            <br> <br> Aún no hay productos para este local. <a
-                                href="/comerciante/locales/agregarProductoLocal">Agregar producto.</a>
-                            {{/each}}
+                                                    <button type="submit" class="btn btn-success"
+                                                        id="btn-input-presentacion-producto-local"
+                                                        style="font-size: auto;"><i class="fas fa-save"
+                                                            data-toggle="tooltip" data-placement="bottom"
+                                                            title="Guardar cambios"></i></button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        {{else}}
+                                        <div class="mt-2 col-12">
+                                            Aún no hay presentaciones para este producto. <a
+                                                href="/comerciante/locales/agregarPresentacionProductoLocal/{{pkIdProductoLocal}}">Agregar
+                                                presentación.</a>
+                                        </div>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                                {{else}}
+
+
+                                <div>Aún no hay productos para este local. <a
+                                        href="/comerciante/locales/agregarProductoLocal">Agregar producto.</a>
+                                </div>
+                                {{/each}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -217,5 +226,18 @@
 
     </div>
 </div>
+<script>
+    $(".list-group").on("mouseleave blur scroll wheel", function () {
+        $("#listadoLocalesCollapse1").removeClass("show");
+    })
 
+    $(".input-producto-local").on("input", function () {
+        $("#btn-input-producto-local").removeClass("btn-success").addClass("btn-warning");
+    })
+
+    $(".input-presentacion-producto-local").on("input", function () {
+        $("#btn-input-presentacion-producto-local").removeClass("btn-success").addClass("btn-warning");
+    })
+
+</script>
 {{>navegacionComerciante}}
