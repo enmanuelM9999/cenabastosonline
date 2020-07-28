@@ -12,13 +12,6 @@ router.get('/logup', async (req, res) => {
   res.render('comerciante/sesion/logup', { rowsTipoDoc });
 });
 
-router.post("/logup",
-  passport.authenticate("comerciante.logup", {
-    successRedirect: "/comerciante/index",
-    failureRedirect: "/comerciante/sesion/logup",
-    failureFlash: true
-  })
-);
 
 router.post("/logup", (req, res, next) => {
   req.check("email", "Campo vacío").notEmpty();
@@ -34,7 +27,7 @@ router.post("/logup", (req, res, next) => {
     res.redirect("/comerciante/sesion/logup");
   }
   passport.authenticate("comerciante.logup", {
-    successRedirect: "/comerciante/index",
+    successRedirect: "/comerciante/localesListadoLocales",
     failureRedirect: "/comerciante/sesion/logup",
     failureFlash: true
   })(req, res, next);
@@ -56,7 +49,7 @@ router.post("/login", (req, res, next) => {
     res.redirect("/comerciante/sesion/login");
   }
   passport.authenticate("comerciante.login", {
-    successRedirect: "/comerciante/index",
+    successRedirect: "/comerciante/locales/listadoLocales",
     failureRedirect: "/comerciante/sesion/login",
     failureFlash: true
   })(req, res, next);

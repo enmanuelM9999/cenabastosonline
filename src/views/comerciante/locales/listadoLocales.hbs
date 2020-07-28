@@ -1,6 +1,7 @@
 <div class="container pt-3">
-    <a href="/comerciante/locales/crearLocal" style="font-size: 20px;" class="btn btn-outline-success" data-toggle="tooltip" data-placement="bottom"
-        title="Crear local"><i class="fas fa-plus"></i> <i class="fas fa-store"></i></a>
+    <a href="/comerciante/locales/crearLocal" style="font-size: 20px;" class="btn btn-outline-success"
+        data-toggle="tooltip" data-placement="bottom" title="Crear local"><i class="fas fa-plus"></i> <i
+            class="fas fa-store"></i></a>
     <br> <br>
     <div class="accordion shadow" id="listadoLocalesAcordion1">
         <div class="card">
@@ -20,8 +21,8 @@
                     <div class="list-group">
                         {{#each rowsLocalesImprimibles}}
                         <a href="/comerciante/locales/listadoLocales/{{pkIdLocalComercial}}"
-                            class="list-group-item list-group-item-action"><i class="fas fa-store"></i> {{nombreLocal}} <small
-                                class="text-muted">({{mayoMino}})</small></a>
+                            class="list-group-item list-group-item-action"><i class="fas fa-store"></i> {{nombreLocal}}
+                            <small class="text-muted">({{mayoMino}})</small></a>
                         {{else}}
                         No hay locales creados.<a href="/comerciante/crearLocal" class=""> Crea uno</a>
                         {{/each}}
@@ -31,29 +32,32 @@
         </div>
     </div>
 
-    {{#each primerLocal}}
-    <div class="card shadow mt-3">
-        
-        <img src="/img/Tiendas-de-barrio.jpg" class="card-img-top" alt="Img de local">
-        <div class="card-body">
-            <h5 class="card-title">Nombre del local: {{nombreLocal}}</h5>
-            <p class="card-text">Descripción al público: {{descripcionLocal}}</p>
-            <a href="/comerciante/locales/local/{{pkIdLocalComercial}}" class="btn btn-success">Ver local <i class="fas fa-angle-right"></i></a>
+    <div class="">
+        {{#each primerLocal}}
+        <div class="card shadow mt-3 mr-auto ml-auto" style="max-width: 650px;">
+
+            <img src="/img/Tiendas-de-barrio.jpg" class="card-img-top" alt="Img de local">
+            <div class="card-body">
+                <h5 class="card-title">Nombre del local: {{nombreLocal}}</h5>
+                <p class="card-text">Descripción al público: {{descripcionLocal}}</p>
+                <a href="/comerciante/locales/local/{{pkIdLocalComercial}}" class="btn btn-success">Ver local <i
+                        class="fas fa-angle-right"></i></a>
+            </div>
+            <div class="card-footer">
+                <small class="text-muted">
+                    Calificación promedio: {{calificacionPromedio}} <br>
+                    Cantidad de personas que han calificado el local: {{calificacionContadorCliente}} <br>
+                    ID local en Cenabastos: {{idLocalEnCenabastos}} <br>
+                    Total vendido: ${{totalVendido}} <br>
+                    Parcial vendido desde el último cierre de caja: ${{parcialVendido}}
+                </small>
+            </div>
         </div>
-        <div class="card-footer">
-            <small class="text-muted">
-                Calificación promedio:{{calificacionPromedio}} <br>
-                Cantidad de personas que han calificado el local: {{calificacionContadorCliente}} <br>
-                ID local en Cenabastos: {{idLocalEnCenabastos}} <br>
-                Total vendido: ${{totalVendido}} <br>
-                Parcial vendido desde el último cierre de caja: ${{parcialVendido}}
-            </small>
-        </div>
+        {{else}}
+
+
+        {{/each}}
     </div>
-    {{else}}
-
-
-    {{/each}}
 
 </div>
 

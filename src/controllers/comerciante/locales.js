@@ -3,6 +3,14 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
+function localCargado(req) {
+    var estaCargado = true;
+    if (req.session.idLocalActual == undefined) {
+        estaCargado = false;
+    }
+    return estaCargado;
+}
+
 router.get('/local/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
@@ -11,7 +19,7 @@ router.get('/local/:id', esComercianteAprobado, async (req, res) => {
             throw "El local no le pertenece a este propietario"
         }
         req.session.idLocalActual = rowsLocalComercial[0].pkIdLocalComercial;
-        req.session.nombreLocalActual=rowsLocalComercial[0].nombreLocal;
+        req.session.nombreLocalActual = rowsLocalComercial[0].nombreLocal;
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
@@ -124,8 +132,12 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     }
 });
 
+// De aquí en adelante es necesario que haya un local cargado en sesión
 router.get('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]);
         //checked
@@ -146,16 +158,21 @@ router.get('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
         res.render("comerciante/locales/agregarProductoLocal", { productosImprimibles });
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         var { productosAAgregar } = req.body;
         if (!Array.isArray(productosAAgregar)) {
             productosAAgregar = [productosAAgregar];
         }
-        if (productosAAgregar.length==0) {
+        if (productosAAgregar.length == 0) {
             throw "No se han seleccionado productos";
         }
         console.log(productosAAgregar);
@@ -180,13 +197,17 @@ router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => 
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        res.redirect("/comerciante/locales/pedidos");
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
         const rowsNuevosPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [0, 0, 0, idLocal]);
         const totalRowsNuevosPedidos = rowsNuevosPedidos.length;
 
@@ -199,30 +220,68 @@ router.get('/pedidos', esComercianteAprobado, async (req, res) => {
         const rowsPedidosEntregados = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [1, 1, 1, idLocal]);
         const totalRowsPedidosEntregados = rowsPedidosEntregados.length;
 
-        res.render("comerciante/locales/pedidos", {nombreLocalActual:req.session.nombreLocalActual, rowsNuevosPedidos, totalRowsNuevosPedidos,  rowsPedidosEmpacados, totalRowsPedidosEmpacados, rowsPedidosEnviados, totalRowsPedidosEnviados, rowsPedidosEntregados, totalRowsPedidosEntregados});
+        res.render("comerciante/locales/pedidos", { nombreLocalActual: req.session.nombreLocalActual, rowsNuevosPedidos, totalRowsNuevosPedidos, rowsPedidosEmpacados, totalRowsPedidosEmpacados, rowsPedidosEnviados, totalRowsPedidosEnviados, rowsPedidosEntregados, totalRowsPedidosEntregados });
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
+router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
+        
+        var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
+        const tamanioRowsItemVenta = rowsItemVenta.length;
+
+        for(let index = 0; index<tamanioRowsItemVenta; index++){
+            var totalItemVenta = 0;
+            totalItemVenta = rowsItemVenta[index].precioUnitarioItem * rowsItemVenta[index].cantidadItem;
+            rowsItemVenta[index].totalItemVenta = totalItemVenta;
+        }
+        
+        const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?",[idPedido, idLocal]);
+
+        res.render("comerciante/locales/informacionPedido", {nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos:rowDatos[0]});
+    } catch (error) {
+        console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
+    }
+});
+
+
 router.get('/pedidos/moverAEmpacado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEmpacado = {
             fueEmpacado: 1
         };
-        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?",[fueEmpacado, idPedido, idLocal]);
+        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEmpacado = {
             fueEmpacado: 0
         };
@@ -230,13 +289,18 @@ router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req,
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEnviado = {
             fueEnviado: 1
         };
@@ -244,13 +308,18 @@ router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (re
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEnviado = {
             fueEnviado: 0
         };
@@ -258,13 +327,18 @@ router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async 
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEntregado = {
             fueEntregado: 1
         };
@@ -272,13 +346,18 @@ router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (r
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
-        const idLocal=req.session.idLocalActual;
-        const { idPedido }=  req.params;
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const { idPedido } = req.params;
         const fueEntregado = {
             fueEntregado: 0
         };
@@ -286,19 +365,29 @@ router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (r
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/buzon', esComercianteAprobado, async (req, res) => {
     try {
-        res.render("comerciante/locales/buzon",{nombreLocalActual:req.session.nombreLocalActual});
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual });
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const pkIdLocalComercial = req.session.idLocalActual;
         //ajuste de los productos
         var rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ? ORDER BY producto.nombreProducto ASC", [pkIdLocalComercial]);
@@ -313,14 +402,19 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
 
         //ajuste de actualizar datos del local
         const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
-        res.render("comerciante/locales/ajustes", {nombreLocalActual:req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
+        res.render("comerciante/locales/ajustes", { nombreLocalActual: req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { idProductoLocal, detallesProductoLocal } = req.body;
 
         //Recolectar y actualizar los datos en la BD
@@ -332,12 +426,16 @@ router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) 
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
-        res.redirect('/comerciante/locales/ajustes');
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
 
         //Recolectar y actualizar los datos en la BD
@@ -351,45 +449,62 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
-        res.redirect('/comerciante/locales/ajustes');
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 //pendiente
 router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         res.render("comerciante/locales/actualizarProductos");
     } catch (error) {
         console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 
 router.get('/local/borrarProducto/:id', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { id } = req.params;
         await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.fkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
         await pool.query("DELETE pl FROM productolocal pl INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = pl.fkIdLocalComercial WHERE pl.pkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario", [id, req.session.idComerciante]);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        res.redirect("/comerciante/locales/ajustes");
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { id } = req.params;
         await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        res.redirect("/comerciante/locales/ajustes");
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const pkIdLocalComercial = req.session.idLocalActual;
         const { idlocal, name, descripcion, domicilio } = req.body;
 
@@ -401,26 +516,34 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
             idLocalEnCenabastos: idlocal
         };
         await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
-        req.session.nombreLocalActual=newLocalComercial.nombreLocal;
+        req.session.nombreLocalActual = newLocalComercial.nombreLocal;
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
-        res.redirect('/comerciante/locales/ajustes');
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.get('/agregarPresentacionProductoLocal/:id', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { id } = req.params;
         res.render("comerciante/locales/agregarPresentacionProductoLocal", { id });
     } catch (error) {
         console.log(error);
-        res.redirect("/comerciante/locales/ajustes");
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
 router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (req, res) => {
     try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
         const { idProductoLocal, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
         //Verificar si el id del producto-local es válido
         const rowsProductoLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.fkIdComerciantePropietario=? AND productolocal.pkIdProductoLocal=?", [req.session.idComerciante, idProductoLocal]);
@@ -438,7 +561,8 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        res.redirect("/comerciante/locales/ajustes");
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
     }
 });
 
