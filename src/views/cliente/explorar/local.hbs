@@ -344,17 +344,15 @@
         <div class="state">Abierto</div>
         <img src="https://res.cloudinary.com/megaplaza/image/upload/v1595817698/screenshot20190314at24807pm-af3ef74748f44fb77ca0fea86873723e-600x400_fttqm8.jpg"
             class="img-banner">
-
     </div>
     <div class="seller-space">
         <div class="title">
             <h4>Informacion</h4>
         </div>
 
-        <div class="stories-space" id="stories-space">
+        <div class="justify-content-start">
             <div id="stories" class="storiesWrapper stories"></div>
         </div>
-
 
         <div class="store-data">
             <div class="delivery">$
@@ -435,15 +433,13 @@
     </div>
 </div>
 
-
 <script src="/zuckjs/dist/zuck.min.js"></script>
 <script src="/zuckjs/demo/script.js"></script>
 <script>
     var currentSkin = getCurrentSkin();
     currentSkin['name'] = "VemDeZAP";
     //currentSkin['params']['list'] = "true";
-
-    console.log("----++++---", currentSkin);
+    currentSkin['params']['cubeEffect'] = false;
     var stories = new Zuck('stories', {
         backNative: true,
         previousTap: true,
@@ -488,31 +484,11 @@
                     ["ladygaga-1", "photo", 5, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", '', false, false, timestamp()],
                     ["ladygaga-2", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", 'http://ladygaga.com', false, false, timestamp()],
                 ]
-            ),
-            Zuck.buildTimelineItem(
-                "starboy",
-                "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/users/4.jpg",
-                "The Weeknd",
-                "",
-                timestamp(),
-                [
-                    ["starboy-1", "photo", 5, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/8.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/8.jpg", '', false, false, timestamp()]
-                ]
-            ),
-            Zuck.buildTimelineItem(
-                "riversquomo",
-                "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/users/5.jpg",
-                "Rivers Cuomo",
-                "",
-                timestamp(),
-                [
-                    ["riverscuomo", "photo", 10, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/9.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/9.jpg", '', false, false, timestamp()]
-                ]
             )
         ],
         language: { // if you need to translate :)
             unmute: 'Toca para oir',
-            keyboardTip: 'Espacio para cambiar',
+            keyboardTip: 'Espacio para siguiente',
             visitLink: 'Visita el link',
             time: {
                 ago: 'atrás',
