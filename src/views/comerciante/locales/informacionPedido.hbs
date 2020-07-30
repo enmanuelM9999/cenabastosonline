@@ -8,7 +8,7 @@
 
     <div class="row">
         <div class="col-12 p-2">
-            <div class="card col-12">
+            <div class="card ">
                 <div class="table-responsive-lg" style="border-top: 0;">
                     <!--Para encerrar la tabla responsive-->
                     <table class="table b-0">
@@ -60,10 +60,51 @@
 
             <div class="card p-3">
                 <h4>Estado del Pedido</h4>
-                <label for="">  </label>
-                <label for="">  </label>
-                <label for="">  </label>
-                <label for="">  </label>
+                    <div class="table-responsive-lg" style="border-top: 0;">
+                    <!--Para encerrar la tabla responsive-->
+                    <table class="table b-0">
+                        
+                        <tbody>
+
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                                <td><b>Opciones</b></td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-shopping-cart"></i> Fecha y Hora de Compra</th>
+                                <td>{{rowEstadoPedido.fechaHoraVenta}}</td>
+                                <td>{{{rowEstadoPedido.nuevoEmpacadoHtml}}}</td>    
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-box"></i> Fecha y Hora de Empacado</th>
+                                <td>{{rowEstadoPedido.fechaHoraEmpacado}}</td>
+                                <td>
+                                    {{{rowEstadoPedido.devolverNuevoHtml}}}
+                                    {{{rowEstadoPedido.nuevoEnviadoHtml}}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fa fa-truck"></i> Fecha y Hora de Envio</th>
+                                <td>{{rowEstadoPedido.fechaHoraEnvio}}</td>
+                                <td>
+                                    {{{rowEstadoPedido.devolverEmpacadoHtml}}}
+                                    {{{rowEstadoPedido.nuevoEntregadoHtml}}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-dollar-sign"></i> Fecha y Hora de Entrega</th>
+                                <td>{{rowEstadoPedido.fechaHoraEntrega}}</td>
+                                <td>{{{rowEstadoPedido.devolverEnviadoHtml}}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             

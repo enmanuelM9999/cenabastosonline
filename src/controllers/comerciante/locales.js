@@ -235,19 +235,58 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         }
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
-        
+
+        //Informacion de la venta
         var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         const tamanioRowsItemVenta = rowsItemVenta.length;
 
-        for(let index = 0; index<tamanioRowsItemVenta; index++){
+        for (let index = 0; index < tamanioRowsItemVenta; index++) {
             var totalItemVenta = 0;
             totalItemVenta = rowsItemVenta[index].precioUnitarioItem * rowsItemVenta[index].cantidadItem;
             rowsItemVenta[index].totalItemVenta = totalItemVenta;
         }
-        
-        const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?",[idPedido, idLocal]);
 
-        res.render("comerciante/locales/informacionPedido", {nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos:rowDatos[0]});
+        const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
+
+
+        
+        //Estado del pedido `
+        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
+        if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
+            const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/'+idPedido+'" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
+                '<i class="fas fa-chevron-circle-down" data-toggle="tooltip" title="Mover a Empacados"></i> </a>';
+            rowEstadoPedido[0].nuevoEmpacadoHtml = htmlBotonMover;
+        } else if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/"+idPedido+"' class='btn btn-primary p-0 pr-2 pl-2'" +
+                "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Nuevos'></i></a>";
+            rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;
+
+            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEnviados/"+idPedido+"' class='btn btn-warning p-0 pr-2 pl-2'" +
+                "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Enviado'></i></a>";
+            rowEstadoPedido[0].nuevoEnviadoHtml = htmlBotonMover;
+        } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/"+idPedido+"' class='btn btn-danger p-0 pr-2 pl-2'" +
+                "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Empacado'></i></a>";
+            rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;
+
+            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEntregado/"+idPedido+"' class='btn btn-success p-0 pr-2 pl-2'" +
+                "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Recibidos'></i></a>";
+            rowEstadoPedido[0].nuevoEntregadoHtml = htmlBotonMover;
+        } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 1 && rowEstadoPedido[0].fueEmpacado == 1) {
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/"+idPedido+"' class='btn btn-warning p-0 pr-2 pl-2'" +
+                "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Enviados'></i></a>";
+            rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;
+        }
+
+        console.log(rowEstadoPedido[0]);
+
+
+        //Buzon
+        //const rowsBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN mensajebuzon ON buzon.pkIdBuzon=mensajebuzon.fkIdBuzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
+
+
+        //Renderizar vista
+        res.render("comerciante/locales/informacionPedido", { nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0] });
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")

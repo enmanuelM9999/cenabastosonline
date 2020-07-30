@@ -1,5 +1,3 @@
-
-
 <div class="container mt-3">
     <h4>{{nombreLocalActual}}</h4>
     <nav class="mt-4 border-0">
@@ -19,12 +17,81 @@
         <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
 
             <div class="card border-0" style="background-color: rgb(250, 250, 250);">
-                
+
+
+                <div class="buzon card">
+                    <div class="mensajes pb-3" style="height: 500px; overflow: auto; scrollTop:500px,1000;">
+                        <div class="mensajes-interno" id="mensajes-interno">
+                            <div class="mensaje p-1">
+                                <div class="burbuja col-7 card bg-light ml-auto">
+                                    El tomate llegó picho señor Lorem, ipsum dolor sit amet consectetur adipisicing
+                                    elit. Amet fuga similique culpa corrupti nostrum nisi officiis sapiente expedita,
+                                    quae veritatis placeat doloremque odio aliquam, voluptas fugit molestiae? Enim ipsam
+                                    ea sit quae quos ut dolor eum ex voluptatum? Repellendus cum enim consequuntur
+                                    blanditiis architecto! Reprehenderit, facilis, dicta accusantium soluta ipsam, culpa
+                                    fugiat dolor voluptate deserunt nam explicabo possimus temporibus labore. Eveniet
+                                    laboriosam et accusamus ipsam eligendi architecto? Eos eius unde ducimus. Magni
+                                    culpa dolor, cumque veniam, placeat illo corporis illum pariatur optio, officia modi
+                                    sapiente aliquid vel quis vero impedit iusto nam. Dicta debitis inventore quisquam
+                                    ullam, eos, fugiat in tenetur perspiciatis magnam ea assumenda vero. Accusantium
+                                    quia doloribus unde ex praesentium quas. Eligendi, tenetur consequuntur autem et
+                                    veritatis dicta! Veritatis laboriosam exercitationem officiis minus officia.
+                                    Doloremque incidunt labore aut perspiciatis veritatis dolor culpa saepe temporibus
+                                    optio voluptatem eos corrupti, amet dignissimos ab qui rem, laboriosam maiores at.
+                                    Iure minus itaque explicabo, tempora voluptatem architecto quidem laboriosam
+                                    excepturi obcaecati ipsum, molestias atque, corrupti vero? Molestias architecto sit
+                                    nobis commodi? Commodi maxime numquam quia deserunt sequi delectus, at deleniti
+                                    optio error labore nostrum corporis eos magnam itaque explicabo culpa aliquam enim.
+                                    Incidunt dolor labore assumenda officiis vero voluptatum ipsam? Ea, in.
+                                    <br>
+                                    <small class="text-muted"> 23:02</small>
+                                </div>
+                            </div>
+                            <div class="mensaje p-1">
+                                <div class="burbuja col-7 card bg-light ml-auto">
+                                    El tomate llegó picho señor
+                                    <br>
+                                    <small class="text-muted"> 23:02</small>
+                                </div>
+                            </div>
+                            <div class="mensaje p-1">
+                                <div class="burbuja col-7 card bg-light ml-auto">
+                                    El tomate llegó picho señor
+                                    <br>
+                                    <small class="text-muted"> 23:02</small>
+                                </div>
+                            </div>
+                            <div class="mensaje p-1">
+                                <div class="burbuja col-7 card mr-auto">
+                                    El tomate llegó picho señor
+                                    <br>
+                                    <small class="text-muted"> 23:02</small>
+                                </div>
+                            </div>
+                            <div class="final-chat" id="final-chat">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-mensaje p-1" style="position:relative; bottom:0; width: 100%; height: 100px;">
+                        <div class="input-text">
+                            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur impedit tempore inventore
+                            ducimus fugiat dolorem quas necessitatibus voluptas quae illo.
+                        </div>
+                        <div class="btn-enviar-mensaje"></div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
 </div>
 
-
+<script>
+    $(document).ready(function () {
+        $("#mensajes-interno").scrollIntoView({ behavior: "smooth" })
+    })
+</script>
 
 {{>navegacionComerciante}}
