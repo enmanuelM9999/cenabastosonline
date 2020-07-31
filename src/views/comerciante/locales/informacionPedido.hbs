@@ -13,7 +13,7 @@
                     <!--Para encerrar la tabla responsive-->
                     <table class="table b-0">
                         <thead>
-                            <tr >
+                            <tr>
                                 <th scope="col">Producto</th>
                                 <th scope="col">Tipo Presentacion</th>
                                 <th scope="col">Precio Unitario</th>
@@ -60,10 +60,10 @@
 
             <div class="card p-3">
                 <h4>Estado del Pedido</h4>
-                    <div class="table-responsive-lg" style="border-top: 0;">
+                <div class="table-responsive-lg" style="border-top: 0;">
                     <!--Para encerrar la tabla responsive-->
                     <table class="table b-0">
-                        
+
                         <tbody>
 
                             <tr>
@@ -75,7 +75,7 @@
                             <tr>
                                 <th scope="row"><i class="fas fa-shopping-cart"></i> Fecha y Hora de Compra</th>
                                 <td>{{rowEstadoPedido.fechaHoraVenta}}</td>
-                                <td>{{{rowEstadoPedido.nuevoEmpacadoHtml}}}</td>    
+                                <td>{{{rowEstadoPedido.nuevoEmpacadoHtml}}}</td>
                             </tr>
 
                             <tr>
@@ -107,21 +107,22 @@
                 </div>
             </div>
 
-            
+
         </div>
         <div class="col-lg-6 col-sm-12 p-2">
 
 
             <div class="card p-3">
                 <h4>Información de Orden</h4>
-                <label for=""><i class="fas fa-user"></i> {{rowDatos.nombresPersonaNatural}} {{rowDatos.apellidosPersonaNatural}}</label>
+                <label for=""><i class="fas fa-user"></i> {{rowDatos.nombresPersonaNatural}}
+                    {{rowDatos.apellidosPersonaNatural}}</label>
                 <label for=""><i class="far fa-envelope"></i> {{rowDatos.correoUsuario}}</label>
                 <label for=""><i class="fas fa-mobile-alt"></i> {{rowDatos.telefonoCliente}}</label>
                 <label for=""><i class="far fa-calendar-check"></i> {{rowDatos.fechaHoraVenta}}</label>
             </div>
 
 
-           
+
         </div>
     </div>
 
@@ -129,21 +130,91 @@
     <div class="row mt-2">
         <div class="col-lg-6 col-sm-12 p-2">
             <div class="card p-3">
-                <h4>Información de Pago</h4>
-                <label for="">  </label>
-                <label for="">  </label>
-                <label for="">  </label>
+                <h4><i class="far fa-credit-card"></i> Información de Pago</h4>
+                <!--<img src="" class="img-fluid" alt="Responsive image">-->
+                <label for="">Pago realizado con:  </label>
+                <label for="">Referencia de Pago #69  </label>
+                <label for="">Fecha de pago  </label>
                 <label for="">  </label>
             </div>
         </div>
 
         <div class="col-lg-6 col-sm-12 p-2">
-             <div class="card p-3">
+            <div class="card p-3">
                 <h4>Dirección de Envio</h4>
                 <label for="">Dirección: {{rowDatos.direccionCliente}}</label>
                 <label for="">Departamento: Norte de Santander</label>
                 <label for="">Codigo Postal: 57</label>
                 <label for="">Pais: Colombia</label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12 p-2">
+            <div class="buzon card" style="height: 450px; overflow:auto;">
+                <h4 class="ml-3 mt-3"><i class="far fa-envelope"></i> Buzón</h4>
+                <div class="mensajes pb-3" style="height: 100%; overflow: auto; scrollTop:500px,1000;">
+                    <div class="mensajes-interno" id="mensajes-interno">
+                        <div class="mensaje p-1">
+                            <div class="burbuja col-7 card bg-light ml-auto">
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Inventore ipsa nam quam.
+                                Non vero omnis molestias cum libero neque quos optio expedita laudantium illum
+                                mollitia, repellat praesentium unde, animi enim iste sequi! Reiciendis aliquam vero
+                                maiores. Mollitia magni architecto accusantium debitis doloremque! Tempora quia
+                                similique ad necessitatibus. Quidem ad perspiciatis, hic sed ipsa cupiditate cumque
+                                sit praesentium? Blanditiis perspiciatis mollitia animi voluptatum rem quos,
+                                praesentium saepe officiis labore ratione provident recusandae voluptatibus illum
+                                enim natus odio reprehenderit fugit nulla architecto. Nulla molestiae et, libero
+                                inventore, accusantium, voluptatum totam mollitia necessitatibus aut corporis
+                                quibusdam nam voluptas rem nobis! Voluptatibus laudantium, officia placeat, tenetur
+                                ducimus, soluta adipisci amet tempora rem sunt ratione aliquid animi atque odit
+                                aspernatur dignissimos. Cumque voluptas officiis praesentium nihil reiciendis fuga
+                                asperiores quaerat deserunt quae, sit autem facilis illum commodi enim vel
+                                repellendus laboriosam voluptatem nam ad impedit necessitatibus tempore maxime ipsam
+                                aliquam. Accusamus quibusdam quae molestiae iure sunt ullam amet? Ex, tempore
+                                sapiente ipsa beatae vel illo recusandae cumque voluptas necessitatibus
+                                exercitationem eligendi. Veritatis temporibus sed voluptatibus repudiandae ab
+                                dolorem. Tempora esse minus enim soluta ipsa! Accusantium praesentium expedita
+                                fugiat voluptates enim velit fuga dolorem ipsa eius repellendus, fugit aperiam, nemo
+                                libero veniam cumque beatae molestiae autem.
+                                <br>
+                                <small class="text-muted"> 23:02</small>
+                            </div>
+                        </div>
+                        <div class="mensaje p-1">
+                            <div class="burbuja col-7 card bg-light ml-auto">
+                                El tomate llegó picho señor
+                                <br>
+                                <small class="text-muted"> 23:02</small>
+                            </div>
+                        </div>
+                        <div class="mensaje p-1">
+                            <div class="burbuja col-7 card bg-light ml-auto">
+                                El tomate llegó picho señor
+                                <br>
+                                <small class="text-muted"> 23:02</small>
+                            </div>
+                        </div>
+                        <div class="mensaje p-1">
+                            <div class="burbuja col-7 card mr-auto">
+                                El tomate llegó picho señor
+                                <br>
+                                <small class="text-muted"> 23:02</small>
+                            </div>
+                        </div>
+                        <div class="final-chat" id="final-chat">
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Caja de texto-->
+                <div class="input-mensaje p-1 shadow bg-light" style="position:relative; bottom:0; width: 100%;">
+                    <textarea name="" id="" style="width: 100%; min-height:70px; max-height: 150px;  border: 1px solid #ccc;
+                            border-radius:16px;"></textarea>
+                    <a href="" class="btn btn-success"><i class="fas fa-paper-plane"></i></a>
+                </div>
             </div>
         </div>
     </div>

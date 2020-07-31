@@ -3,6 +3,7 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
+
 function localCargado(req) {
     var estaCargado = true;
     if (req.session.idLocalActual == undefined) {
@@ -10,6 +11,7 @@ function localCargado(req) {
     }
     return estaCargado;
 }
+
 
 router.get('/local/:id', esComercianteAprobado, async (req, res) => {
     try {
@@ -249,36 +251,36 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
 
 
-        
+
         //Estado del pedido `
         var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
-            const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/'+idPedido+'" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
+            const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/' + idPedido + '" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
                 '<i class="fas fa-chevron-circle-down" data-toggle="tooltip" title="Mover a Empacados"></i> </a>';
             rowEstadoPedido[0].nuevoEmpacadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/"+idPedido+"' class='btn btn-primary p-0 pr-2 pl-2'" +
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/" + idPedido + "' class='btn btn-primary p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Nuevos'></i></a>";
             rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;
 
-            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEnviados/"+idPedido+"' class='btn btn-warning p-0 pr-2 pl-2'" +
+            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEnviados/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Enviado'></i></a>";
             rowEstadoPedido[0].nuevoEnviadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/"+idPedido+"' class='btn btn-danger p-0 pr-2 pl-2'" +
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/" + idPedido + "' class='btn btn-danger p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Empacado'></i></a>";
             rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;
 
-            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEntregado/"+idPedido+"' class='btn btn-success p-0 pr-2 pl-2'" +
+            const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEntregado/" + idPedido + "' class='btn btn-success p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Recibidos'></i></a>";
             rowEstadoPedido[0].nuevoEntregadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 1 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/"+idPedido+"' class='btn btn-warning p-0 pr-2 pl-2'" +
+            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Enviados'></i></a>";
             rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;
         }
 
-        console.log(rowEstadoPedido[0]);
+        //console.log(rowEstadoPedido[0]);
 
 
         //Buzon
@@ -414,7 +416,12 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual });
+        const msg=getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
+        const msg2=getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
+        const msg3=getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
+        const msg4=getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
+        const msg5=getMessageBubble("Esta le voy a devolver", "2020-07-30 22:02:10", false);
+        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual,msg,msg2,msg3,msg4,msg5});
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")
