@@ -3,7 +3,6 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
-
 function localCargado(req) {
     var estaCargado = true;
     if (req.session.idLocalActual == undefined) {
@@ -11,7 +10,6 @@ function localCargado(req) {
     }
     return estaCargado;
 }
-
 
 router.get('/local/:id', esComercianteAprobado, async (req, res) => {
     try {
@@ -416,11 +414,12 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        const msg=getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
-        const msg2=getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
-        const msg3=getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
-        const msg4=getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
-        const msg5=getMessageBubble("Esta le voy a devolver", "2020-07-30 22:02:10", false);
+        const buzon= require("../../util/buzon.components");
+        const msg=buzon.getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
+        const msg2=buzon.getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
+        const msg3=buzon.getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
+        const msg4=buzon.getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
+        const msg5=buzon.getMessageBubble("Esta le voy a devolver", "2020-07-30 22:02:10", false);
         res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual,msg,msg2,msg3,msg4,msg5});
     } catch (error) {
         console.log(error);

@@ -1,6 +1,6 @@
 var buzon={};
-
-buzon.getFechaHoraChat=(stringFechaHora)=> {
+//Funciones privadas
+function getFechaHoraChat(stringFechaHora) {
     var moment = require('moment'); // require
     var momentNow = require('moment'); // require
     moment.locale("es-us");
@@ -16,6 +16,7 @@ buzon.getFechaHoraChat=(stringFechaHora)=> {
     return fechaHora;
 }
 
+//Funciones a exportar
 buzon.getMessageBubble=(message, stringFechaHora, isRight)=> {
     var date=getFechaHoraChat(stringFechaHora);
     var leftRightHtml = "mr-auto";
