@@ -414,7 +414,7 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        const buzon= require("../../util/buzon.components");
+        const buzon= require("../../util/buzon.component");
         const msg=buzon.getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
         const msg2=buzon.getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
         const msg3=buzon.getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
