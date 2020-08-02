@@ -21,8 +21,8 @@
         --product-height: 100px;
         --product-width: 150px;
         /*Colores*/
-        --mega-green: rgb(102, 211, 116);
-        --mega-orange: rgb(255, 153, 0);
+        --mega-green: rgb(2, 184, 117);
+        --mega-orange: rgb(240, 173, 78);
         --white: rgb(255, 255, 255);
     }
 
@@ -321,14 +321,14 @@
 
 <header class="header" style="overflow: auto;">
     <div class="title p-2">
-        <h4>Fruver Don David</h4>
+        <h4>{{rowsLocalesMayoristas.nombreLocal}}</h4>
     </div>
 </header>
 
 <div class="no-header">
     <div class="banner">
-        <div class="state">Abierto</div>
-        <img src="https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3"
+        <div class="state">{{rowsLocalesMayoristas.textoEstaAbierto}}</div>
+        <img src="{{rowsLocalesMayoristas.rutaImagen}}"
             class="img-banner">
     </div>
     <div class="seller-space">
@@ -336,22 +336,18 @@
             <h4>Informacion</h4>
         </div>
 
-        <div class="justify-content-start">
-            <div id="stories" class="storiesWrapper stories"></div>
-        </div>
+        
 
         <div class="store-data">
-
             <div class="text-success" style="font-size: 1.5em;">
-                <i class="fas fa-truck"></i> $4000
+                <i class="fas fa-truck"></i> ${{rowsLocalesMayoristas.precioDomicilio}}
             </div>
             <div class="text-warning" style="font-size: 1.5em;">
-                <i class="fas fa-star"></i> 4.3
+                <i class="fas fa-star"></i> {{rowsLocalesMayoristas.calificacionPromedio}}
             </div>
             <div class="seller-info" style="font-size: 1.2em;">
-                <p>Lorem ipsum dolor sit ame</p>
+                <p>{{rowsLocalesMayoristas.descripcionLocal}}</p>
             </div>
-
         </div>
 
         <div class="store-products">
@@ -359,60 +355,17 @@
                 <h4>Alimentos</h4>
             </div>
             <div class="products">
-                <a class="product tomate" href="tomate.html">
+
+                {{#each rowsProductoLocal}}
+                <a class="product" href="#" style="{{cssPropertiesBg}}">
                     <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806197/tomate_xi6jyn.png"
-                            alt="Tomate"></div>
-                    <div class="product-info">$1200 /kg</div>
+                            src="{{rutaImagen}}"
+                            alt="{{nombreProducto}}"></div>
+                    <div class="product-info"><b>{{nombreProducto}}</b></div>
                 </a>
-                <a class="product banano" href="banano.html">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806188/banano_wfutos.png"
-                            alt=""></div>
-                    <div class="product-info">$2200 /racimo</div>
-                </a>
-                <a class="product aguacate" href="aguacate.html">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806180/aguacate_ezz3ad.png"
-                            alt=""></div>
-                    <div class="product-info">$1200 c/u</div>
-                </a>
-                <div class="product papa">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806194/papa_jzlwzm.png"
-                            alt="Tomate"></div>
-                    <div class="product-info">$1200 /kg</div>
-                </div>
-                <div class="product zanahoria" hidden=true>
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806202/zanahoria_y3xnf5.png"
-                            alt=""></div>
-                    <div class="product-info">$2200 /racimo</div>
-                </div>
-                <div class="product cebolla">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806191/cebolla_z9949y.png"
-                            alt=""></div>
-                    <div class="product-info">$1200 c/u</div>
-                </div>
-                <a class="product uva" href="../html/product.html">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806201/uva_zol9mo.png"
-                            alt="Tomate"></div>
-                    <div class="product-info">$1200 /kg</div>
-                </a>
-                <div class="product sandia">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806196/sandia_ajk4zg.png"
-                            alt=""></div>
-                    <div class="product-info">$2200 /racimo</div>
-                </div>
-                <div class="product mandarina">
-                    <div class="product-img"><img
-                            src="https://res.cloudinary.com/megaplaza/image/upload/v1595806162/mandarina_le51uv.png"
-                            alt=""></div>
-                    <div class="product-info">$1200 c/u</div>
-                </div>
+                {{else}}
+                Este local no cuenta con ningun producto.
+                {{/each}}
             </div>
 
         </div>
