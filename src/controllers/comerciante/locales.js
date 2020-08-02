@@ -250,7 +250,7 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
 
 
 
-        //Estado del pedido `
+        //Estado del pedido
         var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
             const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/' + idPedido + '" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
@@ -278,19 +278,91 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
             rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;
         }
 
-        //console.log(rowEstadoPedido[0]);
-
-
         //Buzon
-        //const rowsBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN mensajebuzon ON buzon.pkIdBuzon=mensajebuzon.fkIdBuzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
-
-
+        var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
+        if (rowsBuzon.length == 1) {
+            var rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
+            for (let index = 0; index < rowsMensajesBuzon.length; index++) {
+                var leftRight = true;
+                if (rowsMensajesBuzon[index].esCliente == 1) {
+                    leftRight = false;
+                }
+                const buzon = require("../../lib/buzon.component");
+                const msg = buzon.getMessageBubble(rowsMensajesBuzon[index].mensajeBuzon, rowsMensajesBuzon[index].fechaHoraMensajeBuzon, leftRight);
+                rowsMensajesBuzon[index].htmlMsg = msg;
+            }
+            rowsBuzon[0].mensajes = rowsMensajesBuzon;
+        }
         //Renderizar vista
-        res.render("comerciante/locales/informacionPedido", { nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0] });
+        res.render("comerciante/locales/informacionPedido", { nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
+    }
+});
+
+router.get('/pedidos/crearBuzon/:idPedido', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const { idPedido } = req.params;
+        const rowsBuzon = await pool.query("SELECT buzon.pkIdBuzon FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=?", [idPedido, req.session.idLocalActual]);
+        if (rowsBuzon.length != 0) {
+            throw "Error, ya existe un buzon para esta venta";
+        }
+        const newBuzon = {
+            buzonLeido: 1,
+            fkIdVenta: idPedido
+        };
+        await pool.query("INSERT INTO buzon SET ?", [newBuzon]);
+        res.redirect("/comerciante/locales/pedido/" + idPedido);
+    } catch (error) {
+        console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
+    }
+});
+
+router.post('/pedidos/enviarMensaje', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw new Error("02-Local no cargado");
+        }
+        const { idVenta, idBuzon, mensaje } = req.body;
+        console.log("mi mensajito es *" + mensaje.trim() + "*");
+        if (mensaje.trim() === "") {
+            throw new Error("01-" + idVenta + "-Mensaje en blanco");
+        }
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+        const newMensajeBuzon = {
+            mensajeBuzon: mensaje,
+            fechaHoraMensajeBuzon: moment,
+            esCliente: 0,
+            fkIdBuzon: idBuzon
+        };
+        await pool.query("INSERT INTO mensajebuzon SET ?", [newMensajeBuzon]);
+        res.redirect("/comerciante/locales/pedido/" + idVenta);
+    } catch (error) {
+        console.log(error);
+        var codError = error.message.toString().split("-");
+
+        switch (codError[0]) {
+            case "01":
+                req.flash("message", "Mensaje en blanco");
+                res.redirect("/comerciante/locales/pedido/" + codError[1]);
+                break;
+            case "02":
+                req.flash("message", "Seleccione un local de nuevo");
+                res.redirect("/comerciante/locales/listadoLocales");
+                break;
+            default:
+                req.flash("message", "Seleccione un local de nuevo")
+                res.redirect("/comerciante/locales/listadoLocales");
+                break;
+        }
     }
 });
 
@@ -414,13 +486,13 @@ router.get('/buzon', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        const buzon= require("../../lib/buzon.component");
-        const msg=buzon.getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
-        const msg2=buzon.getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
-        const msg3=buzon.getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
-        const msg4=buzon.getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
-        const msg5=buzon.getMessageBubble("Esta le voy a devolver", "2020-07-31 13:02:10", false);
-        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual,msg,msg2,msg3,msg4,msg5});
+        const buzon = require("../../lib/buzon.component");
+        const msg = buzon.getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
+        const msg2 = buzon.getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
+        const msg3 = buzon.getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
+        const msg4 = buzon.getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
+        const msg5 = buzon.getMessageBubble("Esta le voy a devolver", "2020-07-31 13:02:10", false);
+        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual, msg, msg2, msg3, msg4, msg5 });
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")

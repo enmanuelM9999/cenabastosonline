@@ -190,11 +190,9 @@
     .seller-info {
         width: 100%;
         display: flex;
-        max-height: 60px;
+        max-height: 150px;
         overflow-y: auto;
-        background-color: white;
         margin-bottom: 30px;
-
     }
 
     .seller-info::-webkit-scrollbar {
@@ -315,23 +313,11 @@
         position: absolute;
         bottom: 10px;
         left: 10px;
-
         display: flex;
         align-items: flex-end;
     }
 </style>
 
-<!-- demo styles -->
-<link rel="stylesheet" href="/zuckjs/demo/style.css">
-
-<!-- lib styles -->
-<link rel="stylesheet" href="/zuckjs/dist/zuck.min.css">
-
-<!-- lib skins -->
-<link rel="stylesheet" href="/zuckjs/dist/skins/snapgram.css">
-<link rel="stylesheet" href="/zuckjs/dist/skins/vemdezap.css">
-<link rel="stylesheet" href="/zuckjs/dist/skins/facesnap.css">
-<link rel="stylesheet" href="/zuckjs/dist/skins/snapssenger.css">
 
 <header class="header" style="overflow: auto;">
     <div class="title p-2">
@@ -342,7 +328,7 @@
 <div class="no-header">
     <div class="banner">
         <div class="state">Abierto</div>
-        <img src="https://res.cloudinary.com/megaplaza/image/upload/v1595817698/screenshot20190314at24807pm-af3ef74748f44fb77ca0fea86873723e-600x400_fttqm8.jpg"
+        <img src="https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3"
             class="img-banner">
     </div>
     <div class="seller-space">
@@ -355,17 +341,17 @@
         </div>
 
         <div class="store-data">
-            <div class="delivery">$
-                <div class="delivery-value">4000</div>
-                <div class="delivery-icon"></div>
+
+            <div class="text-success" style="font-size: 1.5em;">
+                <i class="fas fa-truck"></i> $4000
             </div>
-            <div class="seller-info">
-                <p>Bienvenido al local </p>
+            <div class="text-warning" style="font-size: 1.5em;">
+                <i class="fas fa-star"></i> 4.3
             </div>
-            <div class="score">
-                <div class="score-icon"></div>
-                <div class="score-value">4.3</div>
+            <div class="seller-info" style="font-size: 1.2em;">
+                <p>Lorem ipsum dolor sit ame</p>
             </div>
+
         </div>
 
         <div class="store-products">
@@ -433,78 +419,6 @@
     </div>
 </div>
 
-<script src="/zuckjs/dist/zuck.min.js"></script>
-<script src="/zuckjs/demo/script.js"></script>
-<script>
-    var currentSkin = getCurrentSkin();
-    currentSkin['name'] = "VemDeZAP";
-    //currentSkin['params']['list'] = "true";
-    currentSkin['params']['cubeEffect'] = false;
-    var stories = new Zuck('stories', {
-        backNative: true,
-        previousTap: true,
-        skin: currentSkin['name'],
-        autoFullScreen: currentSkin['params']['autoFullScreen'],
-        avatars: currentSkin['params']['avatars'],
-        paginationArrows: currentSkin['params']['paginationArrows'],
-        list: currentSkin['params']['list'],
-        cubeEffect: currentSkin['params']['cubeEffect'],
-        localStorage: true,
-        stories: [
-            Zuck.buildTimelineItem(
-                "ramon",
-                "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/users/1.jpg",
-                "Ramon",
-                "https://ramon.codes",
-                timestamp(),
-                [
-                    ["ramon-1", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/1.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/1.jpg", '', false, false, timestamp()],
-                    ["ramon-2", "video", 0, "https://res.cloudinary.com/megaplaza/video/upload/v1595892407/VID-20190504-WA0006_qlbag6.mp4", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/2.jpg", '', false, false, timestamp()],
-                    ["ramon-3", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/3.png", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/3.png", 'https://ramon.codes', 'Visit my Portfolio', false, timestamp()]
-                ]
-            ),
-            Zuck.buildTimelineItem(
-                "gorillaz",
-                "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/users/2.jpg",
-                "Gorillaz",
-                "",
-                timestamp(),
-                [
-                    ["gorillaz-1", "video", 0, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/4.mp4", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/4.jpg", '', false, false, timestamp()],
-                    ["gorillaz-2", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/5.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/5.jpg", '', false, false, timestamp()],
-                ]
-            ),
-            Zuck.buildTimelineItem(
-                "ladygaga",
-                "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/users/3.jpg",
-                "Lady Gaga",
-                "",
-                timestamp(),
-                [
-                    ["ladygaga-1", "photo", 5, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", '', false, false, timestamp()],
-                    ["ladygaga-2", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", 'http://ladygaga.com', false, false, timestamp()],
-                ]
-            )
-        ],
-        language: { // if you need to translate :)
-            unmute: 'Toca para oir',
-            keyboardTip: 'Espacio para siguiente',
-            visitLink: 'Visita el link',
-            time: {
-                ago: 'atrás',
-                hour: 'hora',
-                hours: 'horas',
-                minute: 'minuto',
-                minutes: 'minutos',
-                fromnow: 'ahora',
-                seconds: 'segundos',
-                yesterday: 'ayer',
-                tomorrow: 'mañana',
-                days: 'días'
-            }
-        }
-    });
 
-</script>
 
-{{>navegacionComerciante}}
+{{>navegacionCliente}}
