@@ -1,0 +1,330 @@
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        position: relative;
+        transition: 0.2s;
+    }
+
+    html {
+        overflow-x: hidden;
+    }
+
+    /*Variables*/
+
+    :root {
+        /*Longitudes*/
+        --header-height: 150px;
+        --icon-size: 30px;
+        --product-size: 100px;
+        /*Colores*/
+        --mega-green: rgb(2, 184, 117);
+        --mega-orange: rgb(240, 173, 78);
+        --white: rgb(255, 255, 255);
+    }
+
+
+    /* ----------- Mobile First------------------*/
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header {
+        width: 100%;
+        flex: 0 0 var(--header-height);
+        border-bottom-left-radius: 40%;
+        border-bottom-right-radius: 40%;
+
+
+    }
+
+    .header .back {
+        width: 25px;
+        height: 25px;
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        background-image: url("../icons/back.svg");
+        background-size: cover;
+    }
+
+    .header .product-img {
+        width: 50%;
+        height: 50%;
+        transform: translateX(50%) scale(1.3);
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        bottom: 0;
+    }
+
+    .product-img img {
+        width: var(--product-size);
+        height: var(--product-size);
+    }
+
+    .product-info {
+        width: 100%;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        top: 40px;
+    }
+
+    .product-name {
+        width: 100%;
+        min-height: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .product-info .product-data {
+        width: 100%;
+        min-height: 200px;
+        margin-bottom: 50px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-data .quantity-manager,
+    .btn-add-to-car {
+        width: 100%;
+        min-height: 50px;
+    }
+
+    .product-data .quantity-manager {
+        width: 100%;
+        height: 200px;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .quantity {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        margin-right: 5px;
+    }
+
+    .quantity-manager input {
+        width: 100px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .quantity-manager select {
+        background-image: white;
+        width: 100%;
+        height: 50px;
+    }
+
+    .quantity-manager button {
+        height: 100%;
+    }
+
+    .quantity button {
+        width: 50px;
+        background-color: var(--mega-green);
+        border: 0 solid red;
+        font-size: 30px;
+        color: white;
+        cursor: pointer;
+    }
+
+    #less {
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
+        background-color: rgb(255, 123, 123);
+    }
+
+    #more {
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    .details {
+        width: 100%;
+        min-height: 150px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+
+    .details textarea {
+        padding: 10px;
+        min-height: 100px;
+        width: 100%;
+    }
+
+    .price {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        color: var(--mega-green);
+        margin-bottom: 10px;
+    }
+
+    .btn-add-to-car {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-add-to-car button {
+        width: 300px;
+        background-color: var(--mega-green);
+        border: 0 solid red;
+        font-size: 15px;
+        color: white;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 5px;
+    }
+</style>
+
+<div class="header" style="{{rowProductoLocal.cssPropertiesBg}}">
+    <a class="back p-0" style="font-size: 45px; color:rgb(37, 37, 37);"
+        href="/cliente/explorar/local/{{rowProductoLocal.pkIdLocalComercial}}"><i class="fas fa-angle-left"></i></a>
+    <div class="product-img"><img src={{rowProductoLocal.rutaImagen}} alt="{{rowProductoLocal.nombreProducto}}"> </div>
+
+</div>
+<div class="product-info">
+
+    <div class="container mb-3">
+        <div class="product-name">
+            <h4>{{rowProductoLocal.nombreProducto}}</h4>
+        </div>
+        <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 20px;">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut ratione voluptate dolor cum aperiam consequuntur
+            facere voluptas? Cumque, labore aliquid adipisci veniam perspiciatis necessitatibus ullam similique? Ut
+            voluptas nostrum iste odio. Vitae odio enim cum porro et quos impedit, nisi debitis. Cumque quod optio
+            delectus quis reiciendis eos quidem non hic reprehenderit praesentium, doloribus commodi fugiat magni sint
+            natus repellendus assumenda sapiente eum aliquam vitae? Itaque pariatur ea assumenda quam minima magni omnis
+            neque id deserunt dignissimos hic, vitae debitis nisi. Blanditiis consequatur neque consequuntur, laborum
+            eum rerum fugit consectetur modi commodi, aut quaerat voluptatibus a enim id dolorum eius velit harum minus
+            voluptate praesentium? A, perspiciatis! Voluptatibus, obcaecati ex tempore illo aperiam a neque dolores,
+            excepturi soluta laboriosam ut repellat. Dolore facere aperiam nobis cumque aspernatur non, maiores
+            perferendis porro a dolorum ab error repudiandae, expedita eaque, enim quod earum rem quis accusantium. Ab
+            excepturi, non id libero nemo reiciendis quo nulla rem, praesentium eius sint inventore impedit accusamus
+            delectus numquam totam facere? Nisi repudiandae animi praesentium explicabo qui ab perspiciatis quas
+            corporis tempora nam veniam ad, enim dolore laudantium in. Temporibus, consectetur sapiente? Nostrum quas
+            odio non veniam tempora dolore. Praesentium nisi, delectus odit eius maiores harum? Sit esse, sint, veniam
+            corporis dolore fuga, repellendus atque molestias ipsam enim minus molestiae commodi reprehenderit! Veniam
+            vero id rerum libero? Praesentium fugit quo saepe architecto quas aspernatur! Consequatur aut itaque
+            sapiente. Placeat totam libero quod velit, laudantium dolorem delectus cupiditate consequuntur illo aliquam
+            alias perferendis quos. Quia, deserunt. Ut provident eius accusamus qui quam optio?
+        </div>
+        <form class="product-data" name="product" method="POST" action="" style="position: relative; right:10px">
+            <div class="row pt-2">
+                <div class="col-xs-12 col-md-6 my-auto p-3">
+                    <select class="form-control">
+                        {{#each productoLocal.presentaciones}}
+                        <option value="{{pkIdPresentacionProducto}}">{{nombrePresentacion}}</option>
+                        {{else}}
+                        Este producto no cuenta con ninguna presentacion.
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="col-xs-12 col-md-6 my-auto p-3">
+                    <div class="quantity">
+                        <button id="less" type="button">-</button>
+                        <input id="number" type="number" min="1" step="1" value="0">
+                        <button id="more" type="button">+</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="detalles-vendedor p-3 mt-2" style="overflow: auto; max-height: 150px;min-height: 20px;">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut ratione voluptate dolor cum aperiam
+                consequuntur facere voluptas? Cumque, labore aliquid adipisci veniam perspiciatis necessitatibus ullam
+                similique? Ut voluptas nostrum iste odio. Vitae odio enim cum porro et quos impedit, nisi debitis.
+                Cumque quod optio delectus quis reiciendis eos quidem non hic reprehenderit praesentium, doloribus
+                commodi fugiat magni sint natus repellendus assumenda sapiente eum aliquam vitae? Itaque pariatur ea
+                assumenda quam minima magni omnis neque id deserunt dignissimos hic, vitae debitis nisi. Blanditiis
+                consequatur neque consequuntur, laborum eum rerum fugit consectetur modi commodi, aut quaerat
+                voluptatibus a enim id dolorum eius velit harum minus voluptate praesentium? A, perspiciatis!
+                Voluptatibus, obcaecati ex tempore illo aperiam a neque dolores, excepturi soluta laboriosam ut
+                repellat. Dolore facere aperiam nobis cumque aspernatur non, maiores perferendis porro a dolorum ab
+                error repudiandae, expedita eaque, enim quod earum rem quis accusantium. Ab excepturi, non id libero
+                nemo reiciendis quo nulla rem, praesentium eius sint inventore impedit accusamus delectus numquam totam
+                facere? Nisi repudiandae animi praesentium explicabo qui ab perspiciatis quas corporis tempora nam
+                veniam ad, enim dolore laudantium in. Temporibus, consectetur sapiente? Nostrum quas odio non veniam
+                tempora dolore. Praesentium nisi, delectus odit eius maiores harum? Sit esse, sint, veniam corporis
+                dolore fuga, repellendus atque molestias ipsam enim minus molestiae commodi reprehenderit! Veniam vero
+                id rerum libero? Praesentium fugit quo saepe architecto quas aspernatur! Consequatur aut itaque
+                sapiente. Placeat totam libero quod velit, laudantium dolorem delectus cupiditate consequuntur illo
+                aliquam alias perferendis quos. Quia, deserunt. Ut provident eius accusamus qui quam optio?
+            </div>
+            <div class="details mt-2">
+                <h5>Detalles</h5> <textarea class="form-control"
+                    placeholder='Ejemplo: "La papa parejita por favor"'></textarea>
+            </div>
+            <div class="price">
+                <h4 id="price">$0</h4>
+            </div>
+            <button type="submit" class="btn btn-success ml-auto mr-auto mt-2"> <i class="fas fa-shopping-cart"></i>
+                Agregar al carrito</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    var producto = {
+            idLocal: {{productoLocal.idLocal}},
+            idPresentacionSeleccionada: {{ productoLocal.idPresentacionSeleccionada}},
+            cantidadItem: {{ productoLocal.cantidadItem }},
+            detallesCliente: "{{{productoLocal.detallesCliente}}}",
+            precioUnitarioSeleccionado: {{ productoLocal.precioUnitarioSeleccionado}},
+            presentaciones: {{{ productoLocal.htmlJSON }}}
+        }
+
+    $less = $("#less");
+    $more = $("#more");
+
+    $less.on("click", function () {
+        var actual = $("#number").val();
+        actual--;
+        actual = Math.abs(actual);
+        $("#number").val(actual);
+        calcPrice();
+    })
+
+    $more.on("click", function () {
+        var vari = $("#number").val();
+        try {
+            vari = parseInt(vari);
+            vari++;
+            $("#number").val(vari);
+            calcPrice();
+
+        } catch (error) {
+            vari = 3;
+            vari++;
+            $("#number").val(vari);
+            calcPrice();
+
+        }
+    })
+
+    $("#number").on("change input load keyup readystatechange", function () {
+        calcPrice();
+    })
+
+    function calcPrice() {
+        var newPrice = producto.precioUnitarioSeleccionado * $("#number").val();
+        $("#price").html("$" + newPrice);
+    }
+</script>
+
+{{>navegacionCliente}}

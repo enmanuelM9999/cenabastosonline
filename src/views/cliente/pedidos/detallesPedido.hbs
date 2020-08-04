@@ -1,0 +1,180 @@
+<div class="container pt-5">
+
+    <h4>Pedido #{{rowDatos.pkIdVenta}}</h4>
+
+
+    <div class="row">
+        <div class="col-12 p-2">
+            <div class="card ">
+                <div class="table-responsive-lg" style="border-top: 0;">
+                    <!--Para encerrar la tabla responsive-->
+                    <table class="table b-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Tipo Presentacion</th>
+                                <th scope="col">Precio Unitario</th>
+                                <th scope="col">Precio total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each rowsItemVenta}}
+                            <tr>
+                                <th scope="row">{{nombreProducto}}</th>
+                                <td>{{nombrePresentacionItemVenta}}</td>
+                                <td>${{precioUnitarioItem}} x {{cantidadItem}}</td>
+                                <td>${{totalItemVenta}}</td>
+                            </tr>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td>No hay Pedidos</td>
+                            </tr>
+                            {{/each}}
+
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                                <td><b>Valor Domicilio</b></td>
+                                <td>${{rowDatos.precioDomicilioVenta}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                                <td><b>Valor Total</b></td>
+                                <td class="text-success"><b>${{rowDatos.montoTotal}}</b></td>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mt-2">
+        <div class="col-lg-6 col-sm-12 p-2">
+
+            <div class="card p-3">
+                <h4>Estado del Pedido</h4>
+                <div class="table-responsive-lg" style="border-top: 0;">
+                    <!--Para encerrar la tabla responsive-->
+                    <table class="table b-0">
+
+                        <tbody>
+
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-shopping-cart"></i> Fecha y Hora de Compra</th>
+                                <td>{{rowEstadoPedido.fechaHoraVenta}}</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-box"></i> Fecha y Hora de Empacado</th>
+                                <td>{{rowEstadoPedido.fechaHoraEmpacado}}</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fa fa-truck"></i> Fecha y Hora de Envio</th>
+                                <td>{{rowEstadoPedido.fechaHoraEnvio}}</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row"><i class="fas fa-dollar-sign"></i> Fecha y Hora de Entrega</th>
+                                <td>{{rowEstadoPedido.fechaHoraEntrega}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-lg-6 col-sm-12 p-2">
+
+
+            <div class="card p-3">
+                <h4>Información de Orden</h4>
+                <label for=""><i class="fas fa-user"></i> {{rowDatos.nombresPersonaNatural}}
+                    {{rowDatos.apellidosPersonaNatural}}</label>
+                <label for=""><i class="far fa-envelope"></i> {{rowDatos.correoUsuario}}</label>
+                <label for=""><i class="fas fa-mobile-alt"></i> {{rowDatos.telefonoCliente}}</label>
+                <label for=""><i class="far fa-calendar-check"></i> {{rowDatos.fechaHoraVenta}}</label>
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+    <div class="row mt-2">
+        <div class="col-lg-6 col-sm-12 p-2">
+            <div class="card p-3">
+                <h4><i class="far fa-credit-card"></i> Información de Pago</h4>
+                <!--<img src="" class="img-fluid" alt="Responsive image">-->
+                <label for="">Pago realizado con: </label>
+                <label for="">Referencia de Pago #69 </label>
+                <label for="">Fecha de pago </label>
+                <label for=""> </label>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-sm-12 p-2">
+            <div class="card p-3">
+                <h4>Dirección de Envio</h4>
+                <label for="">Dirección: {{rowDatos.direccionCliente}}</label>
+                <label for="">Departamento: Norte de Santander</label>
+                <label for="">Codigo Postal: 57</label>
+                <label for="">Pais: Colombia</label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12 p-2">
+            {{#each rowsBuzon}}
+            <div class="buzon card" style="height: 450px; overflow:auto;">
+                <h4 class="ml-3 mt-3"><i class="far fa-envelope"></i> Buzón <br><small style="font-size: 15px;"
+                        class="text-muted"><i class="fas fa-exclamation-circle"></i> Refresca la página para actualizar
+                        el buzón</small></h4>
+                <div class="mensajes pb-3" style="height: 100%; overflow: auto; scrollTop:500px,1000;">
+                    <div class="mensajes-interno" id="mensajes-interno">
+                        {{#each mensajes}}
+                        {{{htmlMsg}}}
+                        {{else}}
+                        {{/each}}
+                        <div class="final-chat" id="final-chat"></div>
+                    </div>
+                </div>
+                <!-- Caja de texto-->
+                <div class="input-mensaje p-1 shadow bg-light" style="position:relative; bottom:0; width: 100%;">
+                    <form action="/cliente/pedidos/detallesPedido/enviarMensaje" id="formBuzon" method="POST">
+                        <input type="hidden" name="idVenta" value="{{pkIdVenta}}">
+                        <input type="hidden" name="idBuzon" value="{{pkIdBuzon}}">
+                        <textarea name="mensaje" style="width: 100%; min-height:70px; max-height: 150px;  border: 1px solid #ccc;
+                            border-radius:16px;" form="formBuzon"></textarea>
+                        <button class="btn btn-success" type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+            {{else}}
+            <a href="/cliente/pedidos/crearBuzon/{{rowDatos.pkIdVenta}}" class="btn btn-light">
+                <h5><i class="fas fa-plus"></i> <i class="far fa-envelope"></i> Iniciar una conversación con el vendedor
+                </h5>
+            </a>
+            {{/each}}
+        </div>
+    </div>
+
+
+
+</div>
+
+{{>navegacionCliente}}

@@ -234,12 +234,9 @@
         min-height: var(--product-height);
         display: flex;
         flex-wrap: wrap;
-        padding-top: 15px;
-        padding-left: 10px;
-        margin-bottom: var(--header-height);
     }
 
-    .store-products .products .product {
+    .product {
         flex: 0 0 var(--product-width);
         height: var(--product-height);
         box-shadow: 11px 26px 33px 3px rgba(0, 0, 0, 0.15);
@@ -252,60 +249,55 @@
         align-items: flex-end;
     }
 
+    .producto {
+        width: 150px;
+        height: 100px;
+        overflow: hidden;
+        display: flex;
+        border-radius: 15px;
+    }
+
+    .producto .informacion {
+        height: 50%;
+        width: 50%;
+        color: white;
+        font-size: 15px;
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .producto .imagen {
+        position: absolute;
+        top: 0;
+        width: 100px;
+        height: 100px;
+    }
+
+    .producto .imagen img {
+        width: 100%;
+        height: 100%;
+        transform: scale(1.2) translateX(50%);
+    }
+
     .store-products .products .product:hover {
         transform: scale(1.1);
     }
 
-    .store-products .products .product.tomate {
-        background: rgb(255, 152, 152);
-        background: linear-gradient(to left, rgb(255, 119, 119), #ff9966);
-    }
-
-    .store-products .products .product.zanahoria {
-        background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
-    }
-
-    .store-products .products .product.papa {
-        background-color: #e8c99b;
-        background-image: linear-gradient(315deg, #e8c99b 0%, #e8bc85 74%);
-    }
-
-    .store-products .products .product.banano {
-        background-image: linear-gradient(to right top, #f4f464, #baf252);
-    }
-
-    .store-products .products .product.aguacate {
-        background-image: linear-gradient(120deg, #d9fc79 0%, #4da759 100%);
-    }
-
-    .store-products .products .product.uva {
-        background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
-    }
-
-    .store-products .products .product.cebolla {
-        background-image: linear-gradient(to right top, #98f88f, #dff8b1);
-    }
-
-    .store-products .products .product.sandia {
-        background-image: linear-gradient(to right top, #f88f8f, #93ffb4);
-    }
-
-    .store-products .products .product.mandarina {
-        background-image: linear-gradient(to right top, #fda23f, #ffd993);
-    }
-
-    .products .product .product-img {
+    .product .product-img {
         position: absolute;
-        top: 0;
+        right: 70px;
     }
 
-    .products .product .product-img img {
+    .product .product-img img {
         width: var(--product-height);
         height: var(--product-height);
         transform: scale(1.2) translateX(50%);
     }
 
-    .products .product .product-info {
+    .product .product-info {
         height: 50%;
         width: 50%;
         color: white;
@@ -327,18 +319,18 @@
 
 <div class="no-header">
     <div class="banner">
-        <div class="state">{{rowsLocalesMayoristas.textoEstaAbierto}}</div>
-        <img src="{{rowsLocalesMayoristas.rutaImagen}}"
-            class="img-banner">
+        <div class="state"></div>
+        <img src="{{rowsLocalesMayoristas.rutaImagen}}" class="img-banner">
     </div>
     <div class="seller-space">
         <div class="title">
             <h4>Informacion</h4>
         </div>
 
-        
-
         <div class="store-data">
+
+            {{{rowsLocalesMayoristas.textoEstaAbierto}}}
+
             <div class="text-success" style="font-size: 1.5em;">
                 <i class="fas fa-truck"></i> ${{rowsLocalesMayoristas.precioDomicilio}}
             </div>
@@ -354,18 +346,31 @@
             <div class="title">
                 <h4>Alimentos</h4>
             </div>
-            <div class="products">
 
-                {{#each rowsProductoLocal}}
-                <a class="product" href="#" style="{{cssPropertiesBg}}">
-                    <div class="product-img"><img
-                            src="{{rutaImagen}}"
-                            alt="{{nombreProducto}}"></div>
-                    <div class="product-info"><b>{{nombreProducto}}</b></div>
-                </a>
-                {{else}}
-                Este local no cuenta con ningun producto.
-                {{/each}}
+
+            <div class="products">
+                <div class="container">
+                    <div class="row pt-3">
+                        
+                        {{#each rowsProductoLocal}}
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 pb-3 pl-3 pr-3 pt-0">
+                            <a href="/cliente/explorar/productoLocal/{{pkIdProductoLocal}}" class="product mx-auto" style="{{cssPropertiesBg}}">
+                                <div class="product-img"><img src="{{rutaImagen}}" alt="{{nombreProducto}}"></div>
+                                <div class="product-info">
+                                    <b>
+                                        - {{nombrePresentacion}}
+                                        <br>
+                                        /${{precioUnitarioPresentacion}}
+                                        <br>
+                                         <small>{{nombreProducto}}</small>
+                                    </b></div>
+                            </a>
+                        </div>
+                        {{else}}
+                        Este local no cuenta con ningun producto.
+                        {{/each}}
+                    </div>
+                </div>
             </div>
 
         </div>
