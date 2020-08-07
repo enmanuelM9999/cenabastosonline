@@ -1,7 +1,12 @@
 <div class="container pt-5">
 
-    <h4>Pedido #{{rowDatos.pkIdVenta}}</h4>
+    <h4>Pedido #{{rowDatos.pkIdVenta}}
+        <div>
+            <a href="/cliente/explorar/local/{{rowDatos.pkIdLocalComercial}}" class="btn btn-link mt-2 text-success"
+                style="font-size: 20px;">{{rowDatos.nombreLocal}} <i class="fas fa-angle-right"></i></a>
 
+        </div>
+    </h4>
 
     <div class="row">
         <div class="col-12 p-2">

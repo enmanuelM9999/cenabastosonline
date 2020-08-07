@@ -65,6 +65,7 @@ app.use('/comerciante/sesion', require('./controllers/comerciante/sesion'));
 app.use('/cliente/explorar', require('./controllers/cliente/explorar'));
 app.use('/cliente/sesion', require('./controllers/cliente/sesion'));
 app.use('/cliente/pedidos', require('./controllers/cliente/pedidos'));
+app.use('/cliente/buzon', require('./controllers/cliente/buzon'));
 // Public
 app.use(express.static(path.join(__dirname, 'public')));
 

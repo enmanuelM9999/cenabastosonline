@@ -2,11 +2,11 @@
     <h2>Explorar</h2>
     <nav class="mt-4 border-0">
         <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/cliente/explorar/listadoLocalesMinoristas"
-                role="tab" aria-controls="nav-home" aria-selected="false"> Minoristas</a>
-            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/cliente/explorar/listadoLocalesMayoristas" role="tab"
-                aria-controls="nav-profile" aria-selected="true">
-                Mayoristas</a>
+            <a class="nav-item nav-link text-success active" id="nav-pedidos-tab" href="/cliente/explorar/listadoLocalesMinoristas"
+                role="tab" aria-controls="nav-home" aria-selected="true">Minoristas</a>
+            <a class="nav-item nav-link text-success" id="nav-buzon-tab" href="/cliente/explorar/listadoLocalesMayoristas" role="tab"
+                aria-controls="nav-profile" aria-selected="false">
+                Mayoristas </a>
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
@@ -17,7 +17,7 @@
                 <div class="row">
 
 
-                    {{#each rowsLocalesMayoristas}}
+                    {{#each rowsLocalesMinoristas}}
                     <div class="col-xs-12 col-md-6 col-lg-4 p-1">
                         <div class="card shadow" style="border-radius: 0.8em;">
                             <img src="{{rutaImagen}}" class="card-img-top" alt="..."

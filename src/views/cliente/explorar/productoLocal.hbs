@@ -225,62 +225,43 @@
             sapiente. Placeat totam libero quod velit, laudantium dolorem delectus cupiditate consequuntur illo aliquam
             alias perferendis quos. Quia, deserunt. Ut provident eius accusamus qui quam optio?
         </div>
-        <form class="product-data" name="product" method="POST" action="" style="position: relative; right:10px">
+
+        <div class="details mt-2">
+            <h5>Detalles</h5> <textarea class="form-control" placeholder='Ejemplo: "La papa parejita por favor"'
+                id="detallesCliente"></textarea>
+        </div>
+        <div class="product-data" name="product" style="position: relative;">
             <div class="row pt-2">
                 <div class="col-xs-12 col-md-6 my-auto p-3">
-                    <select class="form-control">
+                    <select class="form-control" id="selectPresentacion">
                         {{#each productoLocal.presentaciones}}
-                        <option value="{{pkIdPresentacionProducto}}">{{nombrePresentacion}}</option>
+                        <option value="{{pkIdPresentacionProducto}}" {{inputSelected}}>{{nombrePresentacion}}</option>
                         {{else}}
-                        Este producto no cuenta con ninguna presentacion.
+                        Este producto no cuenta con ninguna presentacion. Si ve este mensaje notifique el error
                         {{/each}}
                     </select>
                 </div>
                 <div class="col-xs-12 col-md-6 my-auto p-3">
                     <div class="quantity">
                         <button id="less" type="button">-</button>
-                        <input id="number" type="number" min="1" step="1" value="0">
+                        <input id="number" type="number" min="0" step="1" value="0">
                         <button id="more" type="button">+</button>
                     </div>
                 </div>
 
             </div>
-            <div class="detalles-vendedor p-3 mt-2" style="overflow: auto; max-height: 150px;min-height: 20px;">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut ratione voluptate dolor cum aperiam
-                consequuntur facere voluptas? Cumque, labore aliquid adipisci veniam perspiciatis necessitatibus ullam
-                similique? Ut voluptas nostrum iste odio. Vitae odio enim cum porro et quos impedit, nisi debitis.
-                Cumque quod optio delectus quis reiciendis eos quidem non hic reprehenderit praesentium, doloribus
-                commodi fugiat magni sint natus repellendus assumenda sapiente eum aliquam vitae? Itaque pariatur ea
-                assumenda quam minima magni omnis neque id deserunt dignissimos hic, vitae debitis nisi. Blanditiis
-                consequatur neque consequuntur, laborum eum rerum fugit consectetur modi commodi, aut quaerat
-                voluptatibus a enim id dolorum eius velit harum minus voluptate praesentium? A, perspiciatis!
-                Voluptatibus, obcaecati ex tempore illo aperiam a neque dolores, excepturi soluta laboriosam ut
-                repellat. Dolore facere aperiam nobis cumque aspernatur non, maiores perferendis porro a dolorum ab
-                error repudiandae, expedita eaque, enim quod earum rem quis accusantium. Ab excepturi, non id libero
-                nemo reiciendis quo nulla rem, praesentium eius sint inventore impedit accusamus delectus numquam totam
-                facere? Nisi repudiandae animi praesentium explicabo qui ab perspiciatis quas corporis tempora nam
-                veniam ad, enim dolore laudantium in. Temporibus, consectetur sapiente? Nostrum quas odio non veniam
-                tempora dolore. Praesentium nisi, delectus odit eius maiores harum? Sit esse, sint, veniam corporis
-                dolore fuga, repellendus atque molestias ipsam enim minus molestiae commodi reprehenderit! Veniam vero
-                id rerum libero? Praesentium fugit quo saepe architecto quas aspernatur! Consequatur aut itaque
-                sapiente. Placeat totam libero quod velit, laudantium dolorem delectus cupiditate consequuntur illo
-                aliquam alias perferendis quos. Quia, deserunt. Ut provident eius accusamus qui quam optio?
-            </div>
-            <div class="details mt-2">
-                <h5>Detalles</h5> <textarea class="form-control"
-                    placeholder='Ejemplo: "La papa parejita por favor"'></textarea>
-            </div>
+
             <div class="price">
                 <h4 id="price">$0</h4>
             </div>
-            <button type="submit" class="btn btn-success ml-auto mr-auto mt-2"> <i class="fas fa-shopping-cart"></i>
+            <button class="btn btn-success ml-auto mr-auto mt-2" id="btnSubmit"> <i class="fas fa-shopping-cart"></i>
                 Agregar al carrito</button>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
-    var producto = {
+var producto = {
             idLocal: {{productoLocal.idLocal}},
             idPresentacionSeleccionada: {{ productoLocal.idPresentacionSeleccionada}},
             cantidadItem: {{ productoLocal.cantidadItem }},
@@ -325,6 +306,47 @@
         var newPrice = producto.precioUnitarioSeleccionado * $("#number").val();
         $("#price").html("$" + newPrice);
     }
+
+    $("#btnSubmit").on("click", function () {
+        var form = document.createElement("form");
+        document.body.appendChild(form);
+        form.method = "POST";
+        form.action = "/cliente/explorar/agregarAlCarrito";
+
+        //input id local
+        var inputIdLocal = document.createElement("input");
+        inputIdLocal.setAttribute("type", "hidden");
+        inputIdLocal.setAttribute("name", "idLocal");
+        inputIdLocal.setAttribute("value", producto.idLocal);
+        form.appendChild(inputIdLocal);
+
+        //input id presentacion
+        var inputIdPresentacion = document.createElement("input");
+        inputIdPresentacion.setAttribute("type", "hidden");
+        inputIdPresentacion.setAttribute("name", "idPresentacion");
+        var select = document.getElementById("selectPresentacion");
+        inputIdPresentacion.setAttribute("value", select.value);
+        form.appendChild(inputIdPresentacion);
+
+        //input id cantidad item
+        var inputCantidadItem = document.createElement("input");
+        inputCantidadItem.setAttribute("type", "hidden");
+        inputCantidadItem.setAttribute("name", "cantidadItem");
+        var cantidadItem = document.getElementById("number");
+        inputCantidadItem.setAttribute("value", cantidadItem.value);
+        form.appendChild(inputCantidadItem);
+
+        //input detallesCliente,
+        var inputDetallesCliente = document.createElement("input");
+        inputDetallesCliente.setAttribute("type", "hidden");
+        inputDetallesCliente.setAttribute("name", "detallesCliente");
+        var detallesCliente = document.getElementById("detallesCliente");
+        inputDetallesCliente.setAttribute("value", detallesCliente.value);
+        form.appendChild(inputDetallesCliente);
+
+        //Enviar formulario
+        form.submit();
+    });
 </script>
 
 {{>navegacionCliente}}

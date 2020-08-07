@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-//const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
+const { esCliente } = require('../../lib/auth');
 const pool = require("../../database");
 
 
-router.get('/listadoLocalesMayoristas', async (req, res) => {
+router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
     try {
         //Buscar todos los locales mayoristas
         const rowsLocalesMayoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 1");
@@ -16,7 +16,19 @@ router.get('/listadoLocalesMayoristas', async (req, res) => {
     }
 });
 
-router.get('/local/:idLocal', async (req, res) => {
+router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
+    try {
+        //Buscar todos los locales minoristas
+        const rowsLocalesMinoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
+
+        res.render("cliente/explorar/listadoLocalesMinoristas", { rowsLocalesMinoristas });
+    } catch (error) {
+        console.log(error);
+
+    }
+});
+
+router.get('/local/:idLocal', esCliente, async (req, res) => {
     try {
         const { idLocal } = req.params;
         //Buscar todos los locales mayoristas
@@ -27,47 +39,76 @@ router.get('/local/:idLocal', async (req, res) => {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
         }
 
-        const rowsProductoLocal = await pool.query("SELECT presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
-
+        const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
         res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal });
     } catch (error) {
         console.log(error);
     }
 });
 
-router.get('/productoLocal/:idProducto', async (req, res) => {
+router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) => {
     try {
-        const { idProducto } = req.params;
-        const rowProductoLocal = await pool.query("SELECT producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, localcomercial.pkIdLocalComercial FROM productolocal INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
-        const rowsPresentacionProducto = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion,presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
+        const { productoYPresentacion } = req.params;
+        const array = productoYPresentacion.toString().split("-");
+        const idProducto = array[0];
+        const idPresentacionSeleccionada = array[1];
 
+        const rowProductoLocal = await pool.query("SELECT producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, localcomercial.pkIdLocalComercial FROM productolocal INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
+        var rowsPresentacionProducto = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion,presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
+        //Actualizar carrito
+        //req.session.carrito.idLocalSeleccionado = rowProductoLocal[0].pkIdLocalComercial;
+        //Preparar datos del producto para enviar al carrito
         var productoLocal = {
             idLocal: rowProductoLocal[0].pkIdLocalComercial,
-            idPresentacionSeleccionada: -1,
+            idPresentacionSeleccionada,
             cantidadItem: 0,
             detallesCliente: "",
             precioUnitarioSeleccionado: rowsPresentacionProducto[0].precioUnitarioPresentacion,
             presentaciones: rowsPresentacionProducto,
-            htmlJSON:''
+            htmlJSON: ''
         }
 
- 
-        var html='[';
+        var html = '[';
         for (let index = 0; index < rowsPresentacionProducto.length; index++) {
-            html+='{';
-            html+='idPresentacion:'+rowsPresentacionProducto[index].pkIdPresentacionProducto+',';
-            html+='nombrePresentacion:"'+rowsPresentacionProducto[index].nombrePresentacion+'",';
-            html+='precioUnitario:'+rowsPresentacionProducto[index].precioUnitarioPresentacion+',';
-            html+='detallesVendedor:"'+rowsPresentacionProducto[index].detallesPresentacionProducto+'"';
-            html+='},';
+            //Seleccionar presentación
+            rowsPresentacionProducto[index].inputSelected = "";
+            if (rowsPresentacionProducto[index].pkIdPresentacionProducto == idPresentacionSeleccionada) {
+                rowsPresentacionProducto[index].inputSelected = "selected";
+            }
+            //Guardarlo en html
+            html += '{';
+            html += 'idPresentacion:' + rowsPresentacionProducto[index].pkIdPresentacionProducto + ',';
+            html += 'nombrePresentacion:"' + rowsPresentacionProducto[index].nombrePresentacion + '",';
+            html += 'precioUnitario:' + rowsPresentacionProducto[index].precioUnitarioPresentacion + ',';
+            html += 'detallesVendedor:"' + rowsPresentacionProducto[index].detallesPresentacionProducto + '"';
+            html += '},';
         }
-        html+=']';
-        productoLocal.htmlJSON=html;
+        html += ']';
+        productoLocal.htmlJSON = html;
 
-        res.render("cliente/explorar/productoLocal", {productoLocal, rowProductoLocal:rowProductoLocal[0]});
+        res.render("cliente/explorar/productoLocal", { productoLocal, rowProductoLocal: rowProductoLocal[0] });
     } catch (error) {
         console.log(error);
 
+    }
+});
+
+router.post('/agregarAlCarrito', esCliente, async (req, res) => {
+    try {
+        const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
+        //console.log("idlocal:" + idLocal +" presentacion "+ idPresentacion +" cantidad item "+ cantidadItem +" detalles "+ detallesCliente);
+        if (req.session.carrito.idLocalSeleccionado != idLocal) {
+            throw new Error("01-El usuario quiere comprar productos de locales diferentes, se le debe advertir comprar en 1 solo local a la vez");
+        }
+
+        const newItemCarrito = {
+            idLocal, idPresentacion, cantidadItem, detallesCliente
+        };
+        req.session.carrito.items.push(newItemCarrito);
+        res.redirect("/cliente/explorar/local/" + idLocal);
+    } catch (error) {
+        console.log(error);
+        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 });
 

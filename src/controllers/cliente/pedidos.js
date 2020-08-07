@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-//const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
+const { esCliente } = require('../../lib/auth');
 const pool = require("../../database");
 
-router.get('/historial', async (req, res) => {
+router.get('/historial', esCliente, async (req, res) => {
     try {
         //const idCliente = req.session.idCliente;
         const idCliente = 1;
@@ -19,7 +19,7 @@ router.get('/historial', async (req, res) => {
     }
 });
 
-router.get('/detallesPedido/:idPedido', async (req, res) => {
+router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
     try {
         var moment = require("moment");
         moment.locale("es-us");
@@ -36,7 +36,7 @@ router.get('/detallesPedido/:idPedido', async (req, res) => {
         }
 
         //Datos adicionales
-        var rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ?", [idPedido]);
+        var rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.pkIdVenta = ?", [idPedido]);
         rowDatos[0].fechaHoraVenta = moment(rowDatos[0].fechaHoraVenta).format("LLLL");
 
         //Estado del pedido
@@ -62,14 +62,14 @@ router.get('/detallesPedido/:idPedido', async (req, res) => {
             rowsBuzon[0].mensajes = rowsMensajesBuzon;
         }
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0],rowsBuzon});
+        res.render("cliente/pedidos/detallesPedido", { rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
     }
 });
 
-router.get('/crearBuzon/:idPedido', async (req, res) => {
+router.get('/crearBuzon/:idPedido', esCliente, async (req, res) => {
     try {
         const { idPedido } = req.params;
         const rowsBuzon = await pool.query("SELECT buzon.pkIdBuzon FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=?", [idPedido]);
@@ -88,7 +88,7 @@ router.get('/crearBuzon/:idPedido', async (req, res) => {
     }
 });
 
-router.post('/detallesPedido/enviarMensaje', async (req, res) => {
+router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
     try {
         const { idVenta, idBuzon, mensaje } = req.body;
         console.log("mi mensajito es *" + mensaje.trim() + "*");
