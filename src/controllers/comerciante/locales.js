@@ -91,7 +91,7 @@ router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
 
 router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
-        const { name, descripcion, tipoLocal, productos, idlocal, domicilio } = req.body;
+        var { name, descripcion, tipoLocal, productos, idlocal, domicilio } = req.body;
         if (!Array.isArray(productos)) {
             productos = [productos];
         }
@@ -113,7 +113,8 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             totalVendido: 0,
             parcialVendido: 0,
             parcialVendidoAdmin: 0,
-            estaAbierto: 0
+            estaAbierto: 1,
+            fkIdBanner: 12
         };
         const resultLocalComercial = await pool.query("INSERT INTO localComercial SET ? ", [newLocalComercial]);
         const idLocalComercial = resultLocalComercial.insertId;
@@ -124,7 +125,6 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [idLocalComercial, productos[i]]);
             i++;
         }
-
         res.redirect('/comerciante/locales/listadoLocales');
     } catch (error) {
         console.log(error);

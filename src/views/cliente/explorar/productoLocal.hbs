@@ -205,25 +205,9 @@
         <div class="product-name">
             <h4>{{rowProductoLocal.nombreProducto}}</h4>
         </div>
-        <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 20px;">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut ratione voluptate dolor cum aperiam consequuntur
-            facere voluptas? Cumque, labore aliquid adipisci veniam perspiciatis necessitatibus ullam similique? Ut
-            voluptas nostrum iste odio. Vitae odio enim cum porro et quos impedit, nisi debitis. Cumque quod optio
-            delectus quis reiciendis eos quidem non hic reprehenderit praesentium, doloribus commodi fugiat magni sint
-            natus repellendus assumenda sapiente eum aliquam vitae? Itaque pariatur ea assumenda quam minima magni omnis
-            neque id deserunt dignissimos hic, vitae debitis nisi. Blanditiis consequatur neque consequuntur, laborum
-            eum rerum fugit consectetur modi commodi, aut quaerat voluptatibus a enim id dolorum eius velit harum minus
-            voluptate praesentium? A, perspiciatis! Voluptatibus, obcaecati ex tempore illo aperiam a neque dolores,
-            excepturi soluta laboriosam ut repellat. Dolore facere aperiam nobis cumque aspernatur non, maiores
-            perferendis porro a dolorum ab error repudiandae, expedita eaque, enim quod earum rem quis accusantium. Ab
-            excepturi, non id libero nemo reiciendis quo nulla rem, praesentium eius sint inventore impedit accusamus
-            delectus numquam totam facere? Nisi repudiandae animi praesentium explicabo qui ab perspiciatis quas
-            corporis tempora nam veniam ad, enim dolore laudantium in. Temporibus, consectetur sapiente? Nostrum quas
-            odio non veniam tempora dolore. Praesentium nisi, delectus odit eius maiores harum? Sit esse, sint, veniam
-            corporis dolore fuga, repellendus atque molestias ipsam enim minus molestiae commodi reprehenderit! Veniam
-            vero id rerum libero? Praesentium fugit quo saepe architecto quas aspernatur! Consequatur aut itaque
-            sapiente. Placeat totam libero quod velit, laudantium dolorem delectus cupiditate consequuntur illo aliquam
-            alias perferendis quos. Quia, deserunt. Ut provident eius accusamus qui quam optio?
+        <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 0px;"
+            id="detallesVendedor">
+            
         </div>
 
         <div class="details mt-2">
@@ -264,6 +248,7 @@
 var producto = {
             idLocal: {{productoLocal.idLocal}},
             idPresentacionSeleccionada: {{ productoLocal.idPresentacionSeleccionada}},
+            detallesProductoLocal:"{{productoLocal.detallesProductoLocal}}",
             cantidadItem: {{ productoLocal.cantidadItem }},
             detallesCliente: "{{{productoLocal.detallesCliente}}}",
             precioUnitarioSeleccionado: {{ productoLocal.precioUnitarioSeleccionado}},
@@ -347,6 +332,31 @@ var producto = {
         //Enviar formulario
         form.submit();
     });
+
+
+    function actualizarSelect() {
+        const idPresentacion = $("#selectPresentacion").val();
+        var detallesPresentacion = "";
+        //Buscar la presentacion
+        for (let index = 0; index < producto.presentaciones.length; index++) {
+            if (producto.presentaciones[index].idPresentacion == idPresentacion) {
+                detallesPresentacion += producto.presentaciones[index].detallesVendedor;
+            }
+        }
+        var html = "" + producto.detallesProductoLocal + "<br>";
+        html += detallesPresentacion;
+        $("#detallesVendedor").html(html);
+
+    }
+    $("#selectPresentacion").on("load change input", function () {
+        actualizarSelect();
+    });
+
+    $(document).ready(function () {
+        actualizarSelect();
+    });
+
+
 </script>
 
 {{>navegacionCliente}}

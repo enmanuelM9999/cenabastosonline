@@ -1,13 +1,13 @@
 <div class="container mt-3">
 
-    <h2>Historial de Pedidos</h2>
+    <h2>Pedidos</h2>
     <nav class="mt-4 border-0">
         <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
             <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="#" role="tab"
                 aria-controls="nav-home" aria-selected="false">Carrito</a>
-            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/comerciante/locales/pedidos/historial" role="tab"
+            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/cliente/pedidos/historial" role="tab"
                 aria-controls="nav-profile" aria-selected="true">
-                Historial </a>
+                Todos </a>
         </div>
     </nav>
 
@@ -28,7 +28,7 @@
                                         <tr>
                                             <th scope="col"># Pedido</th>
                                             <th scope="col">Valor Total</th>
-                                            <th scope="col">Fecha y Hora Entrega</th>
+                                            <th scope="col">Estado</th>
                                             <th scope="col">Opciones</th>
                                         </tr>
                                     </thead>
@@ -37,7 +37,7 @@
                                         <tr>
                                             <th scope="row">{{pkIdVenta}}</th>
                                             <td>${{montoTotal}}</td>
-                                            <td>{{fechaHoraEntrega}}</td>
+                                            <td>{{estado}}</td>
                                             <td>
                                                 <a href="/cliente/pedidos/detallesPedido/{{pkIdVenta}}"
                                                         class="btn btn-primary p-0 pr-2 pl-2" style="font-size: 20px;"

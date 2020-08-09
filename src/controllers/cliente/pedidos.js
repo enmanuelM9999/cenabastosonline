@@ -5,13 +5,25 @@ const pool = require("../../database");
 
 router.get('/historial', esCliente, async (req, res) => {
     try {
-        //const idCliente = req.session.idCliente;
-        const idCliente = 1;
+        const idCliente = req.session.idCliente;
         //Buscar el historial de pedidos de un cliente
-        var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fechaHoraEntrega FROM venta WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdCliente = ?", [1, 1, 1, idCliente]);
-        var moment = require("moment");
+        var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
+       /* var moment = require("moment");
         moment.locale("es-us");
-        rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");
+        rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
+
+        for (let index = 0; index < rowsHistorialPedidos.length; index++) {
+            if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 0) {
+                rowsHistorialPedidos[index].estado = "Nuevo";
+            } else if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+                rowsHistorialPedidos[index].estado = "Empacado";
+            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+                rowsHistorialPedidos[index].estado = "Enviado";
+            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+                rowsHistorialPedidos[index].estado = "Entregado";
+            }
+            
+        }
         res.render("cliente/pedidos/historial", { rowsHistorialPedidos });
     } catch (error) {
         console.log(error);
@@ -24,9 +36,10 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
         var moment = require("moment");
         moment.locale("es-us");
         const { idPedido } = req.params;
+        const idCliente = req.session.idCliente;
 
         //Informacion de la venta
-        var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ?", [idPedido]);
+        var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         const tamanioRowsItemVenta = rowsItemVenta.length;
 
         for (let index = 0; index < tamanioRowsItemVenta; index++) {
@@ -36,18 +49,18 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
         }
 
         //Datos adicionales
-        var rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.pkIdVenta = ?", [idPedido]);
+        var rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         rowDatos[0].fechaHoraVenta = moment(rowDatos[0].fechaHoraVenta).format("LLLL");
 
         //Estado del pedido
-        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ?", [idPedido]);
+        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         rowEstadoPedido[0].fechaHoraVenta = moment(rowEstadoPedido[0].fechaHoraVenta).format("LLLL");
         rowEstadoPedido[0].fechaHoraEnvio = moment(rowEstadoPedido[0].fechaHoraEnvio).format("LLLL");
         rowEstadoPedido[0].fechaHoraEntrega = moment(rowEstadoPedido[0].fechaHoraEntrega).format("LLLL");
         rowEstadoPedido[0].fechaHoraEmpacado = moment(rowEstadoPedido[0].fechaHoraEmpacado).format("LLLL");
 
         //Buzon
-        var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=?", [idPedido]);
+        var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         if (rowsBuzon.length == 1) {
             var rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
             for (let index = 0; index < rowsMensajesBuzon.length; index++) {

@@ -163,6 +163,7 @@ passport.use('cliente.logup', new LocalStrategy({
     req.session.carrito.pedidoHecho=0;
     req.session.carrito.items=[];
     req.session.carrito.idLocalSeleccionado=-1;
+    req.session.carrito.count=0;
 
 
     //Terminar regitro
@@ -205,6 +206,7 @@ passport.use('cliente.login', new LocalStrategy({
     req.session.carrito.pedidoHecho=0;
     req.session.carrito.items=[];
     req.session.carrito.idLocalSeleccionado=-1;
+    req.session.carrito.count=0;
     
     //Terminar inicio sesion
     const usuario = { id: rowsUsuario[0].pkIdUsuario };

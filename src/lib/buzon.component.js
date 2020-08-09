@@ -43,4 +43,20 @@ buzon.getMessageBubble=(message, stringFechaHora, isRight)=> {
     return bubbleHtml;
 }
 
+buzon.getFechaHoraChat=(stringFechaHora)=>{
+    var moment = require('moment'); // require
+    var momentNow = require('moment'); // require
+    moment.locale("es-us");
+    momentNow.locale("es-us");
+
+    moment = moment(stringFechaHora, "YYYY-MM-DD HH:mm:ss");
+    var stringMomentNow = momentNow.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+    momentNow = momentNow(stringMomentNow);
+
+    const resumida = moment.from(momentNow);
+    const detallada = moment.format("LLLL");
+    fechaHora = { resumida, detallada };
+    return fechaHora;
+}
+
 module.exports=buzon;
