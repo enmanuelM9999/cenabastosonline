@@ -530,11 +530,14 @@ router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) 
             throw "Local no cargado";
         }
         const { idProductoLocal, detallesProductoLocal } = req.body;
+        console.log("el texto es", detallesProductoLocal," y el id es ", idProductoLocal);
 
         //Recolectar y actualizar los datos en la BD
         const newProductoLocal = {
             detallesProductoLocal: detallesProductoLocal
         };
+
+        console.log("aqui el producto local", newProductoLocal);
         await pool.query("UPDATE productolocal SET ? WHERE pkIdProductoLocal = ?", [newProductoLocal, idProductoLocal]);
 
         res.redirect('/comerciante/locales/ajustes');

@@ -50,20 +50,20 @@
                                             <div class="card-title">
                                                 <h5>{{nombreProducto}}</h5>
 
-                                                <form action="/comerciante/locales/actualizarProductoLocal"
-                                                    method="POST" id="form-producto-local">
+                                                <form name="formProductoLocal{{pkIdProductoLocal}}" id="formProductoLocal{{pkIdProductoLocal}}"
+                                                    action="/comerciante/locales/actualizarProductoLocal" method="POST">
                                                     <input type="hidden" name="idProductoLocal"
                                                         value="{{pkIdProductoLocal}}">
-                                                    <div class="card-text">
-                                                        <div class="form-group">
 
-                                                            <textarea name="detallesProductoLocal"
-                                                                id="detallesProductoLocal"
-                                                                class="form-control input-producto-local"
-                                                                form="form-producto-local"
-                                                                cols="1">{{detallesProductoLocal}}</textarea>
-                                                        </div>
+                                                    <div class="form-group">
+
+                                                        <textarea name="detallesProductoLocal"
+                                                            id="detallesProductoLocal"
+                                                            class="form-control input-producto-local"
+                                                            form="formProductoLocal{{pkIdProductoLocal}}"
+                                                            cols="1">{{detallesProductoLocal}}</textarea>
                                                     </div>
+
                                                     <div>
                                                         <a href="/comerciante/locales/local/borrarProducto/{{pkIdProductoLocal}}"
                                                             class="btn btn-danger" data-toggle="tooltip"
