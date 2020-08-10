@@ -8,7 +8,6 @@ carrito.crearCarrito = async (fkIdCliente) => {
             fkIdCliente,
         }
         await pool.query("INSERT INTO carrito SET ?", [newCarrito]);
-
     } catch (error) {
         console.log(error);
     }

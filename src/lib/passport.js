@@ -4,6 +4,43 @@ const LocalStrategy = require('passport-local').Strategy;
 const pool = require('../database');
 const helpers = require('./helpers');
 
+
+//---- Administrador ----//
+
+passport.use('administrador.login', new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password',
+  passReqToCallback: true
+}, async (req, email, password, done) => {
+  try {
+
+    //Verificar si existe y no esta aceptado
+    const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, admin.pkIdAdmin FROM usuario INNER JOIN admin ON admin.fkIdUsuario = usuario.pkIdUsuario WHERE usuario.correoUsuario=?", [email]);
+    if (rowsUsuario.length == 0) {
+      throw "1-No existe un usuario para el correo " + email;
+    }
+
+    //Comprobar si las contraseña es correcta
+    if (rowsUsuario[0].claveUsuario != password) {
+      throw "1-Las contraseñas no coinciden";
+    }
+
+    //Guardar variables en sesion
+    req.session.idUser = rowsUsuario[0].pkIdUsuario;
+    req.session.idAdmin = rowsUsuario[0].pkIdAdmin;
+    req.session.tipoUsuario = 1;
+
+    //Terminar inicio sesion
+    const usuario = { id: rowsUsuario[0].pkIdUsuario };
+    done(null, usuario);
+
+  } catch (error) {
+    console.log(error);
+    return done(null, null, req.flash('message', "Error procesando datos"));
+  }
+}));
+
+
 //---- Comerciante ----//
 
 passport.use('comerciante.logup', new LocalStrategy({

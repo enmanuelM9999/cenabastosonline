@@ -57,6 +57,8 @@ app.use((req, res, next) => {
 
 // Routes
 app.use(require('./controllers/index'));
+//administrador
+app.use('/administrador/sesion', require('./controllers/administrador/sesion'));
 //comerciante
 app.use('/comerciante', require('./controllers/comerciante/index'));
 app.use('/comerciante/locales', require('./controllers/comerciante/locales'));
