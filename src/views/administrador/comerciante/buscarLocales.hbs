@@ -1,0 +1,51 @@
+<div class="container mt-3">
+
+    <h2>Comerciantes</h2>
+    <nav class="mt-4 border-0">
+        <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab"
+                href="/administrador/comerciante/comercianteListado" role="tab" aria-controls="nav-home"
+                aria-selected="false">Aprobar Comerciantes</a>
+            <a class="nav-item nav-link text-success active" id="nav-buzon-tab"
+                href="/administrador/comerciante/buscarLocal" role="tab" aria-controls="nav-profile"
+                aria-selected="true">Informacion Comerciante</a>
+        </div>
+    </nav>
+
+    <div class="tab-content" id="nav-tabContent">
+
+        <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
+            <div class="card border-0 pt-3" style="background-color: rgb(250, 250, 250);">
+
+                <div class="row">
+
+
+                    <div class="col-12 p-2">
+
+
+                        <form action="/administrador/comerciante/buscarLocalPost" method="POST">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" name="cedula" id="cedula" placeholder="Ingresar Cedula Comerciante">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-success" type="submit"><i
+                                            class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {{{html}}}
+                        
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{{>navegacionAdmin}}

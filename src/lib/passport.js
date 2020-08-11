@@ -40,7 +40,6 @@ passport.use('administrador.login', new LocalStrategy({
   }
 }));
 
-
 //---- Comerciante ----//
 
 passport.use('comerciante.logup', new LocalStrategy({
