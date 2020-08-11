@@ -232,7 +232,8 @@ passport.use('cliente.login', new LocalStrategy({
     req.session.tipoUsuario = 3;
 
     //Carrito
-
+    const carrito = require("../lib/carrito.manager");
+    carrito.crearCarrito(rowsUsuario[0].pkIdCliente);
     //Terminar inicio sesion
     const usuario = { id: rowsUsuario[0].pkIdUsuario };
     done(null, usuario);

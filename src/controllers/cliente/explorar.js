@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { esCliente } = require('../../lib/auth');
-const carrito= require("../../lib/carrito.manager");
+const carrito = require("../../lib/carrito.manager");
 const pool = require("../../database");
 
 
@@ -11,8 +11,8 @@ router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
         const rowsLocalesMayoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 1");
 
         //carrito
-        const cantItemsCarrito= await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/listadoLocalesMayoristas", { rowsLocalesMayoristas,cantItemsCarrito });
+        const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
+        res.render("cliente/explorar/listadoLocalesMayoristas", { rowsLocalesMayoristas, cantItemsCarrito });
     } catch (error) {
         console.log(error);
 
@@ -23,10 +23,9 @@ router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
     try {
         //Buscar todos los locales minoristas
         const rowsLocalesMinoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
-
         //carrito
-        const cantItemsCarrito= await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/listadoLocalesMinoristas", { rowsLocalesMinoristas, cantItemsCarrito});
+        const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
+        res.render("cliente/explorar/listadoLocalesMinoristas", { rowsLocalesMinoristas, cantItemsCarrito });
     } catch (error) {
         console.log(error);
 
@@ -45,6 +44,8 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         }
         console.log("el carrito ", req.session.carrito);
         const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
+        //carrito
+        const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, carrito: req.session.carrito });
     } catch (error) {
         console.log(error);
@@ -60,7 +61,6 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
 
         const rowProductoLocal = await pool.query("SELECT productolocal.detallesProductoLocal,producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, localcomercial.pkIdLocalComercial FROM productolocal INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
         var rowsPresentacionProducto = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion,presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE productolocal.pkIdProductoLocal = ?", [idProducto]);
-        //Actualizar carrito
 
         //Preparar datos del producto para enviar al carrito
         var productoLocal = {
@@ -102,7 +102,7 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
 router.post('/agregarAlCarrito', esCliente, async (req, res) => {
     try {
         const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
-
+        carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem);
         res.redirect("/cliente/explorar/local/" + idLocal);
     } catch (error) {
         console.log(error);
