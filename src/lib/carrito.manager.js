@@ -22,7 +22,7 @@ carrito.crearCarrito = async (fkIdCliente) => {
 carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdCarrito, fkIdPresentacion, detallesCarrito, cantidadItem) => {
     try {
         //¿El item a agregar es de un local diferente a los items que ya están?
-        const rowCarrito = await pool.query("SELECT pkIdCarrito,contadorItems,fkIdLocalSeleccionado FROM carrito WHERE pkIdCarrito=? AND fkIdCliente=?", [fkIdCarrito, pkIdUsuario]);
+        var rowCarrito = await pool.query("SELECT pkIdCarrito,contadorItems,fkIdLocalSeleccionado FROM carrito WHERE pkIdCarrito=? AND fkIdCliente=?", [fkIdCarrito, pkIdUsuario]);
         if (rowCarrito.length == 0) {
             throw new Error("404-No hay creado un carrito para el usuario" + pkIdUsuario);
         }
@@ -50,11 +50,15 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdCarrito
     }
 }
 
-carrito.getLengthCarrito = (idCliente) => {
+carrito.getLengthCarrito = async (idCliente) => {
     try {
-        const rowCarrito = await pool.query("SELECT contadorItems FROM carrito WHERE fkIdCliente=?", [idCliente]);
+        var rowCarrito = await pool.query("SELECT contadorItems FROM carrito WHERE fkIdCliente=?", [idCliente]);
         if (rowCarrito.length != 1) {
             throw new Error("999-No existe carrito o existe más de 1 carrito asociado al cliente " + idCliente);
+        }
+
+        if (rowCarrito[0].contadorItems == 0) {
+            rowCarrito[0].contadorItems = "";
         }
         return rowCarrito[0].contadorItems;
     } catch (error) {
@@ -62,7 +66,7 @@ carrito.getLengthCarrito = (idCliente) => {
     }
 }
 
-carrito.vaciarCarrito = (idCliente) => {
+carrito.vaciarCarrito = async (idCliente) => {
     try {
         //borrar todos los items
         await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
@@ -77,7 +81,7 @@ carrito.vaciarCarrito = (idCliente) => {
     }
 }
 
-carrito.borrarItemCarrito = (idCliente, pkIdItemCarrito) => {
+carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito) => {
     try {
         //obtener el carrito
         const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito WHERE itemcarrito.pkIdItemCarrito=?", [pkIdItemCarrito]);
