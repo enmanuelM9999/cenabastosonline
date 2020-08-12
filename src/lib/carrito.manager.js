@@ -1,12 +1,12 @@
 var carrito = {};
 const pool = require("../database");
 
-carrito.crearCarrito = async (fkIdCliente) => {
+carrito.crearCarrito = async (fkIdCliente, req, res) => {
     try {
-        //¿Ya existe un carrito para ese cliente? Si ya existe
+        //¿Ya existe un carrito para ese cliente?
         const rowsCarrito = await pool.query("SELECT pkIdCarrito FROM carrito WHERE fkIdCliente=?", [fkIdCliente]);
         if (rowsCarrito.length != 0) {
-            throw new Error("ca1-Existen 1 o más carritos asociados a ese cliente"); //(Se entiende que no existe carrito, no se valida la posibilidad de que el cliente no exista)
+            throw new Error("impUsrimpUsr--ca1-Existen 1 o más carritos asociados a ese cliente"); //(Se entiende que no existe carrito, no se valida la posibilidad de que el cliente no exista)
         }
         //Crear carrito
         const newCarrito = {
@@ -19,23 +19,23 @@ carrito.crearCarrito = async (fkIdCliente) => {
     }
 }
 
-carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresentacion, detallesCarrito, cantidadItem) => {
+carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresentacion, detallesCarrito, cantidadItem, req, res) => {
     try {
         //¿El item a agregar es de un local diferente a los items que ya están?
         var rowCarrito = await pool.query("SELECT pkIdCarrito,contadorItems,fkIdLocalSeleccionado FROM carrito WHERE fkIdCliente=?", [pkIdUsuario]);
         if (rowCarrito.length == 0) {
-            throw new Error("ca2-No hay creado un carrito para el usuario");
+            throw new Error("impUsr-ca2-No hay creado un carrito para el usuario");
         }
         if (rowCarrito.length != 1) {
-            throw new Error("ca3-No hay 1 solo carrito para el usuario " + pkIdUsuario + ", posiblemente se manipuló la BD manualmente");
+            throw new Error("impUsr-ca3-No hay 1 solo carrito para el usuario " + pkIdUsuario + ", posiblemente se manipuló la BD manualmente");
         }
         if (rowCarrito[0].fkIdLocalSeleccionado != fkIdLocalComercial && rowCarrito[0].contadorItems > 0) {
-            throw new Error("ca4-Se intenta agregar un item de una tienda diferente. Debe pedir en una sola tienda a la vez ");//Advertir que debe pedir en una tienda a la vez hasta que sea posible pedir en varias
+            throw new Error("impUsr-ca4-Se intenta agregar un item de una tienda diferente. Debe pedir en una sola tienda a la vez ");//Advertir que debe pedir en una tienda a la vez hasta que sea posible pedir en varias
         }
         //¿El item está repetido?
-        const rowItemRepetido = await pool.query("SELECT itemcarrito.pkIdItemCarrito FROM itemcarrito INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND itemcarrito.fkIdPresentacion", [pkIdUsuario]);
-        if (rowItemRepetido.length > 0) {
-            throw new Error("ca5-Posiblemente el item está repetido, para modificarlo vaya al carrito");
+        const rowItemRepetido = await pool.query("SELECT itemcarrito.pkIdItemCarrito FROM itemcarrito INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND itemcarrito.fkIdPresentacion=?", [pkIdUsuario, fkIdPresentacion]);
+        if (rowItemRepetido.length >= 1) {
+            throw new Error("impUsr-ca5-Posiblemente el item está repetido, para modificarlo vaya al carrito");
         }
         //Agregar el item al carro
         const newItemCarrito = {
@@ -55,7 +55,15 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresent
         };
         await pool.query("UPDATE carrito SET ? WHERE fkIdCliente=?", [newCarrito, pkIdUsuario]);
     } catch (error) {
-        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0]; // impUsr || impDev
+        var _do = arrayError[1]; // doDefault || etc ...
+        var _msg = arrayError[2];   // msg
+        if ( _imp == "impUsr") {
+            req.flash("info", arrayError[1]);
+        }
+        console.log("aqui iría el error ", error);
+        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 }
 
@@ -63,9 +71,8 @@ carrito.getLengthCarrito = async (idCliente) => {
     try {
         var rowCarrito = await pool.query("SELECT contadorItems FROM carrito WHERE fkIdCliente=?", [idCliente]);
         if (rowCarrito.length != 1) {
-            throw new Error("ca6-No existe carrito o existe más de 1 carrito asociado al cliente");
+            throw new Error("impUsr-ca6-No existe carrito o existe más de 1 carrito asociado al cliente");
         }
-
         if (rowCarrito[0].contadorItems == 0) {
             rowCarrito[0].contadorItems = "";
         }
@@ -78,7 +85,10 @@ carrito.getLengthCarrito = async (idCliente) => {
 carrito.vaciarCarrito = async (idCliente) => {
     try {
         //borrar todos los items
+        //@test !!!!! verificar si se borra algo antes de actualizar el carrito
         await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
+
+        //!!!!! verificar si se borra algo antes de actualizar el carrito
         //actualizar el carrito
         var newCarrito = {
             contadorItems: 0,
@@ -90,20 +100,20 @@ carrito.vaciarCarrito = async (idCliente) => {
     }
 }
 
-carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito) => {
+carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito, req, res) => {
     try {
         //obtener el carrito
         const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito WHERE itemcarrito.pkIdItemCarrito=?", [pkIdItemCarrito]);
         if (rowCarrito.length != 1) {
-            throw new Error("ca7-No existe carrito o existe más de 1 carrito asociado al cliente");
+            throw new Error("impUsr-ca7-No existe carrito o existe más de 1 carrito asociado al cliente");
         }
         var contItems = rowCarrito[0].contadorItems;
         var localSeleccionado = rowCarrito[0].fkIdLocalSeleccionado;
 
         if (contItems == 0) {
-            throw new Error("ca8-El carrito está vacío.");
+            throw new Error("impUsr-ca8-El carrito está vacío.");
         }
-        //borrar el item
+        //@test !!!vrificar si se borró algo |borrar el item
         await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND ic.pkIdItemCarrito=?", [idCliente, pkIdItemCarrito]);
         //actuaizar el carrito
         contItems--;

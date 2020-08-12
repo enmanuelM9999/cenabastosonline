@@ -14,12 +14,12 @@ router.get('/logup', async (req, res) => {
 
 
 router.post("/logup", (req, res, next) => {
-  req.check("email", "Campo vacío").notEmpty();
-  req.check("password", "Campo vacío").notEmpty();
-  req.check("name", "Campo vacío").notEmpty();
-  req.check("lastname", "Campo vacío").notEmpty();
-  req.check("phone", "Campo vacío").notEmpty();
-  req.check("doc", "Campo vacío").notEmpty();
+  req.check("email", "Ingrese un correo").notEmpty();
+  req.check("password", "Debe crear una contraseña").notEmpty();
+  req.check("name", "Ingrese su nombre").notEmpty();
+  req.check("lastname", "Ingrese su apellido").notEmpty();
+  req.check("phone", "Ingrese su número de teléfono").notEmpty();
+  req.check("doc", "Ingrese su documento de identidad").notEmpty();
 
   const errors = req.validationErrors();
   if (errors.length > 0) {
@@ -40,8 +40,8 @@ router.get('/login', async (req, res) => {
 });
 
 router.post("/login", (req, res, next) => {
-  req.check("email", "Campo vacío").notEmpty();
-  req.check("password", "Campo vacío").notEmpty();
+  req.check("email", "Ingrese su correo").notEmpty();
+  req.check("password", "Ingrese su contraseña").notEmpty();
 
   const errors = req.validationErrors();
   if (errors.length > 0) {

@@ -17,7 +17,7 @@ passport.use('administrador.login', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, admin.pkIdAdmin FROM usuario INNER JOIN admin ON admin.fkIdUsuario = usuario.pkIdUsuario WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "1-No existe un usuario para el correo " + email;
+      throw "impDev-doDefault-No existe un usuario para el correo " + email;
     }
 
     //Comprobar si las contraseña es correcta
@@ -53,12 +53,12 @@ passport.use('comerciante.logup', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuariosNoAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE comerciante.estaAprobado=0 AND usuario.correoUsuario=?", [email]);
     if (rowsUsuariosNoAceptados.length > 0) {
-      throw "1-Ya existe un usuario pendiente para ser aceptado, por favor inicie sesión";
+      throw "impUsr-doDefault-Ya existe un usuario pendiente para ser aceptado, por favor inicie sesión";
     }
     //Verificar si existe y esta aceptado
     const rowsUsuariosAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE comerciante.estaAprobado=1 AND usuario.correoUsuario=?", [email]);
     if (rowsUsuariosAceptados.length > 0) {
-      throw "1-Ya existe un usuario activo, por favor inicie sesión";
+      throw "impUsr-doDefault-Ya existe un usuario activo, por favor inicie sesión";
     }
     //Crear y Registrar en BD el nuevo Usuario
     let newUser = {
@@ -107,7 +107,6 @@ passport.use('comerciante.logup', new LocalStrategy({
   }
 }));
 
-
 passport.use('comerciante.login', new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password',
@@ -118,12 +117,12 @@ passport.use('comerciante.login', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, personaNatural.pkIdPersonaNatural, personaNatural.nombresPersonaNatural, comerciante.pkIdComerciante, comerciante.estaAprobado FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "1-No existe un usuario para el correo " + email;
+      throw "impUsr-doDefault-No existe un usuario para el correo " + email;
     }
 
     //Comprobar si las contraseña es correcta
     if (rowsUsuario[0].claveUsuario != password) {
-      throw "1-Las contraseñas no coinciden";
+      throw "impUsr-doDefault-Las contraseñas no coinciden";
     }
 
     //Guardar variables en sesion
@@ -157,7 +156,7 @@ passport.use('cliente.logup', new LocalStrategy({
     //Verificar si existe
     const rowsUsuariosAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuariosAceptados.length > 0) {
-      throw "1-Ya existe un usuario, por favor inicie sesión";
+      throw "impUsr-doDefault-Ya existe un usuario, por favor inicie sesión";
     }
     //Crear y Registrar en BD el nuevo Usuario
     let newUser = {
@@ -217,12 +216,12 @@ passport.use('cliente.login', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, personaNatural.pkIdPersonaNatural, personaNatural.nombresPersonaNatural, cliente.pkIdCliente FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN cliente ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "1-No existe un usuario para el correo " + email;
+      throw "impUsr-doDefault-No existe un usuario para el correo " + email;
     }
 
     //Comprobar si las contraseña es correcta
     if (rowsUsuario[0].claveUsuario != password) {
-      throw "1-Las contraseñas no coinciden";
+      throw "impUsr-doDefault-Las contraseñas no coinciden";
     }
 
     //Guardar variables en sesion

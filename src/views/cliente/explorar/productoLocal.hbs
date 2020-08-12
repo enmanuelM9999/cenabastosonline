@@ -193,21 +193,21 @@
     }
 </style>
 
-<div class="header" style="{{rowProductoLocal.cssPropertiesBg}}">
+<div class="header" style="{{productoLocal.cssPropertiesBg}}">
     <a class="back p-0" style="font-size: 45px; color:rgb(37, 37, 37);"
-        href="/cliente/explorar/local/{{rowProductoLocal.pkIdLocalComercial}}"><i class="fas fa-angle-left"></i></a>
-    <div class="product-img"><img src={{rowProductoLocal.rutaImagen}} alt="{{rowProductoLocal.nombreProducto}}"> </div>
+        href="/cliente/explorar/local/{{productoLocal.idLocal}}"><i class="fas fa-angle-left"></i></a>
+    <div class="product-img"><img src={{productoLocal.rutaImagen}} alt="{{productoLocal.nombreProducto}}"> </div>
 
 </div>
 <div class="product-info">
 
     <div class="container mb-3">
         <div class="product-name">
-            <h4>{{rowProductoLocal.nombreProducto}}</h4>
+            <h4>{{productoLocal.nombreProducto}}</h4>
         </div>
         <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 0px;"
             id="detallesVendedor">
-            
+
         </div>
 
         <div class="details mt-2">
@@ -228,7 +228,7 @@
                 <div class="col-xs-12 col-md-6 my-auto p-3">
                     <div class="quantity">
                         <button id="less" type="button">-</button>
-                        <input id="number" type="number" min="0" step="1" value="0">
+                        <input id="number" type="number" min="0" step="1" value="1">
                         <button id="more" type="button">+</button>
                     </div>
                 </div>
@@ -245,15 +245,12 @@
 </div>
 
 <script>
-var producto = {
+    var producto = {
             idLocal: {{productoLocal.idLocal}},
-            idPresentacionSeleccionada: {{ productoLocal.idPresentacionSeleccionada}},
             detallesProductoLocal:"{{productoLocal.detallesProductoLocal}}",
-            cantidadItem: {{ productoLocal.cantidadItem }},
-            detallesCliente: "{{{productoLocal.detallesCliente}}}",
             precioUnitarioSeleccionado: {{ productoLocal.precioUnitarioSeleccionado}},
             presentaciones: {{{ productoLocal.htmlJSON }}}
-        }
+    }
 
     $less = $("#less");
     $more = $("#more");
@@ -314,7 +311,7 @@ var producto = {
         inputIdPresentacion.setAttribute("value", select.value);
         form.appendChild(inputIdPresentacion);
 
-        //input id cantidad item
+        //input cantidad item
         var inputCantidadItem = document.createElement("input");
         inputCantidadItem.setAttribute("type", "hidden");
         inputCantidadItem.setAttribute("name", "cantidadItem");
@@ -342,12 +339,12 @@ var producto = {
         for (let index = 0; index < producto.presentaciones.length; index++) {
             if (producto.presentaciones[index].idPresentacion == idPresentacion) {
                 detallesPresentacion += producto.presentaciones[index].detallesVendedor;
-                producto.precioUnitarioSeleccionado=presentaciones[index].;
+                producto.precioUnitarioSeleccionado = producto.presentaciones[index].precioUnitario;
                 calcPrice();
             }
         }
-        var html = "" + producto.detallesProductoLocal + "<br>";
-        html += detallesPresentacion;
+        var html = "-" + producto.detallesProductoLocal + "<br>";
+        html += "-" + detallesPresentacion;
         $("#detallesVendedor").html(html);
 
     }
