@@ -310,6 +310,17 @@
     }
 </style>
 
+<!-- demo styles -->
+<link rel="stylesheet" href="/zuckjs/demo/style.css">
+
+<!-- lib styles -->
+<link rel="stylesheet" href="/zuckjs/dist/zuck.min.css">
+
+<!-- lib skins -->
+<link rel="stylesheet" href="/zuckjs/dist/skins/snapgram.css">
+<link rel="stylesheet" href="/zuckjs/dist/skins/vemdezap.css">
+<link rel="stylesheet" href="/zuckjs/dist/skins/facesnap.css">
+<link rel="stylesheet" href="/zuckjs/dist/skins/snapssenger.css">
 
 <header class="header" style="overflow: auto;">
     <div class="title p-2">
@@ -326,6 +337,11 @@
         <div class="title">
             <h4>Informacion</h4>
         </div>
+
+        <div class="justify-content-start">
+            <div id="stories" class="storiesWrapper stories"></div>
+        </div>
+
 
         <div class="store-data">
 
@@ -351,10 +367,11 @@
             <div class="products">
                 <div class="container">
                     <div class="row pt-3">
-                        
+
                         {{#each rowsProductoLocal}}
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 pb-3 pl-3 pr-3 pt-0">
-                            <a href="/cliente/explorar/productoLocal/{{pkIdProductoLocal}}-{{pkIdPresentacionProducto}}" class="product mx-auto" style="{{cssPropertiesBg}}">
+                            <a href="/cliente/explorar/productoLocal/{{pkIdProductoLocal}}-{{pkIdPresentacionProducto}}"
+                                class="product mx-auto" style="{{cssPropertiesBg}}">
                                 <div class="product-img"><img src="{{rutaImagen}}" alt="{{nombreProducto}}"></div>
                                 <div class="product-info">
                                     <b>
@@ -362,7 +379,7 @@
                                         <br>
                                         /${{precioUnitarioPresentacion}}
                                         <br>
-                                         <small>{{nombreProducto}}</small>
+                                        <small>{{nombreProducto}}</small>
                                     </b></div>
                             </a>
                         </div>
@@ -376,6 +393,81 @@
         </div>
     </div>
 </div>
+
+
+<script src="/zuckjs/dist/zuck.min.js"></script>
+<script src="/zuckjs/demo/script.js"></script>
+<script>
+    var currentSkin = getCurrentSkin();
+    currentSkin['name'] = "VemDeZAP";
+    //currentSkin['params']['list'] = "true";
+    currentSkin['params']['cubeEffect'] = false;
+    var stories = new Zuck('stories', {
+        backNative: true,
+        previousTap: true,
+        skin: currentSkin['name'],
+        autoFullScreen: currentSkin['params']['autoFullScreen'],
+        avatars: currentSkin['params']['avatars'],
+        paginationArrows: currentSkin['params']['paginationArrows'],
+        list: currentSkin['params']['list'],
+        cubeEffect: currentSkin['params']['cubeEffect'],
+        localStorage: true,
+        stories: [
+            Zuck.buildTimelineItem(
+                "ramon",
+                "https://media-cdn.tripadvisor.com/media/photo-s/12/25/a2/fd/market.jpg",
+                "Tomates hoy",
+                "https://ramon.codes",
+                timestamp(),
+                [
+                    ["ramon-1", "photo", 3, "https://media-cdn.tripadvisor.com/media/photo-s/12/25/a2/fd/market.jpg", "https://media-cdn.tripadvisor.com/media/photo-s/12/25/a2/fd/market.jpg", '', false, false, timestamp()],
+                    ["ramon-2", "video", 0, "https://res.cloudinary.com/megaplaza/video/upload/v1595892407/VID-20190504-WA0006_qlbag6.mp4", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/2.jpg", '', false, false, timestamp()],
+                    ["ramon-3", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/3.png", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/3.png", 'https://ramon.codes', 'Visit my Portfolio', false, timestamp()]
+                ]
+            ),
+            Zuck.buildTimelineItem(
+                "gorillaz",
+                "https://growproexperience.com/wp-content/uploads/2018/06/Chef-en-Australia.jpg",
+                "Recetas rápidas",
+                "",
+                timestamp(),
+                [
+                    ["gorillaz-1", "video", 0, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/4.mp4", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/4.jpg", '', false, false, timestamp()],
+                    ["gorillaz-2", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/5.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/5.jpg", '', false, false, timestamp()],
+                ]
+            ),
+            Zuck.buildTimelineItem(
+                "ladygaga",
+                "https://www.designevo.com/res/templates/thumb_small/microphone-cable-and-news.png",
+                "Novedades",
+                "",
+                timestamp(),
+                [
+                    ["ladygaga-1", "photo", 5, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/6.jpg", '', false, false, timestamp()],
+                    ["ladygaga-2", "photo", 3, "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", "https://raw.githubusercontent.com/ramon82/assets/master/zuck.js/stories/7.jpg", 'http://ladygaga.com', false, false, timestamp()],
+                ]
+            )
+        ],
+        language: { // if you need to translate :)
+            unmute: 'Toca para oir',
+            keyboardTip: 'Espacio para siguiente',
+            visitLink: 'Visita el link',
+            time: {
+                ago: 'atrás',
+                hour: 'hora',
+                hours: 'horas',
+                minute: 'minuto',
+                minutes: 'minutos',
+                fromnow: 'ahora',
+                seconds: 'segundos',
+                yesterday: 'ayer',
+                tomorrow: 'mañana',
+                days: 'días'
+            }
+        }
+    });
+
+</script>
 
 
 

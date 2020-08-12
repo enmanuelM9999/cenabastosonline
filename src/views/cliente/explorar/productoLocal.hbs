@@ -257,6 +257,7 @@ var producto = {
 
     $less = $("#less");
     $more = $("#more");
+    calcPrice();
 
     $less.on("click", function () {
         var actual = $("#number").val();
@@ -341,6 +342,8 @@ var producto = {
         for (let index = 0; index < producto.presentaciones.length; index++) {
             if (producto.presentaciones[index].idPresentacion == idPresentacion) {
                 detallesPresentacion += producto.presentaciones[index].detallesVendedor;
+                producto.precioUnitarioSeleccionado=presentaciones[index].;
+                calcPrice();
             }
         }
         var html = "" + producto.detallesProductoLocal + "<br>";

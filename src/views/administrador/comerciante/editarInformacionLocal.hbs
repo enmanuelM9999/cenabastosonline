@@ -1,0 +1,53 @@
+<div class="container mt-3">
+    <h3>Local: {{rowDatosLocal.nombreLocal}}</h3>
+
+    <div class="row">
+
+        <div class="col-12 p-2">
+
+            <div class="card p-4">
+                <form action="/administrador/comerciante/editarInformacionLocal" method="POST" name="form" id="form">
+                    <input type="hidden" name="id" value="{{rowDatosLocal.pkIdLocalComercial}}">
+                    <div class="form-group">
+                        <label for="idLocal">Id Local Cenabastos</label>
+                        <input type="text" class="form-control" value="{{rowDatosLocal.idLocalEnCenabastos}}" id="idLocal" name="idLocal">
+                    </div>
+                    <div class="form-group">
+                        <label for="nameLocal">Nombre Local</label>
+                        <input type="text" class="form-control" value="{{rowDatosLocal.nombreLocal}}" id="nameLocal"
+                            name="nameLocal">
+                    </div>
+                    <div class="form-group">
+                            <label for="descripcion">Descripcion al público</label>
+                            <textarea name="descripcion" id="descripcion" class="form-control"
+                                form="form">{{rowDatosLocal.descripcionLocal}}</textarea>
+                        </div>
+                    <div class="form-group">
+                        <label for="precioDom">Precio Domicilio</label>
+                        <input type="number" class="form-control" value="{{rowDatosLocal.precioDomicilio}}" id="precioDom" name="precioDom">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoLocal">¿Qué tipo de local es?</label>
+                            <select name="tipoLocal" id="tipoLocal" class="form-control">
+                                {{{rowDatosLocal.html}}}   
+                            </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estadoLocal">Estado Local</label>
+                            <select name="estadoLocal" id="estadoLocal" class="form-control">
+                                {{{rowDatosLocal.htmlEstado}}}   
+                            </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Actualizar</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{{>navegacionAdmin}}

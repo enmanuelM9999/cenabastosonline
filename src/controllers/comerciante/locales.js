@@ -30,7 +30,7 @@ router.get('/local/:id', esComercianteAprobado, async (req, res) => {
 router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
     try {
         //Obtener locales de la base de datos
-        var rowsLocales = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        var rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.parcialVendido,localcomercial.estaAbierto,imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE localcomercial.fkIdComerciantePropietario =?", [req.session.idComerciante]);
         //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
         const rowsLocalesImprimibles = rowsLocales.map(function (local) {
             const mayomino = local.esMayorista;
@@ -53,7 +53,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
         //Obtener locales de la base de datos
-        var rowsLocales = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        var rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.parcialVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
         //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
         const rowsLocalesImprimibles = rowsLocales.map(function (local) {
             const mayomino = local.esMayorista;
@@ -65,7 +65,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        var primerLocal = await pool.query("SELECT pkIdLocalComercial,nombreLocal,esMayorista,precioDomicilio,descripcionLocal,calificacionPromedio,calificacionContadorCliente,idLocalEnCenabastos,totalVendido,parcialVendido,estaAbierto FROM localcomercial WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
+        var primerLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.parcialVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
         var tempLocal = primerLocal[0];
         const mayomino = primerLocal.esMayorista;
         if (mayomino == 0) {
