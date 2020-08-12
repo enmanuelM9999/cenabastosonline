@@ -71,6 +71,7 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
             detallesCliente: "",
             precioUnitarioSeleccionado: rowsPresentacionProducto[0].precioUnitarioPresentacion,
             presentaciones: rowsPresentacionProducto,
+            cssPropertiesBg: "",
             htmlJSON: ''
         }
 
