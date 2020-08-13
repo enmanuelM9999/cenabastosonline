@@ -3,71 +3,80 @@
 
     <form method="POST" action="/comerciante/locales/crearLocal" class="mt-4" name="form" id="form">
 
-        <nav class="border-0">
-            <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link text-success active" id="nav-home-tab" data-toggle="tab" href="#nav-home"
-                    role="tab" aria-controls="nav-home" aria-selected="true"><i class="fas fa-store"></i> Datos del
-                    local</a>
-                <a class="nav-item nav-link text-success" id="nav-profile-tab" data-toggle="tab" href="#nav-profile"
-                    role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fas fa-apple-alt"></i>
-                    Productos</a>
-            </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
+        <div class="accordion" id="accordionExample">
+            <div class="card">
+                <div class="" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left"
+                            type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+                            aria-controls="collapseOne">
+                            <h5>1. <i class="fas fa-store"></i> Datos del local</h5>
+                        </button>
+                    </h2>
+                </div>
 
-            <div class="tab-pane fade show active pb-3" id="nav-home" role="tabpanel" aria-labelledby="nav-home">
+                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="container pt-3">
+                            <div class="form-group">
+                                <label for="idlocal">ID Local en Cenabastos</label>
+                                <input class="form-control" type="text" placeholder="Ejemplo: e-104" name="idlocal"
+                                    id="idlocal">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">¿Cómo se llama el local?</label>
+                                <input class="form-control" type="text" placeholder="Ejemplo: Fruver Don jacinto"
+                                    name="name" id="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcion">Descripcion al público</label>
+                                <textarea name="descripcion" id="descripcion" class="form-control"
+                                    placeholder="Ejemplo: Las mejores frutas y verduras de la ciudad"
+                                    form="form"> </textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipoLocal">¿Qué tipo de local es?</label>
+                                <select name="tipoLocal" id="tipoLocal" class="form-control">
 
-                <div class="card shadow border-top-0">
-                    <div class="container pt-3">
-                        <div class="form-group">
-                            <label for="idlocal">ID Local en Cenabastos</label>
-                            <input class="form-control" type="text" placeholder="Ejemplo: e-104" name="idlocal"
-                                id="idlocal">
-                        </div>
-                        <div class="form-group">
-                            <label for="name">¿Cómo se llama el local?</label>
-                            <input class="form-control" type="text" placeholder="Ejemplo: Fruver Don jacinto"
-                                name="name" id="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcion">Descripcion al público</label>
-                            <textarea name="descripcion" id="descripcion" class="form-control"
-                                placeholder="Ejemplo: Las mejores frutas y verduras de la ciudad"
-                                form="form"> </textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipoLocal">¿Qué tipo de local es?</label>
-                            <select name="tipoLocal" id="tipoLocal" class="form-control">
+                                    <option value="0">Minorista</option>
+                                    <option value="1">Mayorista</option>
 
-                                <option value="0">Minorista</option>
-                                <option value="1">Mayorista</option>
-
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="domicilio">Precio del domicilio (se puede modificar después)</label>
-                            <input class="form-control" type="number" step="50" placeholder="Ejemplo: 10000"
-                                name="domicilio" id="domicilio">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="domicilio">Precio del domicilio (se puede modificar después)</label>
+                                <input class="form-control" type="number" step="50" placeholder="Ejemplo: 10000"
+                                    name="domicilio" id="domicilio">
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-
-            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile">
-                <div class="card shadow border-top-0 pb-3">
-                    <div class="container pt-3">
-                        <h5>Selecciona los productos que vendes</h5>
-                        <small class="text-muted">Las presentaciones de tus productos se añadirán después</small>
-                        <div class="productos row mt-2">
-                            {{#each rowsProductos}}
-                            <div class="form-control border-0 col-sm-12 col-lg-3">
-                                <label><input type="checkbox" value="{{pkIdProducto}}" name="productos">
-                                    <img src="{{rutaImagen}}" alt="" style="width: 20px; height: 20px;"> {{nombreProducto}}</label>
+            <div class="card">
+                <div class="" id="headingTwo">
+                    <h2 class="mb-0">
+                        <button class="btn btn-outline-light text-dark text-decoration-none btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
+                            aria-controls="collapseTwo">
+                            <h5>2. <i class="fas fa-apple-alt"></i> Productos que vendes</h5>
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="container pt-3">
+                            <h5>Selecciona los productos que vendes</h5>
+                            <small class="text-muted">Las presentaciones de tus productos se añadirán después</small>
+                            <div class="productos row mt-2">
+                                {{#each rowsProductos}}
+                                <div class="form-control border-0 col-sm-12 col-lg-3">
+                                    <label><input type="checkbox" value="{{pkIdProducto}}" name="productos">
+                                        <img src="{{rutaImagen}}" alt="" style="width: 40px; height: 40px;">
+                                        {{nombreProducto}}</label>
+                                </div>
+                                {{/each}}
                             </div>
-                            {{/each}}
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </div>

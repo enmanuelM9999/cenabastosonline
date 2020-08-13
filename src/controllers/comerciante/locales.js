@@ -156,7 +156,7 @@ router.get('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        const rowsProductos = await pool.query("SELECT pkIdProducto, nombreProducto FROM producto ORDER BY nombreProducto ASC");
+        const rowsProductos = await pool.query("SELECT producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM producto INNER JOIN imagen ON producto.fkIdImagen=imagen.pkIdImagen ORDER BY nombreProducto ASC");
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]);
         //checked
         const productosImprimibles = rowsProductos.map(function (producto) {
@@ -626,8 +626,8 @@ router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async
             throw "Local no cargado";
         }
         const { id } = req.params;
-        const resultDelete=await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
-        console.log("el resultado de borrar algo es ",resultDelete);
+        const resultDelete = await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        console.log("el resultado de borrar algo es ", resultDelete);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
@@ -681,10 +681,14 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
             throw "Local no cargado";
         }
         const { idProductoLocal, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
+        nombrePresentacion.trim();
+        if (nombrePresentacion == "") {
+            throw new Error("impUsr-reForm-Ingrese un nombre válido");
+        }
         //Verificar si el id del producto-local es válido
         const rowsProductoLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.fkIdComerciantePropietario=? AND productolocal.pkIdProductoLocal=?", [req.session.idComerciante, idProductoLocal]);
         if (rowsProductoLocal.length != 1) {
-            throw "El id del producto-local no es valido";
+            throw "impDev-doDefault-El id del producto-local no es valido";
         }
         //Agregar presentación
         const newPresentacionProductoLocal = {
@@ -697,8 +701,22 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        req.flash("message", "Seleccione un local de nuevo")
-        res.redirect("/comerciante/locales/listadoLocales");
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+
+        if (_imp === "impUsr") {
+            req.flash("message", _msg);
+        }
+
+        if (_do === "reForm") {
+            res.redirect("/comerciante/locales/agregarPresentacionProductoLocal/" + idProductoLocal + "");
+        }
+
+        if (_do === "doDefault") {
+            res.redirect("/comerciante/locales/listadoLocales");
+        }
     }
 });
 
