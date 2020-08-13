@@ -92,6 +92,15 @@ router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
 router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
         var { name, descripcion, tipoLocal, productos, idlocal, domicilio } = req.body;
+        req.check("idlocal", "Ingrese el id que identifica su local en Cenabastos P.H.").notEmpty();
+        req.check("name", "Ingrese el nombre de su local comercial").notEmpty();
+        req.check("tipoLocal", "Seleccione un tipo de local").notEmpty();
+        req.check("domicilio", "Ingrese un precio base de su cobro de domicilios").notEmpty();
+
+        const errors = req.validationErrors();
+        if (errors.length > 0) {
+            throw new Error("impUsr-reForm-" + errors[0].msg);
+        }
         if (!Array.isArray(productos)) {
             productos = [productos];
         }
@@ -111,8 +120,6 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             esMayorista: tipoLocal,
             idLocalEnCenabastos: idlocal,
             totalVendido: 0,
-            parcialVendido: 0,
-            parcialVendidoAdmin: 0,
             estaAbierto: 1,
             fkIdBanner: 12
         };
@@ -121,14 +128,25 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
 
         //Algoritmo para Insertar en la BD los productoLocal de un localComercial
         let i = 0;
-        while (i < productos.length) {
+        while (i < productos.length && productos[i] != null) {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [idLocalComercial, productos[i]]);
             i++;
         }
         res.redirect('/comerciante/locales/listadoLocales');
     } catch (error) {
         console.log(error);
-        res.redirect('/comerciante/locales/pedidos');
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp === "impUsr" && _do === "doDefault") {
+            req.flash("message", _msg);
+        }
+        if (_imp === "impUsr" && _do === "reForm") {
+            req.flash("message", _msg);
+            res.redirect('/comerciante/locales/crearLocal');
+        }
+        res.redirect('/comerciante/locales/listadoLocales');
     }
 });
 
@@ -530,7 +548,7 @@ router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) 
             throw "Local no cargado";
         }
         const { idProductoLocal, detallesProductoLocal } = req.body;
-        console.log("el texto es", detallesProductoLocal," y el id es ", idProductoLocal);
+        console.log("el texto es", detallesProductoLocal, " y el id es ", idProductoLocal);
 
         //Recolectar y actualizar los datos en la BD
         const newProductoLocal = {
@@ -608,7 +626,8 @@ router.get('/local/borrarPresentacionProducto/:id', esComercianteAprobado, async
             throw "Local no cargado";
         }
         const { id } = req.params;
-        await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        const resultDelete=await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.pkIdPresentacionProducto = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
+        console.log("el resultado de borrar algo es ",resultDelete);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);

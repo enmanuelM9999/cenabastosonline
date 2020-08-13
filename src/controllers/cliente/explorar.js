@@ -22,7 +22,7 @@ router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
 router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
     try {
         //Buscar todos los locales minoristas
-        const rowsLocalesMinoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
+        const rowsLocalesMinoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         res.render("cliente/explorar/listadoLocalesMinoristas", { rowsLocalesMinoristas, cantItemsCarrito });
