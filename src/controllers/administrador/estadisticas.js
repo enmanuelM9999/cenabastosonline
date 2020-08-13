@@ -44,11 +44,12 @@ router.post('/buscarLocal', async (req, res) => {
 
             html +=         '<div id="listadoLocalesCollapse1" class="collapse show" aria-labelledby="listadoLocalesCabecera1" data-parent="#listadoLocalesAcordion1"';
             html +=             '<div class="card-body">';
-            html +='';
-            html +='';
-            html +='';
-            html +='';
-
+            html +=                 '<a href="/administrador/estadisticas/buscarFechas/'+rowsLocalesComerciante[index].pkIdLocalComercial+'" class="btn btn-success p-0 pr-2 pl-2" style="font-size: 20px;" data-toggle="tooltip" title="Ver Local">Buscar por Fechas <i class="fas fa-search-dollar"></i> </a>';
+            html +=                 '<br><label>Total Vendido por el local <$/la:bel>';
+            html +=             '</div>'
+            html +=  '</div>';
+            
+            
         res.render("administrador/estadisticas/buscarLocales", {html});
     } catch (error) {
         console.log(error);
