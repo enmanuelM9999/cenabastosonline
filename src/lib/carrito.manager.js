@@ -6,7 +6,7 @@ carrito.crearCarrito = async (fkIdCliente, req, res) => {
         //¿Ya existe un carrito para ese cliente?
         const rowsCarrito = await pool.query("SELECT pkIdCarrito FROM carrito WHERE fkIdCliente=?", [fkIdCliente]);
         if (rowsCarrito.length != 0) {
-            throw new Error("impUsrimpUsr--ca1-Existen 1 o más carritos asociados a ese cliente"); //(Se entiende que no existe carrito, no se valida la posibilidad de que el cliente no exista)
+            throw new Error("impUsr-doDefault-ca1-Existen 1 o más carritos asociados a ese cliente"); //(Se entiende que no existe carrito, no se valida la posibilidad de que el cliente no exista)
         }
         //Crear carrito
         const newCarrito = {
@@ -86,8 +86,10 @@ carrito.vaciarCarrito = async (idCliente) => {
     try {
         //borrar todos los items
         //@test !!!!! verificar si se borra algo antes de actualizar el carrito
-        await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
-
+        const resultDelete=await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
+        if (resultDelete.affectedRows==0) {
+            throw new Error("impDev-doDefault-Falló el sql para borrar el itemcarrito");
+        }
         //!!!!! verificar si se borra algo antes de actualizar el carrito
         //actualizar el carrito
         var newCarrito = {
@@ -114,7 +116,10 @@ carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito, req, res) => {
             throw new Error("impUsr-ca8-El carrito está vacío.");
         }
         //@test !!!vrificar si se borró algo |borrar el item
-        await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND ic.pkIdItemCarrito=?", [idCliente, pkIdItemCarrito]);
+        const resultDelete= await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND ic.pkIdItemCarrito=?", [idCliente, pkIdItemCarrito]);
+        if (resultDelete.affectedRows==0) {
+            throw new Error("impDev-doDefault-Falló el sql para borrar el itemcarrito");
+        }
         //actuaizar el carrito
         contItems--;
         if (contItems == 0) {

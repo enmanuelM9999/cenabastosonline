@@ -22,8 +22,6 @@ router.get('/listadoBuzon', esCliente, async (req, res) => {
             }
 
         }
-
-
         //rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");
         res.render("cliente/buzon/listadoBuzon", { rowsUltimoMensaje });
     } catch (error) {

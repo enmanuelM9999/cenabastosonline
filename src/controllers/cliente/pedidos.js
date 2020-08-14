@@ -2,15 +2,101 @@ const express = require('express');
 const router = express.Router();
 const { esCliente } = require('../../lib/auth');
 const pool = require("../../database");
+const carrito = require("../../lib/carrito.manager");
+
+
+router.get('/carrito', esCliente, async (req, res) => {
+    try {
+        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
+        var cantItems = 0;
+        if (rowsItemCarrito.length > 0) {
+            cantItems = rowsItemCarrito[0].contadorItems;
+            for (let index = 0; index < rowsItemCarrito.length; index++) {
+                rowsItemCarrito[index].precioInicialCalculado = rowsItemCarrito[index].cantidadItem * rowsItemCarrito[index].precioUnitarioPresentacion;
+
+            }
+        }
+        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems });
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
+        }
+        if (_do == "reForm") {
+            res.redirect('/comerciante/locales/crearLocal');
+        }
+        if (_do == "doDefault") {
+            res.redirect('/comerciante/locales/listadoLocales');
+        }
+    }
+});
+
+router.get('/carrito/borrarItemCarrito/idItem', esCliente, async (req, res) => {
+    try {
+        const {idItem} = req.params;
+        carrito.borrarItemCarrito(req.session.idCliente,idItem); 
+        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
+        var cantItems = 0;
+        if (rowsItemCarrito.length > 0) {
+            cantItems = rowsItemCarrito[0].contadorItems;
+            for (let index = 0; index < rowsItemCarrito.length; index++) {
+                rowsItemCarrito[index].precioInicialCalculado = rowsItemCarrito[index].cantidadItem * rowsItemCarrito[index].precioUnitarioPresentacion;
+
+            }
+        }
+        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems });
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
+        }
+        if (_do == "reForm") {
+            res.redirect('/comerciante/locales/crearLocal');
+        }
+        if (_do == "doDefault") {
+            res.redirect('/comerciante/locales/listadoLocales');
+        }
+    }
+});
+
+router.get('/comprar', esCliente, async (req, res) => {
+    try {
+        res.render('cliente/pedidos/comprar');
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
+        }
+        if (_do == "reForm") {
+            res.redirect('/comerciante/locales/crearLocal');
+        }
+        if (_do == "doDefault") {
+            res.redirect('/comerciante/locales/listadoLocales');
+        }
+    }
+});
+
 
 router.get('/historial', esCliente, async (req, res) => {
     try {
         const idCliente = req.session.idCliente;
         //Buscar el historial de pedidos de un cliente
         var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
-       /* var moment = require("moment");
-        moment.locale("es-us");
-        rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
+        /* var moment = require("moment");
+         moment.locale("es-us");
+         rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
 
         for (let index = 0; index < rowsHistorialPedidos.length; index++) {
             if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 0) {
@@ -22,9 +108,11 @@ router.get('/historial', esCliente, async (req, res) => {
             } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1) {
                 rowsHistorialPedidos[index].estado = "Entregado";
             }
-            
+
         }
-        res.render("cliente/pedidos/historial", { rowsHistorialPedidos });
+        //carrito
+        const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
+        res.render("cliente/pedidos/historial", { rowsHistorialPedidos, cantItemsCarrito });
     } catch (error) {
         console.log(error);
 
@@ -74,8 +162,10 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
             }
             rowsBuzon[0].mensajes = rowsMensajesBuzon;
         }
+        //carrito
+        const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
+        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
