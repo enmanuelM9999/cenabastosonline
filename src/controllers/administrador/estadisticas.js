@@ -53,7 +53,7 @@ router.post('/editarInformacionLocal', async (req, res) => {
 
         const newDateInicio = dateInicio+' 00:00:00';
         const newDateFin = dateFin+' 23:59:59';
-        console.log(newDateInicio);
+        //console.log(newDateInicio);
         var totalMostar = 0;
         const rowsVendidios = await pool.query("SELECT montoTotal FROM venta WHERE fkIdLocalComercial = ? AND fueEntregado = ? AND fueEmpacado = ? AND fueEnviado = ? AND fechaHoraEntrega BETWEEN  ? AND   ? ", [idLocal, 1, 1, 1, newDateInicio, newDateFin]);
         for (let j = 0; j < rowsVendidios.length; j++) {
@@ -65,5 +65,20 @@ router.post('/editarInformacionLocal', async (req, res) => {
         res.redirect("/administrador/index");
     }
 });
+
+router.get('/buscarTodosLocales', async (req, res) => {
+    try {
+        totalVendido = 0;
+        const rowsVendidios = await pool.query("SELECT totalVendido FROM localcomercial");
+        for (let j = 0; j < rowsVendidios.length; j++) {
+            totalVendido += rowsVendidios[j].totalVendido;
+        }
+        res.render("administrador/estadisticas/todasVentas", {totalVendido});
+    } catch (error) {
+        console.log(error);
+        res.redirect("/administrador/index");
+    }
+});
+
 
 module.exports = router;

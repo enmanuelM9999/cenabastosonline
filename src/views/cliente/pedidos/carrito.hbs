@@ -19,10 +19,11 @@
                 <div class="col-md-6 col-lg-4 p-2">
                     <div class="card shadow" style="border-radius: 10px;">
                         <div class="container p-3">
-                            <form action="" method="post" name="formActCarrito"
+                            <form action="/cliente/pedidos/carrito/actualizarItemCarrito" method="post" name="formActCarrito"
                                 id="formActCarrito{{{pkIdItemCarrito}}}">
+                                <input type="hidden" name="item" value="{{{pkIdItemCarrito}}}">
                                 <div class="foto-producto">
-                                    <img src="{{rutaImagen}}" alt="" style="width: 100px; height: 100px;">
+                                    <img  src="{{rutaImagen}}" alt="" style="width: 100px; height: 100px;">
                                 </div>
                                 <div class="titulo-producto-y-presentacion">
                                     <div>
@@ -30,7 +31,7 @@
                                     </div>
                                 </div>
                                 <div class="cantidad-y-precio mt-2">
-                                    <input style="border: 1px solid rgb(167, 167, 167); width: 100px;" type="number" min="0" step="1"
+                                    <input style="border: 1px solid rgb(199, 199, 199); width: 100px;" type="number" min="0" step="1"
                                         name="cant" id="cant{{pkIdItemCarrito}}" value="{{cantidadItem}}">
                                     <small style="font-size: 18px;" class="precioCalculado text-success"
                                         id="precio{{pkIdItemCarrito}}">${{precioInicialCalculado}}</small>
@@ -44,15 +45,12 @@
                                     </script>
                                 </div>
                                 <div class="detalles mt-2">
-                                    <textarea name="detalles" id="detalles{{pkIdItemCarrito}}" class="form-control"
+                                    <textarea placeholder="Detalles" name="detalles" id="detalles{{pkIdItemCarrito}}" class="form-control"
                                         form="formActCarrito{{{pkIdItemCarrito}}}">{{detallesCarrito}}</textarea>
                                 </div>
                                 <div class="botones mt-2">
-                                    <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Guardar cambios</button>
-                                    <a href="/cliente/pedidos/borrarItemCarrito/{{pkIdItemCarrito}}"
-                                                            class="btn btn-outline-danger" data-toggle="tooltip"
-                                                            data-placement="bottom" title="Borrar producto"><i
-                                                                class="far fa-trash-alt"></i></a>
+                                    <button type="submit" class="btn btn-link text-success" style="font-size: 15px;"><i class="fas fa-save"></i> Guardar cambios</button>
+                                    <a style="font-size: 15px;" href="/cliente/pedidos/carrito/borrarItemCarrito/{{pkIdItemCarrito}}" class="card-link text-warning" data-toggle="tooltip" data-placement="bottom" title="Borrar producto"><i class="far fa-trash-alt"></i> Eliminar</a>
                                 </div>
                             </form>
                         </div>
@@ -65,7 +63,7 @@
             </div>
             {{#if rowsItemCarrito}}
                     <a href="/cliente/pedidos/comprar" class="btn btn-success mt-2" style=""><i class="fas fa-shopping-bag"></i> Comprar</a>
-                    <a href="" class="btn btn-outline-danger mt-2" style=""><i class="far fa-trash-alt"></i> Vaciar carrito</a>
+                    <a href="/cliente/pedidos/carrito/vaciarCarrito" class="btn btn-outline-warning mt-2" style=""><i class="far fa-trash-alt"></i> Vaciar carrito</a>
             {{/if}}
         </div>
     </div>

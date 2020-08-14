@@ -36,7 +36,7 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
     try {
         const { idLocal } = req.params;
         //Buscar todos los locales mayoristas
-        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
+        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
         if (rowsLocalesMayoristas[0].estaAbierto == 1) {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto </div>';
         } else {
@@ -105,7 +105,7 @@ router.post('/agregarAlCarrito', esCliente, async (req, res) => {
         carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem, req, res);
         res.redirect("/cliente/explorar/local/" + idLocal);
     } catch (error) {
-        console.log("aqui iría el error ", error);
+        console.log(error);
         res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 });

@@ -59,10 +59,10 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresent
         var _imp = arrayError[0]; // impUsr || impDev
         var _do = arrayError[1]; // doDefault || etc ...
         var _msg = arrayError[2];   // msg
-        if ( _imp == "impUsr") {
+        if (_imp == "impUsr") {
             req.flash("info", arrayError[1]);
         }
-        console.log("aqui iría el error ", error);
+        console.log(error);
         res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 }
@@ -86,8 +86,8 @@ carrito.vaciarCarrito = async (idCliente) => {
     try {
         //borrar todos los items
         //@test !!!!! verificar si se borra algo antes de actualizar el carrito
-        const resultDelete=await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
-        if (resultDelete.affectedRows==0) {
+        const resultDelete = await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=ic.fkIdCarrito WHERE carrito.fkIdCliente=?", [idCliente]);
+        if (resultDelete.affectedRows == 0) {
             throw new Error("impDev-doDefault-Falló el sql para borrar el itemcarrito");
         }
         //!!!!! verificar si se borra algo antes de actualizar el carrito
@@ -116,8 +116,8 @@ carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito, req, res) => {
             throw new Error("impUsr-ca8-El carrito está vacío.");
         }
         //@test !!!vrificar si se borró algo |borrar el item
-        const resultDelete= await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND ic.pkIdItemCarrito=?", [idCliente, pkIdItemCarrito]);
-        if (resultDelete.affectedRows==0) {
+        const resultDelete = await pool.query("DELETE ic FROM itemcarrito ic INNER JOIN carrito ON carrito.pkIdCarrito=ic.fkIdCarrito WHERE carrito.fkIdCliente=? AND ic.pkIdItemCarrito=?", [idCliente, pkIdItemCarrito]);
+        if (resultDelete.affectedRows == 0) {
             throw new Error("impDev-doDefault-Falló el sql para borrar el itemcarrito");
         }
         //actuaizar el carrito
@@ -132,6 +132,32 @@ carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito, req, res) => {
         await pool.query("UPDATE carrito SET ? WHERE fkIdCliente=?", [newCarrito, idCliente]);
     } catch (error) {
         console.log(error);
+    }
+}
+
+carrito.editarItemCarrito = async (idCliente, idItemCarrito, detallesCliente, cantidadItem) => {
+    try {
+        const rowItemCarrito = await pool.query("SELECT * FROM itemcarrito INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE itemcarrito.pkIdItemCarrito=? AND carrito.fkIdCliente=?", [idItemCarrito, idCliente]);
+        if (rowItemCarrito.length != 1) {
+            throw new Error("impUsr-doDefault-El producto no es uno solo. Por favor notifique el error");
+        }
+        const newItem = {
+            detallesCarrito: detallesCliente,
+            cantidadItem
+        }
+        await pool.query("UPDATE itemcarrito SET ? WHERE pkIdItemCarrito=?",[newItem,idItemCarrito]);
+    } catch (error) {
+        var arrayError = error.message.toString().split("-");
+        if (arrayError.length >= 3) {
+            var _imp = arrayError[0]; // impUsr || impDev
+            var _do = arrayError[1]; // doDefault || etc ...
+            var _msg = arrayError[2];   // msg
+            if (_imp == "impUsr") {
+                req.flash("info", arrayError[1]);
+            }
+        }
+        console.log(error);
+        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 }
 

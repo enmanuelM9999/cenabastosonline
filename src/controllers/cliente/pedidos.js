@@ -7,8 +7,8 @@ const carrito = require("../../lib/carrito.manager");
 
 router.get('/carrito', esCliente, async (req, res) => {
     try {
-        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
-        var cantItems = 0;
+        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
+        var cantItems = "";
         if (rowsItemCarrito.length > 0) {
             cantItems = rowsItemCarrito[0].contadorItems;
             for (let index = 0; index < rowsItemCarrito.length; index++) {
@@ -35,20 +35,54 @@ router.get('/carrito', esCliente, async (req, res) => {
     }
 });
 
-router.get('/carrito/borrarItemCarrito/idItem', esCliente, async (req, res) => {
+router.get('/carrito/borrarItemCarrito/:idItem', esCliente, async (req, res) => {
     try {
-        const {idItem} = req.params;
-        carrito.borrarItemCarrito(req.session.idCliente,idItem); 
-        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
-        var cantItems = 0;
-        if (rowsItemCarrito.length > 0) {
-            cantItems = rowsItemCarrito[0].contadorItems;
-            for (let index = 0; index < rowsItemCarrito.length; index++) {
-                rowsItemCarrito[index].precioInicialCalculado = rowsItemCarrito[index].cantidadItem * rowsItemCarrito[index].precioUnitarioPresentacion;
-
-            }
+        const { idItem } = req.params;
+        carrito.borrarItemCarrito(req.session.idCliente, idItem, req, res);
+        res.redirect("/cliente/pedidos/carrito");
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
         }
-        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems });
+        if (_do == "reForm") {
+            res.redirect('/comerciante/locales/crearLocal');
+        }
+        if (_do == "doDefault") {
+            res.redirect('/comerciante/locales/listadoLocales');
+        }
+    }
+});
+
+router.get('/carrito/vaciarCarrito', esCliente, async (req, res) => {
+    try {
+        carrito.vaciarCarrito(req.session.idCliente);
+        res.redirect("/cliente/pedidos/carrito");
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
+        }
+        if (_do == "doDefault") {
+            res.redirect('/comerciante/locales/listadoLocales');
+        }
+    }
+});
+
+router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
+    try {
+        const { item, cant, detalles } = req.body;
+        carrito.editarItemCarrito(req.session.idCliente, item, detalles, cant);
+        req.flash("success","Actualizado");
+        res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
