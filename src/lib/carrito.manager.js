@@ -30,12 +30,12 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresent
             throw new Error("impUsr-ca3-No hay 1 solo carrito para el usuario " + pkIdUsuario + ", posiblemente se manipuló la BD manualmente");
         }
         if (rowCarrito[0].fkIdLocalSeleccionado != fkIdLocalComercial && rowCarrito[0].contadorItems > 0) {
-            throw new Error("impUsr-ca4-Se intenta agregar un item de una tienda diferente. Debe pedir en una sola tienda a la vez ");//Advertir que debe pedir en una tienda a la vez hasta que sea posible pedir en varias
+            throw new Error("impUsr-ca4-Se intenta agregar un producto de un local diferente. Debe pedir en una sola tienda a la vez. Puede vaciar el carrito y empezar a pedir en otro local");//Advertir que debe pedir en una tienda a la vez hasta que sea posible pedir en varias
         }
         //¿El item está repetido?
         const rowItemRepetido = await pool.query("SELECT itemcarrito.pkIdItemCarrito FROM itemcarrito INNER JOIN carrito ON carrito.pkIdCarrito=itemcarrito.fkIdCarrito WHERE carrito.fkIdCliente=? AND itemcarrito.fkIdPresentacion=?", [pkIdUsuario, fkIdPresentacion]);
         if (rowItemRepetido.length >= 1) {
-            throw new Error("impUsr-ca5-Posiblemente el item está repetido, para modificarlo vaya al carrito");
+            throw new Error("impUsr-ca5-El producto está repetido, para modificarlo vaya al carrito");
         }
         //Agregar el item al carro
         const newItemCarrito = {
@@ -60,7 +60,10 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresent
         var _do = arrayError[1]; // doDefault || etc ...
         var _msg = arrayError[2];   // msg
         if (_imp == "impUsr") {
-            req.flash("info", arrayError[1]);
+            return {error:true,_msg};
+        }
+        if (_do=="ca4") {
+            
         }
         console.log(error);
         res.redirect("/cliente/explorar/listadoLocalesMinoristas");
@@ -161,7 +164,7 @@ carrito.editarItemCarrito = async (idCliente, idItemCarrito, detallesCliente, ca
 
 carrito.getCarritoCarrito = async (idCliente) => {
     try {
-        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
+        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM carrito INNER JOIN localcomercial ON carrito.fkIdLocalSeleccionado=localcomercial.pkIdLocalComercial INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
         var cantItems = "";
         var montoTotal = "";
         if (rowsItemCarrito.length > 0) {
@@ -175,7 +178,8 @@ carrito.getCarritoCarrito = async (idCliente) => {
         return {
             rowsItemCarrito,
             montoTotal,
-            cantItems
+            cantItems,
+            local:{id:rowsItemCarrito[0].pkIdLocalComercial,nombre: rowsItemCarrito[0].nombreLocal}
         };
 
     } catch (error) {
@@ -204,7 +208,7 @@ carrito.getCarritoPrecompra = async (idCliente) => {
             venta.fkIdCliente
             fechas y estados
         */
-        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.precioDomicilio, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
+        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.nombreLocal,localcomercial.precioDomicilio, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
 
         if (rowCarrito[0].contadorItems <= 0) {
             throw new Error("impDev-doDefault-El carrito está vacío, no se puede comprar nada");

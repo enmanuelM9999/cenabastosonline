@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-//const { esCliente } = require('../../lib/auth');
+const { esAdmin } = require('../../lib/auth');
 const pool = require("../../database");
 
-router.get('/buscarPorFechas', async (req, res) => {
+router.get('/buscarPorFechas', esAdmin, async (req, res) => {
     try {
         res.render("administrador/estadisticas/buscarLocales");
     } catch (error) {
@@ -12,7 +12,7 @@ router.get('/buscarPorFechas', async (req, res) => {
     }
 });
 
-router.post('/buscarLocal', async (req, res) => {
+router.post('/buscarLocal', esAdmin, async (req, res) => {
     try {
         const { cedula } = req.body;
         var rowsLocalesComerciante = await pool.query("SELECT personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.idLocalEnCenabastos FROM personanatural INNER JOIN comerciante ON comerciante.fkIdPersonaNatural = personanatural.pkIdPersonaNatural INNER JOIN localcomercial ON localcomercial.fkIdComerciantePropietario = comerciante.pkIdComerciante WHERE personanatural.numeroDocumento = ?", [cedula]);
@@ -34,7 +34,7 @@ router.post('/buscarLocal', async (req, res) => {
     }
 });
 
-router.get('/buscarFechas/:id', async (req, res) => {
+router.get('/buscarFechas/:id', esAdmin, async (req, res) => {
     try {
         const {id} = req.params;
         const rowNombreLocal = await pool.query("SELECT nombreLocal, idLocalEnCenabastos FROM localcomercial WHERE pkIdLocalComercial = ?",[id]);
@@ -45,7 +45,7 @@ router.get('/buscarFechas/:id', async (req, res) => {
     }
 });
 
-router.post('/editarInformacionLocal', async (req, res) => {
+router.post('/editarInformacionLocal', esAdmin, async (req, res) => {
     try {
         const {idLocal, dateInicio, dateFin} = req.body;
         req.check("dateInicio", "Ingrese Fecha Inicio de Busqueda").notEmpty();
@@ -66,7 +66,7 @@ router.post('/editarInformacionLocal', async (req, res) => {
     }
 });
 
-router.get('/buscarTodosLocales', async (req, res) => {
+router.get('/buscarTodosLocales', esAdmin, async (req, res) => {
     try {
         totalVendido = 0;
         const rowsVendidios = await pool.query("SELECT totalVendido FROM localcomercial");

@@ -7,8 +7,9 @@ const carrito = require("../../lib/carrito.manager");
 
 router.get('/carrito', esCliente, async (req, res) => {
     try {
-        const { cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
-        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal });
+        const { local,cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
+        
+        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal,local });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -25,6 +26,20 @@ router.get('/carrito', esCliente, async (req, res) => {
             res.redirect('/comerciante/locales/listadoLocales');
         }
         res.redirect('/comerciante/locales/listadoLocales');
+    }
+});
+
+router.post('/agregarAlCarrito', esCliente, async (req, res) => {
+    try {
+        const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
+        const resultAdd= await carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem, req, res);
+        if (resultAdd.error) {
+            req.flash("info", resultAdd._msg);
+        }
+        res.redirect("/cliente/explorar/local/" + idLocal);
+    } catch (error) {
+        console.log(error);
+        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
     }
 });
 
@@ -99,17 +114,17 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
 
 router.get('/precomprar', esCliente, async (req, res) => {
     try {
-        //dónde y quién recibe
-        //del carrito viene el listado de los productos, el monto total, el id del local comercial
+        //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
         const { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
 
         //datos de pago
 
-        //***aqui va Wompi dompi***
+        /**AQUI VA EL WOMPI DOMPI***/
 
         //cargar vista
         console.log("datos env ", datos);
-        res.render('cliente/pedidos/precompra', { datos, items });
+        console.log("items ", items)
+        res.render('cliente/pedidos/precompra', { datos:datos[0], items });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -263,6 +278,15 @@ router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
                 res.redirect("/cliente/pedidos/historial");
                 break;
         }
+    }
+});
+
+router.get('/msgCarritoLocalesDiferentes', esCliente, async (req, res) => {
+    try {
+        res.render("cliente/pedidos/msgCarritoLocalesDiferentes");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/cliente/pedidos/historial");
     }
 });
 

@@ -99,15 +99,6 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
     }
 });
 
-router.post('/agregarAlCarrito', esCliente, async (req, res) => {
-    try {
-        const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
-        carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem, req, res);
-        res.redirect("/cliente/explorar/local/" + idLocal);
-    } catch (error) {
-        console.log(error);
-        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
-    }
-});
+
 
 module.exports = router;

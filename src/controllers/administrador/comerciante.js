@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-//const { esCliente } = require('../../lib/auth');
+const { esAdmin } = require('../../lib/auth');
 const pool = require("../../database");
 
 
-router.get('/comercianteListado', async (req, res) => {
+router.get('/comercianteListado', esAdmin, async (req, res) => {
     try {
         const rowsListadoComerciantesAprobar = await pool.query("SELECT comerciante.pkIdComerciante, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural, personanatural.numeroDocumento, usuario.correoUsuario FROM comerciante INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE comerciante.estaAprobado = ?",[0]);
         res.render("administrador/comerciante/listadoAprobar",{rowsListadoComerciantesAprobar});
@@ -14,7 +14,7 @@ router.get('/comercianteListado', async (req, res) => {
     }   
 });
 
-router.get('/aceptarComerciante/:id', async (req, res) => {
+router.get('/aceptarComerciante/:id', esAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         await pool.query("UPDATE comerciante SET estaAprobado = ? WHERE pkIdComerciante = ?", [1,id]);
@@ -25,7 +25,7 @@ router.get('/aceptarComerciante/:id', async (req, res) => {
     }   
 });
 
-router.get('/rechazarComerciante/:id', async (req, res) => {
+router.get('/rechazarComerciante/:id', esAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const rowDatosComerciante = await pool.query("SELECT personanatural.pkIdPersonaNatural, personanatural.fkIdUsuario FROM comerciante INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural WHERE comerciante.pkIdComerciante = ?", [id]);
@@ -39,7 +39,7 @@ router.get('/rechazarComerciante/:id', async (req, res) => {
     }   
 });
 
-router.get('/buscarLocal', async (req, res) => {
+router.get('/buscarLocal', esAdmin, async (req, res) => {
     try {
         res.render("administrador/comerciante/buscarLocales");
     } catch (error) {
@@ -49,7 +49,7 @@ router.get('/buscarLocal', async (req, res) => {
 });
 
 
-router.post('/buscarLocal', async (req, res) => {
+router.post('/buscarLocal', esAdmin, async (req, res) => {
     try {
         
         const { cedula } = req.body;
@@ -73,7 +73,7 @@ router.post('/buscarLocal', async (req, res) => {
     }   
 });
 
-router.get('/editarInformacionLocal/:id', async (req, res) => {
+router.get('/editarInformacionLocal/:id', esAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         var rowDatosLocal = await pool.query("SELECT pkIdLocalComercial, nombreLocal, descripcionLocal, precioDomicilio, idLocalEnCenabastos, estaAbierto, esMayorista FROM localcomercial WHERE pkIdLocalComercial = ?",[id]);
@@ -96,7 +96,7 @@ router.get('/editarInformacionLocal/:id', async (req, res) => {
     }   
 });
 
-router.post('/editarInformacionLocal', async (req, res) => {
+router.post('/editarInformacionLocal', esAdmin, async (req, res) => {
     try {
         const { id, idLocal, nameLocal, descripcion, precioDom, tipoLocal, estadoLocal } = req.body;
         const updateLocal = {

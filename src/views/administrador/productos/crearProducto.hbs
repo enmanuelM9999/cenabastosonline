@@ -1,0 +1,73 @@
+<div class="container mt-3">
+
+    <h2>Productos</h2>
+    <nav class="mt-4 border-0">
+        <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/administrador/productos/listadoProductos" role="tab"
+                aria-controls="nav-home" aria-selected="false">Listado de Productos</a>
+            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/administrador/productos/crearProducto" role="tab"
+                aria-controls="nav-profile" aria-selected="true">Crear Nuevo Producto</a>
+        </div>
+    </nav>
+
+    <div class="tab-content" id="nav-tabContent">
+
+        <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
+            <div class="card border-0 pt-3" style="background-color: rgb(250, 250, 250);">
+
+                <div class="row">
+
+
+                    <div class="col-12 p-2">
+                        <div class="card p-4">
+                            
+                            <form action="/administrador/productos/crearProducto" method="POST" name="form" id="form">
+
+                                <div class="form-group">
+                                    <label for="nameProd">Nombre Producto</label>
+                                    <input type="text" class="form-control" id="nameProd" name="nameProd">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="descProd">¿Qué tipo de Categoria es?</label>
+                                        <select name="descProd" id="descProd" class="form-control">
+                                            {{#each rowsCategorias}}
+                                                <option value="{{pkIdCategoriaProducto}}">{{descripcionCategoriaProducto}}</option>
+                                            {{/each}}  
+                                        </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cssProp">Propiedades CSS</label>
+                                    <textarea name="cssProp" id="cssProp" class="form-control" form="form"
+                                        cols="1"></textarea>
+                                </div>
+
+                                <div class="input-group mb-3">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="imagen" name="imagen">
+                                        <label class="custom-file-label" for="imagen" aria-describedby="uploadImg">Elegir Imagen</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="uploadImg">Subir Imagen</span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Crear Producto</button>
+                            </form>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{{>navegacionAdmin}}

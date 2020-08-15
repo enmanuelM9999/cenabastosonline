@@ -43,7 +43,7 @@
         top: 0;
         box-shadow: 2px 26px 28px -6px rgba(0, 0, 0, 0.05);
         display: flex;
-        z-index: 10000;
+        z-index: 75000;
         align-items: center;
         border-bottom: 5px solid var(--mega-orange);
     }
@@ -76,7 +76,8 @@
     .banner {
         width: 100%;
         margin-top: var(--header-height);
-        overflow: hidden;
+        position: relative;
+        z-index: 1;
         box-shadow: inset -18px -157px 103px -169px rgba(0, 0, 0, 0.51);
         flex: 0 0 var(--banner-height);
     }
@@ -107,6 +108,9 @@
         padding-top: 20px;
         display: flex;
         flex-wrap: wrap;
+        position: relative;
+        z-index: 50000;
+        background-color: white;
     }
 
     .stories-space {

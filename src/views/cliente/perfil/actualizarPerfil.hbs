@@ -1,0 +1,60 @@
+<div class="container mt-3">
+   
+    <h2>Actualizar Informacion Personal</h2>
+    <div class="row">
+
+        <div class="col-12 p-2">
+
+            <div class="card p-4">
+                <form action="/cliente/perfil/editarPerfil" method="POST" name="form" id="form">
+
+                    <div class="form-group">
+                        <label for="name">Nombres</label>
+                        <input type="text" class="form-control" value="{{rowDatos.nombresPersonaNatural}}" id="name" name="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Apellidos</label>
+                        <input type="text" class="form-control" value="{{rowDatos.apellidosPersonaNatural}}" id="lastName" name="lastName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Telefono</label>
+                        <input type="number" class="form-control" value="{{rowDatos.telefonoPersonaNatural}}" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Direccion</label>
+                        <textarea name="direccion" id="direccion" class="form-control" form="form"
+                            cols="1">{{rowDatos.direccionCliente}}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Actualizar Informacion</button>
+                </form>
+            </div>
+
+
+
+            <div class="card p-4 mt-3">
+                <form action="/cliente/perfil/editarClave" method="POST" name="form" id="form">
+
+                    <div class="form-group">
+                        <label for="lastP">Contraseña Antigua</label>
+                        <input type="password" class="form-control" id="lastP" name="lastP">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newP">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="newP" name="newP">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Actualizar Contraseña</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{{>navegacionCliente}}
