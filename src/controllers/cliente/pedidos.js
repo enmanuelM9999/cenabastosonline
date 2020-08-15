@@ -7,16 +7,8 @@ const carrito = require("../../lib/carrito.manager");
 
 router.get('/carrito', esCliente, async (req, res) => {
     try {
-        var rowsItemCarrito = await pool.query("SELECT carrito.contadorItems,itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [req.session.idCliente]);
-        var cantItems = "";
-        if (rowsItemCarrito.length > 0) {
-            cantItems = rowsItemCarrito[0].contadorItems;
-            for (let index = 0; index < rowsItemCarrito.length; index++) {
-                rowsItemCarrito[index].precioInicialCalculado = rowsItemCarrito[index].cantidadItem * rowsItemCarrito[index].precioUnitarioPresentacion;
-
-            }
-        }
-        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems });
+        const { cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
+        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -32,6 +24,7 @@ router.get('/carrito', esCliente, async (req, res) => {
         if (_do == "doDefault") {
             res.redirect('/comerciante/locales/listadoLocales');
         }
+        res.redirect('/comerciante/locales/listadoLocales');
     }
 });
 
@@ -81,29 +74,42 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
     try {
         const { item, cant, detalles } = req.body;
         carrito.editarItemCarrito(req.session.idCliente, item, detalles, cant);
-        req.flash("success","Actualizado");
+        req.flash("success", "Actualizado");
         res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
-        if (_imp == "impUsr") {
-            req.flash("message", _msg);
+        if (arrayError.length >= 3) {
+            var _imp = arrayError[0];
+            var _do = arrayError[1];
+            var _msg = arrayError[2];
+            if (_imp == "impUsr") {
+                req.flash("message", _msg);
+            }
+            if (_do == "reForm") {
+                res.redirect('/comerciante/locales/crearLocal');
+            }
+            if (_do == "doDefault") {
+                res.redirect('/comerciante/locales/listadoLocales');
+            }
         }
-        if (_do == "reForm") {
-            res.redirect('/comerciante/locales/crearLocal');
-        }
-        if (_do == "doDefault") {
-            res.redirect('/comerciante/locales/listadoLocales');
-        }
+        res.redirect('/comerciante/locales/listadoLocales');
     }
 });
 
-router.get('/comprar', esCliente, async (req, res) => {
+router.get('/precomprar', esCliente, async (req, res) => {
     try {
-        res.render('cliente/pedidos/comprar');
+        //dónde y quién recibe
+        //del carrito viene el listado de los productos, el monto total, el id del local comercial
+        const { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
+
+        //datos de pago
+
+        //***aqui va Wompi dompi***
+
+        //cargar vista
+        console.log("datos env ", datos);
+        res.render('cliente/pedidos/precompra', { datos, items });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -114,11 +120,12 @@ router.get('/comprar', esCliente, async (req, res) => {
             req.flash("message", _msg);
         }
         if (_do == "reForm") {
-            res.redirect('/comerciante/locales/crearLocal');
+            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
         }
         if (_do == "doDefault") {
-            res.redirect('/comerciante/locales/listadoLocales');
+            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
         }
+        res.redirect('/cliente/explorar/listadoLocalesMinoristas');
     }
 });
 

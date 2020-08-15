@@ -136,16 +136,21 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
-        if (_imp === "impUsr" && _do === "doDefault") {
-            req.flash("message", _msg);
+        if (arrayError.length >= 3) {
+            var _imp = arrayError[0];
+            var _do = arrayError[1];
+            var _msg = arrayError[2];
+            if (_imp === "impUsr") {
+                req.flash("message", _msg);
+            }
+            if (_do === "reForm") {
+                res.redirect('/comerciante/locales/crearLocal');
+            }
+            if (_do === "doDefault") {
+                res.redirect('/comerciante/locales/listadoLocales');
+            }
         }
-        if (_imp === "impUsr" && _do === "reForm") {
-            req.flash("message", _msg);
-            res.redirect('/comerciante/locales/crearLocal');
-        }
+        req.flash("message", "Error procesando datos. Por favor notifíquelo");
         res.redirect('/comerciante/locales/listadoLocales');
     }
 });
@@ -561,6 +566,21 @@ router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) 
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
+        var arrayError = error.message.toString().split("-");
+        if (arrayError.length >= 3) {
+            var _imp = arrayError[0];
+            var _do = arrayError[1];
+            var _msg = arrayError[2];
+            if (_imp == "impUsr") {
+                req.flash("message", _msg);
+            }
+            if (_do == "reForm") {
+                res.redirect('/comerciante/locales/agregarPresentacionProductoLocal/' + idProductoLocal);
+            }
+            if (_do == "doDefault") {
+                res.redirect('/comerciante/locales/listadoLocales');
+            }
+        }
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
     }
@@ -571,8 +591,13 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        const { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
-
+        var { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
+        if (nombrePresentacion.trim() === "") {
+            throw new Error("impUsr-reForm-Escriba un nombre para la presentación");
+        }
+        if (precioUnitario < 0) {
+            throw new Error("impUsr-reForm-El precio debe ser mayor o igual a cero");
+        }
         //Recolectar y actualizar los datos en la BD
         const newPresentacionProducto = {
             nombrePresentacion: nombrePresentacion,
@@ -584,6 +609,24 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
+        var arrayError = error.message.toString().split("-");
+        if (arrayError.length >= 3) {
+            var _imp = arrayError[0];
+            var _do = arrayError[1];
+            var _msg = arrayError[2];
+
+            if (_imp === "impUsr") {
+                req.flash("message", _msg);
+            }
+
+            if (_do === "reForm") {
+                res.redirect("/comerciante/locales/ajustes");
+            }
+
+            if (_do === "doDefault") {
+                res.redirect("/comerciante/locales/listadoLocales");
+            }
+        }
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
     }
@@ -681,14 +724,13 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
             throw "Local no cargado";
         }
         const { idProductoLocal, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
-        nombrePresentacion.trim();
-        if (nombrePresentacion == "") {
+        if (nombrePresentacion.trim() == "") {
             throw new Error("impUsr-reForm-Ingrese un nombre válido");
         }
         //Verificar si el id del producto-local es válido
         const rowsProductoLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.fkIdComerciantePropietario=? AND productolocal.pkIdProductoLocal=?", [req.session.idComerciante, idProductoLocal]);
         if (rowsProductoLocal.length != 1) {
-            throw "impDev-doDefault-El id del producto-local no es valido";
+            throw "impDev-doDefault-El id del producto local no es valido";
         }
         //Agregar presentación
         const newPresentacionProductoLocal = {

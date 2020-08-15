@@ -62,7 +62,8 @@
                 {{/each}}
             </div>
             {{#if rowsItemCarrito}}
-                    <a href="/cliente/pedidos/comprar" class="btn btn-success mt-2" style=""><i class="fas fa-shopping-bag"></i> Comprar</a>
+                    <h5 class="text-success mt-3">Subtotal: ${{montoTotal}}</h5> 
+                    <a href="/cliente/pedidos/precomprar" class="btn btn-success mt-2" style=""><i class="fas fa-shopping-bag"></i> Comprar</a>
                     <a href="/cliente/pedidos/carrito/vaciarCarrito" class="btn btn-outline-warning mt-2" style=""><i class="far fa-trash-alt"></i> Vaciar carrito</a>
             {{/if}}
         </div>
