@@ -45,7 +45,7 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, cantItemsCarrito });
+        res.render("test/localComercial", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, cantItemsCarrito });
     } catch (error) {
         console.log(error);
     }
