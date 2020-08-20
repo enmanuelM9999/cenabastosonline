@@ -68,12 +68,14 @@ app.use('/administrador/productos', require('./controllers/administrador/product
 app.use('/comerciante', require('./controllers/comerciante/index'));
 app.use('/comerciante/locales', require('./controllers/comerciante/locales'));
 app.use('/comerciante/sesion', require('./controllers/comerciante/sesion'));
+app.use('/comerciante/notificacion', require('./controllers/comerciante/notificacion'));
 //cliente
 app.use('/cliente/explorar', require('./controllers/cliente/explorar'));
 app.use('/cliente/sesion', require('./controllers/cliente/sesion'));
 app.use('/cliente/pedidos', require('./controllers/cliente/pedidos'));
 app.use('/cliente/buzon', require('./controllers/cliente/buzon'));
 app.use('/cliente/perfil', require('./controllers/cliente/perfil'));
+app.use('/cliente/notificacion', require('./controllers/cliente/notificacion'));
 // Public
 app.use(express.static(path.join(__dirname, 'public')));
 

@@ -48,6 +48,8 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         res.render("test/localComercial", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, cantItemsCarrito });
     } catch (error) {
         console.log(error);
+        req.flash("info","No sigas Daniel el Travieso");
+        res.redirect("/cliente/explorar/listadoLocalesminoristas");
     }
 });
 

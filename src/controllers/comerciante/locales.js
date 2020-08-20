@@ -392,10 +392,13 @@ router.get('/pedidos/moverAEmpacado/:idPedido', esComercianteAprobado, async (re
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEmpacado = {
-            fueEmpacado: 1
+            fueEmpacado: 1,
+            fechaHoraEmpacado:moment
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -414,7 +417,8 @@ router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req,
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEmpacado = {
-            fueEmpacado: 0
+            fueEmpacado: 0,
+            fechaHoraEmpacado:null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -430,10 +434,13 @@ router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (re
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEnviado = {
-            fueEnviado: 1
+            fueEnviado: 1,
+            fechaHoraEnvio:moment
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEnviado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -452,7 +459,8 @@ router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async 
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEnviado = {
-            fueEnviado: 0
+            fueEnviado: 0,
+            fechaHoraEnvio:null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEnviado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -468,10 +476,13 @@ router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (r
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEntregado = {
-            fueEntregado: 1
+            fueEntregado: 1,
+            fechaHoraEntrega:moment
         };
         await pool.query("UPDATE venta SET  ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -490,7 +501,8 @@ router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (r
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
         const fueEntregado = {
-            fueEntregado: 0
+            fueEntregado: 0,
+            fechaHoraEntrega:null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");

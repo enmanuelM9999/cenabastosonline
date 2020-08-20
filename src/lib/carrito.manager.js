@@ -19,7 +19,7 @@ carrito.crearCarrito = async (fkIdCliente, req, res) => {
     }
 }
 
-carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresentacion, detallesCarrito, cantidadItem, req, res) => {
+carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresentacion, detallesCarrito, cantidadItem) => {
     try {
         //¿El item a agregar es de un local diferente a los items que ya están?
         var rowCarrito = await pool.query("SELECT pkIdCarrito,contadorItems,fkIdLocalSeleccionado FROM carrito WHERE fkIdCliente=?", [pkIdUsuario]);
@@ -54,16 +54,17 @@ carrito.agregarItemCarrito = async (pkIdUsuario, fkIdLocalComercial, fkIdPresent
             fkIdLocalSeleccionado: rowCarrito[0].fkIdLocalSeleccionado
         };
         await pool.query("UPDATE carrito SET ? WHERE fkIdCliente=?", [newCarrito, pkIdUsuario]);
+        return { error: false }
     } catch (error) {
         var arrayError = error.message.toString().split("-");
         var _imp = arrayError[0]; // impUsr || impDev
         var _do = arrayError[1]; // doDefault || etc ...
         var _msg = arrayError[2];   // msg
         if (_imp == "impUsr") {
-            return {error:true,_msg};
+            return { error: true, _msg };
         }
-        if (_do=="ca4") {
-            
+        if (_do == "ca4") {
+
         }
         console.log(error);
         res.redirect("/cliente/explorar/listadoLocalesMinoristas");
@@ -105,7 +106,7 @@ carrito.vaciarCarrito = async (idCliente) => {
     }
 }
 
-carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito, req, res) => {
+carrito.borrarItemCarrito = async (idCliente, pkIdItemCarrito) => {
     try {
         //obtener el carrito
         const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito WHERE itemcarrito.pkIdItemCarrito=?", [pkIdItemCarrito]);
@@ -179,19 +180,12 @@ carrito.getCarritoCarrito = async (idCliente) => {
             rowsItemCarrito,
             montoTotal,
             cantItems,
-            local:{id:rowsItemCarrito[0].pkIdLocalComercial,nombre: rowsItemCarrito[0].nombreLocal}
+            local: { id: rowsItemCarrito[0].pkIdLocalComercial, nombre: rowsItemCarrito[0].nombreLocal }
         };
 
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0]; // impUsr || impDev
-        var _do = arrayError[1]; // doDefault || etc ...
-        var _msg = arrayError[2];   // msg
-        if (_imp == "impUsr") {
-            req.flash("info", arrayError[1]);
-        }
-        res.redirect("/cliente/explorar/listadoLocalesMinoristas");
+        return {error:true};
     }
 }
 
@@ -214,7 +208,7 @@ carrito.getCarritoPrecompra = async (idCliente) => {
             throw new Error("impDev-doDefault-El carrito está vacío, no se puede comprar nada");
         }
         //items
-        var rowsItemCarrito = await pool.query("SELECT itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
+        var rowsItemCarrito = await pool.query("SELECT itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.pkIdProducto,producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
         var cantItems = "";
         var subtotal = 0;
         if (rowsItemCarrito.length > 0) {
@@ -226,10 +220,10 @@ carrito.getCarritoPrecompra = async (idCliente) => {
         }
         //adjuntar datos al carrito
         rowCarrito[0].subtotal = subtotal;
-        rowCarrito[0].total= subtotal+ rowCarrito[0].precioDomicilio;
+        rowCarrito[0].total = subtotal + rowCarrito[0].precioDomicilio;
         return {
-            datos:rowCarrito,
-            items:rowsItemCarrito
+            datos: rowCarrito,
+            items: rowsItemCarrito
         };
 
     } catch (error) {
@@ -239,9 +233,59 @@ carrito.getCarritoPrecompra = async (idCliente) => {
         var _do = arrayError[1]; // doDefault || etc ...
         var _msg = arrayError[2];   // msg
         if (_imp == "impUsr") {
-          
+
         }
-    
+
+    }
+}
+
+carrito.getCarritoCompra = async (idCliente) => {
+    try {
+        /*
+            venta.precioDomicilioVenta
+            venta.direccionCliente
+            .nombres
+            venta.telefonoCliente
+            vena.documentoResponsable
+            venta.montoTotal
+            venta.fkIdLocalComercial
+            venta.fkIdCliente
+            fechas y estados
+        */
+        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.nombreLocal,localcomercial.precioDomicilio, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
+
+        if (rowCarrito[0].contadorItems <= 0) {
+            throw new Error("impDev-doDefault-El carrito está vacío, no se puede comprar nada");
+        }
+        //items
+        var rowsItemCarrito = await pool.query("SELECT itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.pkIdProducto,producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto,presentacionproducto.nombrePresentacion, productolocal.detallesProductoLocal, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
+        var cantItems = "";
+        var subtotal = 0;
+        if (rowsItemCarrito.length > 0) {
+            cantItems = rowsItemCarrito[0].contadorItems;
+            for (let index = 0; index < rowsItemCarrito.length; index++) {
+                rowsItemCarrito[index].precioInicialCalculado = rowsItemCarrito[index].cantidadItem * rowsItemCarrito[index].precioUnitarioPresentacion;
+                subtotal += rowsItemCarrito[index].precioUnitarioPresentacion * rowsItemCarrito[index].cantidadItem;
+            }
+        }
+        //adjuntar datos al carrito
+        rowCarrito[0].subtotal = subtotal;
+        rowCarrito[0].total = subtotal + rowCarrito[0].precioDomicilio;
+        return {
+            datos: rowCarrito,
+            items: rowsItemCarrito
+        };
+
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0]; // impUsr || impDev
+        var _do = arrayError[1]; // doDefault || etc ...
+        var _msg = arrayError[2];   // msg
+        if (_imp == "impUsr") {
+
+        }
+
     }
 }
 

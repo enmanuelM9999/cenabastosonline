@@ -7,9 +7,8 @@ const carrito = require("../../lib/carrito.manager");
 
 router.get('/carrito', esCliente, async (req, res) => {
     try {
-        const { local,cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
-        
-        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal,local });
+        const { local, cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
+        res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal, local });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -20,23 +19,23 @@ router.get('/carrito', esCliente, async (req, res) => {
             req.flash("message", _msg);
         }
         if (_do == "reForm") {
-            res.redirect('/comerciante/locales/crearLocal');
+           
         }
         if (_do == "doDefault") {
-            res.redirect('/comerciante/locales/listadoLocales');
+        
         }
-        res.redirect('/comerciante/locales/listadoLocales');
+        res.redirect('/cliente/pedidos/carrito');
     }
 });
 
 router.post('/agregarAlCarrito', esCliente, async (req, res) => {
     try {
         const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
-        const resultAdd= await carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem, req, res);
+        const resultAdd = await carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem);
         if (resultAdd.error) {
             req.flash("info", resultAdd._msg);
         }
-        res.redirect("/cliente/explorar/local/" + idLocal);
+        res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/explorar/listadoLocalesMinoristas");
@@ -122,9 +121,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
         /**AQUI VA EL WOMPI DOMPI***/
 
         //cargar vista
-        console.log("datos env ", datos);
-        console.log("items ", items)
-        res.render('cliente/pedidos/precompra', { datos:datos[0], items });
+        res.render('cliente/pedidos/precompra', { datos: datos[0], items });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -139,6 +136,81 @@ router.get('/precomprar', esCliente, async (req, res) => {
         }
         if (_do == "doDefault") {
             res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+        }
+        res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+    }
+});
+
+router.post('/comprar', esCliente, async (req, res) => {
+    try {
+        //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
+        var { datos, items } = await carrito.getCarritoCompra(req.session.idCliente);
+        if (items.length<=0) {
+            throw new Error("impUsr-hacker-El tesoro que buscas demanda esfuerzos mayores");
+        }
+        datos = datos[0];
+        //datos de pago
+
+        /**AQUI VA EL WOMPI DOMPI***/
+        console.log("los datos ", datos, " y los items ", items);
+
+        //crear venta
+        var moment = require("moment");
+        var fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+        const newVenta = {
+            fechaHoraVenta,
+            fueEmpacado: 0,
+            fueEnviado: 0,
+            fueEntregado: 0,
+            precioDomicilioVenta: datos.precioDomicilio,
+            direccionCliente: datos.direccionCliente,
+            telefonoCliente: datos.telefonoPersonaNatural,
+            numeroDocumentoCliente: datos.numeroDocumento,
+            montoTotal: datos.total,
+            fkIdLocalComercial: datos.fkIdLocalSeleccionado,
+            fkIdCliente: req.session.idCliente
+        };
+        const resultInsert=await pool.query("INSERT INTO venta SET ?",[newVenta]);
+        //crear items-venta
+        for (let index = 0; index < items.length; index++) {
+            const nombrePresentacionItemVenta=""+items[index].nombrePresentacion;
+            var detallesComerciante=""+items[index].detallesProductoLocal+" | "+items[index].detallesPresentacionProducto;
+            if (items[index].detallesProductoLocal=="" && items[index].detallesPresentacionProducto=="") {
+                detallesComerciante="";
+            }
+            const newItemVenta = {
+                nombrePresentacionItemVenta,
+                cantidadItem:items[index].cantidadItem,
+                precioUnitarioItem:items[index].precioUnitarioPresentacion,
+                detallesCliente:items[index].detallesCarrito,
+                detallesComerciante,
+                fkIdProducto:items[index].pkIdProducto,
+                fkIdVenta:resultInsert.insertId
+            };
+            await pool.query("INSERT INTO itemventa SET ?",[newItemVenta]);
+            carrito.vaciarCarrito(req.session.idCliente);
+        }
+
+        console.log("la venta es ", newVenta);
+        //cargar vista
+        req.flash("success", "Pedido hecho con éxito");
+        res.redirect('/cliente/pedidos/historial');
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+        if (_imp == "impUsr") {
+            req.flash("message", _msg);
+        }
+        if (_do == "reForm") {
+            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+        }
+        if (_do == "doDefault") {
+            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+        }
+        if (_do == "hacker") {
         }
         res.redirect('/cliente/explorar/listadoLocalesMinoristas');
     }

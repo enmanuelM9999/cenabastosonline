@@ -28,7 +28,7 @@ router.post("/logup", (req, res, next) => {
     res.redirect("/cliente/sesion/logup");
   }
   passport.authenticate("cliente.logup", {
-    successRedirect: "/cliente/explorar/listadoLocalesMayoristas",
+    successRedirect: "/cliente/explorar/listadoLocalesMinoristas",
     failureRedirect: "/cliente/sesion/logup",
     failureFlash: true
   })(req, res, next);
@@ -50,7 +50,7 @@ router.post("/login", (req, res, next) => {
     res.redirect("/cliente/sesion/login");
   }
   passport.authenticate("cliente.login", {
-    successRedirect: "/cliente/explorar/listadoLocalesMayoristas",
+    successRedirect: "/cliente/explorar/listadoLocalesMinoristas",
     failureRedirect: "/cliente/sesion/login",
     failureFlash: true
   })(req, res, next);
