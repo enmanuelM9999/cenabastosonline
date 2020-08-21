@@ -32,7 +32,7 @@ app.set('view engine', '.hbs');
 
 // Middlewares
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended: false}));
+commitapp.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(session({
@@ -46,6 +46,34 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(validator());
+
+
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, 'public/img/uploads'),
+  filename: (req, file, cb, filename) => {
+    console.log(file);
+    cb(null, uuid() + path.extname(file.originalname));
+  }
+})
+app.use(multer({
+  storage,
+  fileFilter: function (req, file, cb) {
+
+    try {
+      var filetypes = /jpg|jpeg|png|webp/;
+      var mimetype = filetypes.test(file.mimetype);
+      var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+      if (mimetype && extname) {
+        return cb(null, true);
+      }
+      cb("Error: Solo se permiten archivos con extensión: - " + filetypes);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  limits: { fileSize: 10000000 }
+}).single('image'));
 
 // Global variables
 app.use((req, res, next) => {

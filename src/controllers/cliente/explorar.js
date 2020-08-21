@@ -32,6 +32,17 @@ router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
     }
 });
 
+function existeCategoria(arrayCategorias,idCategoria){
+    var existe=false;
+    for (let index = 0; index < arrayCategorias.length; index++) {
+        if (arrayCategorias[index].id==idCategoria) {
+            existe=true;
+            break;
+        } 
+    }
+    return existe;
+}
+
 router.get('/local/:idLocal', esCliente, async (req, res) => {
     try {
         const { idLocal } = req.params;
@@ -42,13 +53,37 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         } else {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
         }
-        const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
+
+        const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, categoriaproducto.pkIdCategoriaProducto,categoriaproducto.descripcionCategoriaProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN categoriaproducto ON producto.fkIdCategoriaProducto=categoriaproducto.pkIdCategoriaProducto INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
+
+        //htmlProductos
+        var categorias = [];
+        var productos=[];
+        for (let index = 0; index < rowsProductoLocal.length; index++) {
+            if (!existeCategoria(categorias,rowsProductoLocal[index].pkIdCategoriaProducto)) {
+                categorias.push({ id: rowsProductoLocal[index].pkIdCategoriaProducto, name: rowsProductoLocal[index].descripcionCategoriaProducto });
+            }
+            var producto={
+                id_presentacion: rowsProductoLocal[index].pkIdPresentacionProducto,
+                nombre_presentacion:rowsProductoLocal[index].nombrePresentacion,
+                precio:rowsProductoLocal[index].precioUnitarioPresentacion,
+                id_pl:rowsProductoLocal[index].pkIdProductoLocal,
+                nombre_producto:rowsProductoLocal[index].nombreProducto,
+                css:rowsProductoLocal[index].cssPropertiesBg,
+                img_path:rowsProductoLocal[index].rutaImagen,
+                categoria:rowsProductoLocal[index].pkIdCategoriaProducto
+            }
+            productos.push(producto);
+            
+        }
+        var htmlProductos= JSON.stringify(productos);
+        var htmlCategorias = JSON.stringify(categorias);
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("test/localComercial", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, cantItemsCarrito });
+        res.render("test/localComercial", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito });
     } catch (error) {
         console.log(error);
-        req.flash("info","No sigas Daniel el Travieso");
+        req.flash("info", "Acceso no permitido");
         res.redirect("/cliente/explorar/listadoLocalesminoristas");
     }
 });
@@ -95,7 +130,7 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
         productoLocal.htmlJSON = html;
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/productoLocal", { productoLocal,cantItemsCarrito });
+        res.render("cliente/explorar/productoLocal", { productoLocal, cantItemsCarrito });
     } catch (error) {
         console.log(error);
     }

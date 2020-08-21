@@ -32,4 +32,34 @@ router.get("/logout", (req, res) => {
   res.redirect("/administrador/sesion/login");
 });
 
+//---- recuperar Contraseña
+
+router.get('/recuperarClave', async (req, res) => {
+  try {
+    res.render('administrador/sesion/recuperarClave');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/administrador/sesion/login');
+  }
+  
+});
+
+router.post('/recuperarClave', async (req, res) => {
+  try {
+    const claveManager = require("../../lib/recuperarClave.manager");
+    const { email } = req.body;
+    const result=claveManager.recuperarClave(email);
+    if (result.error) {
+      throw new Error(result.msg);
+    }
+    req.flash('success', 'Datos enviados, por favor revise su correo electrónico');
+    res.redirect('/administrador/sesion/login');
+  } catch (error) {
+    console.log(error)
+    req.flash("message",error.message);
+    res.redirect("/administrador/session/login");
+  }
+
+});
+
 module.exports = router;

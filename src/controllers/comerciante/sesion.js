@@ -67,4 +67,34 @@ router.get("/updatelogout", (req, res) => {
   res.redirect("/comerciante/sesion/login");
 });
 
+
+//---- recuperar Contraseña
+
+router.get('/recuperarClave', async (req, res) => {
+  try {
+    res.render('comerciante/sesion/recuperarClave');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/comerciante/sesion/login');
+  }
+});
+
+router.post('/recuperarClave', async (req, res) => {
+  try {
+    const claveManager = require("../../lib/recuperarClave.manager");
+    const { email } = req.body;
+    const result=claveManager.recuperarClave(email);
+    if (result.error) {
+      throw new Error(result.msg);
+    }
+    req.flash('success', 'Datos enviados, por favor revise su correo electrónico');
+    res.redirect('/comerciante/sesion/login');
+  } catch (error) {
+    console.log(error)
+    req.flash("message",error.message);
+    res.redirect("/comerciate/session/login");
+  }
+
+});
+
 module.exports = router;

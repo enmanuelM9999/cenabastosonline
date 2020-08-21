@@ -1,0 +1,23 @@
+<div class="container mt-3">
+  <div class="card shadow">
+      <div class="card-body">
+          <div class="card-title font-weight-bold">
+              <h3>Recuperar Contraseña</h3>
+          </div>
+          <div class="card-text">
+
+              <form method="POST" action="/administrador/sesion/recuperarClave" class="mt-4">
+                  <div class="form-group">
+                      <label for="email">Correo</label>
+                      <input class="form-control" type="email" placeholder="" name="email" id="email">
+                  </div>
+                  <button type="submit" class="btn btn-success">Recuperar Clave</button>
+                  
+              </form>
+
+          </div>
+      </div>
+  </div>
+</div>
+
+{{>navegacionIndex}}

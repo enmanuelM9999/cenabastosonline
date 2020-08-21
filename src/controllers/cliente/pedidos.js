@@ -190,8 +190,6 @@ router.post('/comprar', esCliente, async (req, res) => {
             await pool.query("INSERT INTO itemventa SET ?",[newItemVenta]);
             carrito.vaciarCarrito(req.session.idCliente);
         }
-
-        console.log("la venta es ", newVenta);
         //cargar vista
         req.flash("success", "Pedido hecho con éxito");
         res.redirect('/cliente/pedidos/historial');
@@ -209,8 +207,6 @@ router.post('/comprar', esCliente, async (req, res) => {
         }
         if (_do == "doDefault") {
             res.redirect('/cliente/explorar/listadoLocalesMinoristas');
-        }
-        if (_do == "hacker") {
         }
         res.redirect('/cliente/explorar/listadoLocalesMinoristas');
     }
