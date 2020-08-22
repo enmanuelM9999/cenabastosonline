@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        
+    </head>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.min.js"></script>
+   
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
+    
+    
+    <link href="css/starrr.css" rel=stylesheet/>
+    <script src="js/starrr.js"></script>
+    
+    
+<body>
+    <div class="container-fluid">
+        <br/>
+    <div class="col-md-2"></div>
+            <div class="col-md-2">
+                <img class="thumbnail" src="img/el-bebe-jefazo.jpg" />
+            </div>
+        <div class="col-md-6" style="margin-left: 17px;">
+             <h2>El bebé jefazo (2017)</h2>
+            <span class="original"><strong>Título original:</strong> The Boss Baby</span>
+            <br/>
+       Géneros: Animación, Comedia<br/>
+   
+            </p>
+            <hr/>
+            Calificar: <span id="Estrellas"></span>
+            <hr/>
+            <p>
+                
+           <h4> SINOPSIS</h4>
+Tim es un niño de 7 años que tiene los mejores padres del mundo. Su vida es perfecta hasta que un fatídico día todo cambia de forma radical. ¿El motivo? Ya no serán solo tres en la familia, porque ha llegado su nuevo hermanito, un adorable bebé, que hace que a sus padres se les caiga la baba.<br/><br/>
+           <iframe width="640" height="360" src="https://www.youtube.com/embed/2zI1OJzYSC8" frameborder="0" allowfullscreen></iframe>
+            </p>
+        </div>
+    
+    <div class="col-md-2"></div>
+    
+    </div>
+	<script>
+   $('#Estrellas').starrr({
+       rating:3,
+       change:function(e,valor){
+           alert(valor);
+           
+       }
+       
+   });
+    
+    </script>
+</body>
+</html>
+
+
+
+

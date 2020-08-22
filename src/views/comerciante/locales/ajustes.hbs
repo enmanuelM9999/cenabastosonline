@@ -50,7 +50,8 @@
                                             <div class="card-title">
                                                 <h5>{{nombreProducto}}</h5>
 
-                                                <form name="formProductoLocal{{pkIdProductoLocal}}" id="formProductoLocal{{pkIdProductoLocal}}"
+                                                <form name="formProductoLocal{{pkIdProductoLocal}}"
+                                                    id="formProductoLocal{{pkIdProductoLocal}}"
                                                     action="/comerciante/locales/actualizarProductoLocal" method="POST">
                                                     <input type="hidden" name="idProductoLocal"
                                                         value="{{pkIdProductoLocal}}">
@@ -79,7 +80,7 @@
                                             <div>
                                                 <h5>Presentaciones ({{cantPresentaciones}})</h5>
                                                 <div>
-                                                    <a href="/comerciante/locales/infoPresentacion"
+                                                    <a href="/comerciante/locales/informacionPresentacion"
                                                         class="btn btn-light" data-toggle="tooltip"
                                                         data-placement="bottom" title="¿Qué son las presentaciones?"><i
                                                             class="far fa-question-circle"></i>
@@ -197,8 +198,25 @@
                                                 value="{{precioDomicilio}}" name="domicilio" id="domicilio">
                                         </div>
                                         {{/each}}
-                                        <button type="submit" class="btn btn-success mt-3"><i class="fas fa-check"></i>
+                                        <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save"></i>
                                             Actualizar datos</button>
+                                    </form>
+                                    <br>
+                                    <h5>Portada del local</h5>
+                                    <form action="/comerciante/locales/actualizarBanner" method="POST"
+                                        enctype="multipart/form-data">
+                                        {{#each rowsDatosLocal}}
+                                            <img src="{{rutaImagen}}" style="width: 90%; max-width: 300px;">
+                                        {{else}}
+                                        {{/each}}
+                                        <div class="mt-2" style="width: 100%;">
+                                            <input type="file" name="myFile">
+                                            
+                                        </div>
+                                        <br>
+                                        <br>
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i>
+                                            Actualizar imagen</button>
                                     </form>
                                 </div>
                             </div>

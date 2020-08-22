@@ -3,6 +3,14 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
+const cloudinary = require("cloudinary");
+const { cloud_name, api_key, api_secret } = require("../../environmentVars");
+cloudinary.config({
+    cloud_name,
+    api_key,
+    api_secret
+});
+
 function localCargado(req) {
     var estaCargado = true;
     if (req.session.idLocalActual == undefined) {
@@ -398,7 +406,7 @@ router.get('/pedidos/moverAEmpacado/:idPedido', esComercianteAprobado, async (re
         const { idPedido } = req.params;
         const fueEmpacado = {
             fueEmpacado: 1,
-            fechaHoraEmpacado:moment
+            fechaHoraEmpacado: moment
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -418,7 +426,7 @@ router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req,
         const { idPedido } = req.params;
         const fueEmpacado = {
             fueEmpacado: 0,
-            fechaHoraEmpacado:null
+            fechaHoraEmpacado: null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -440,7 +448,7 @@ router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (re
         const { idPedido } = req.params;
         const fueEnviado = {
             fueEnviado: 1,
-            fechaHoraEnvio:moment
+            fechaHoraEnvio: moment
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEnviado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -460,7 +468,7 @@ router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async 
         const { idPedido } = req.params;
         const fueEnviado = {
             fueEnviado: 0,
-            fechaHoraEnvio:null
+            fechaHoraEnvio: null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEnviado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -482,7 +490,7 @@ router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (r
         const { idPedido } = req.params;
         const fueEntregado = {
             fueEntregado: 1,
-            fechaHoraEntrega:moment
+            fechaHoraEntrega: moment
         };
         await pool.query("UPDATE venta SET  ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -502,7 +510,7 @@ router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (r
         const { idPedido } = req.params;
         const fueEntregado = {
             fueEntregado: 0,
-            fechaHoraEntrega:null
+            fechaHoraEntrega: null
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);
         res.redirect("/comerciante/locales/pedidos");
@@ -550,7 +558,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
         const cantProductos = rowsProductosLocal.length;
 
         //ajuste de actualizar datos del local
-        const rowsDatosLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal, descripcionLocal, precioDomicilio FROM localcomercial WHERE pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        const rowsDatosLocal = await pool.query("SELECT localcomercial.idLocalEnCenabastos, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
         res.render("comerciante/locales/ajustes", { nombreLocalActual: req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
     } catch (error) {
         console.log(error);
@@ -773,6 +781,75 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
         }
     }
 });
+
+
+router.post('/actualizarBanner', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const size = req.file.size;
+        const extension = req.file.mimetype.split("/")[1].toString();
+        if (extension.trim() != "png" && extension.trim() != "jpg" && extension.trim() != "jpeg" && extension.trim() != "webp") {
+            throw new Error("impUsr-doDefault-Debes subir una imagen con extensión png, jpg, jpeg o webp");
+        }
+        if (size > 5242880) {
+            throw new Error("impUsr-doDefault-Tu imagen no puede pesar más de 5 MB");
+        }
+      
+        const rowLatestImage = await pool.query("SELECT imagen.publicId, imagen.pkIdImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial=?", [req.session.idLocalActual]);
+        if (rowLatestImage.length != 1) {
+            throw new Error("impUsr-doDefafult-No existe un banner asociado al local o existe más de un banner asociado al local");
+        }
+
+        const resultCloud = await cloudinary.v2.uploader.upload(req.file.path);
+        let newImagen = {
+            publicId: resultCloud.public_id,
+            rutaImagen: resultCloud.secure_url
+        };
+        const resultDb = await pool.query("INSERT INTO imagen SET ?", [newImagen]);
+        const newLocal = {
+            fkIdBanner: resultDb.insertId
+        };
+
+        await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial=?", [newLocal, req.session.idLocalActual]);
+
+        //Limpiar
+        await cloudinary.v2.uploader.destroy(rowLatestImage[0].publicId);
+        await pool.query("DELETE FROM imagen WHERE pkIdImagen=?", [rowLatestImage[0].pkIdImagen]);
+        res.redirect("/comerciante/locales/ajustes");
+    } catch (error) {
+        console.log(error);
+        var arrayError = error.message.toString().split("-");
+        var _imp = arrayError[0];
+        var _do = arrayError[1];
+        var _msg = arrayError[2];
+
+        if (_imp === "impUsr") {
+            req.flash("message", _msg);
+        }
+
+        if (_do === "reForm") {
+            res.redirect("/comerciante/locales/agregarPresentacionProductoLocal/" + idProductoLocal + "");
+        }
+
+        res.redirect("/comerciante/locales/ajustes");
+    }
+    finally {
+        const fs = require("fs-extra");
+        await fs.unlink(req.file.path);
+    }
+});
+
+
+router.get('/informacionPresentacion', esComercianteAprobado, async (req, res) => {
+    try {
+        res.render("comerciante/locales/informacionPresentacion");
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 module.exports = router;
 

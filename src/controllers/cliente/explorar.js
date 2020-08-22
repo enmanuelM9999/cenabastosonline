@@ -80,7 +80,7 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         var htmlCategorias = JSON.stringify(categorias);
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("test/localComercial", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito });
+        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito , idLocal});
     } catch (error) {
         console.log(error);
         req.flash("info", "Acceso no permitido");
@@ -136,6 +136,34 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
     }
 });
 
+router.post('/calificarLocal', esCliente, async (req, res) => {
+    try {
+        const { valorEstrella, idLocal} = req.body;
 
+        const rowsVenta = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 0, 0, 0]);
+
+        if (rowsVenta.length < 1) {
+            throw new Error("No se puede calificar el local si no ha realizado una compra satisfactoria");
+        } 
+
+        await pool.query("INSERT INTO calificacionclientelocal");
+
+
+        //Recolectar y actualizar los datos en la BD
+        const newLocalComercial = {
+            nombreLocal: name,
+            precioDomicilio: domicilio,
+            descripcionLocal: descripcion,
+            idLocalEnCenabastos: idlocal
+        };
+        await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
+        req.session.nombreLocalActual = newLocalComercial.nombreLocal;
+        res.redirect('/comerciante/locales/ajustes');
+    } catch (error) {
+        console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
+    }
+});
 
 module.exports = router;

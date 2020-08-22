@@ -21,10 +21,10 @@
                     <div class="col-12 p-2">
                         <div class="card p-4">
                             
-                            <form action="/administrador/productos/crearProducto" method="POST" name="form" id="form">
+                            <form action="/administrador/productos/crearProducto" method="POST" name="form" id="form" enctype="multipart/form-data">
 
                                 <div class="form-group">
-                                    <label for="nameProd">Nombre Producto</label>
+                                    <label for="nameProd"> Nombre Producto</label>
                                     <input type="text" class="form-control" id="nameProd" name="nameProd">
                                 </div>
                                 
@@ -43,14 +43,11 @@
                                         cols="1"></textarea>
                                 </div>
 
-                                <div class="input-group mb-3">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="imagen" name="imagen">
-                                        <label class="custom-file-label" for="imagen" aria-describedby="uploadImg">Elegir Imagen</label>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text" id="uploadImg">Subir Imagen</span>
-                                    </div>
+                                <div class=" mb-3">
+                                    <div>Subir imagen del producto</div>
+                                    <br>
+                                    <small class="text-muted">Se recomienda que la imagen sea cuadrada</small>
+                                    <input type="file" name="myFile" id="myFile">
                                 </div>
 
                                 <button type="submit" class="btn btn-success">Crear Producto</button>
