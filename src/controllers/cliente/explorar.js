@@ -140,13 +140,19 @@ router.post('/calificarLocal', esCliente, async (req, res) => {
     try {
         const { valorEstrella, idLocal} = req.body;
 
-        const rowsVenta = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 0, 0, 0]);
+        const rowsVenta = await pool.query("SELECT venta.pkIdVenta, calificacionclientelocal.calificacion FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 0, 0, 0]);
 
         if (rowsVenta.length < 1) {
             throw new Error("No se puede calificar el local si no ha realizado una compra satisfactoria");
         } 
 
-        await pool.query("INSERT INTO calificacionclientelocal");
+        if (rowsVenta[0].calificacion < 1) {
+            await pool.query("INSERT INTO calificacionclientelocal");
+        } else {
+            await pool.query("INSERT INTO calificacionclientelocal");
+        }
+
+        
 
 
         //Recolectar y actualizar los datos en la BD
