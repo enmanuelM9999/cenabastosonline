@@ -46,13 +46,23 @@ function existeCategoria(arrayCategorias,idCategoria){
 router.get('/local/:idLocal', esCliente, async (req, res) => {
     try {
         const { idLocal } = req.params;
+        const localId = idLocal;
         //Buscar todos los locales mayoristas
-        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
+        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
         if (rowsLocalesMayoristas[0].estaAbierto == 1) {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto </div>';
         } else {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
         }
+
+        let calificacion;
+        const rowCalificacionCliente = await pool.query("SELECT calificacionclientelocal.calificacion FROM localcomercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE calificacionclientelocal.fkIdCliente = ? AND calificacionclientelocal.fkIdLocalComercial = ?",[req.session.idCliente, idLocal]);
+        if (rowCalificacionCliente.length < 1) {
+            calificacion = 0;
+        } else {
+            calificacion = rowCalificacionCliente[0].calificacion;
+        }
+
 
         const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, categoriaproducto.pkIdCategoriaProducto,categoriaproducto.descripcionCategoriaProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN categoriaproducto ON producto.fkIdCategoriaProducto=categoriaproducto.pkIdCategoriaProducto INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
 
@@ -80,7 +90,7 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         var htmlCategorias = JSON.stringify(categorias);
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito , idLocal});
+        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito , localId, calificacion});
     } catch (error) {
         console.log(error);
         req.flash("info", "Acceso no permitido");
@@ -140,35 +150,54 @@ router.post('/calificarLocal', esCliente, async (req, res) => {
     try {
         const { valorEstrella, idLocal} = req.body;
 
-        const rowsVenta = await pool.query("SELECT venta.pkIdVenta, calificacionclientelocal.calificacion FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 0, 0, 0]);
+        console.log("el local es " + idLocal);
+
+        const rowsVenta = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 1, 1, 1]);
 
         if (rowsVenta.length < 1) {
             throw new Error("No se puede calificar el local si no ha realizado una compra satisfactoria");
         } 
 
-        if (rowsVenta[0].calificacion < 1) {
-            await pool.query("INSERT INTO calificacionclientelocal");
+        const rowCalificacion = await pool.query("SELECT calificacion FROM  calificacionclientelocal WHERE fkIdCliente = ? AND fkIdLocalComercial = ?", [req.session.idCliente, idLocal]);
+
+        if (rowCalificacion.length < 1) {
+            const newCalificacion = {
+                fkIdCliente : req.session.idCliente,
+                fkIdLocalComercial : idLocal,
+                calificacion : valorEstrella
+            };
+            await pool.query("INSERT INTO calificacionclientelocal SET ?", [newCalificacion]);
+
+            const rowCalificacionLocal = await pool.query("SELECT SUM(calificacion)calificacion, localcomercial.calificacionContadorCliente FROM calificacionclientelocal INNER JOIN localcomercial on localcomercial.pkIdLocalComercial = calificacionclientelocal.fkIdLocalComercial WHERE fkIdLocalComercial = ?", [idLocal]);
+            const calificacionPromedioLocal = rowCalificacionLocal[0].calificacion / (rowCalificacionLocal[0].calificacionContadorCliente + 1);
+
+            const newCalificacionLocal = {
+                calificacionPromedio : calificacionPromedioLocal,
+                calificacionContadorCliente : rowCalificacionLocal[0].calificacionContadorCliente + 1
+            };
+            await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial = ?", [newCalificacionLocal, idLocal]);
+
         } else {
-            await pool.query("INSERT INTO calificacionclientelocal");
+            const updateCalificacion = {
+                calificacion : valorEstrella
+            };
+            await pool.query("UPDATE calificacionclientelocal SET ? WHERE fkIdCliente = ? AND fkIdLocalComercial = ?",[updateCalificacion, req.session.idCliente, idLocal]);
+
+            const rowCalificacionLocal = await pool.query("SELECT SUM(calificacion)calificacion, localcomercial.calificacionContadorCliente FROM calificacionclientelocal INNER JOIN localcomercial on localcomercial.pkIdLocalComercial = calificacionclientelocal.fkIdLocalComercial WHERE fkIdLocalComercial = ?", [idLocal]);
+            const calificacionPromedioLocal = rowCalificacionLocal[0].calificacion / rowCalificacionLocal[0].calificacionContadorCliente;
+
+            const newCalificacionLocal = {
+                calificacionPromedio : calificacionPromedioLocal
+            };
+            await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial = ?", [newCalificacionLocal, idLocal]);
         }
 
-        
-
-
-        //Recolectar y actualizar los datos en la BD
-        const newLocalComercial = {
-            nombreLocal: name,
-            precioDomicilio: domicilio,
-            descripcionLocal: descripcion,
-            idLocalEnCenabastos: idlocal
-        };
-        await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
-        req.session.nombreLocalActual = newLocalComercial.nombreLocal;
-        res.redirect('/comerciante/locales/ajustes');
+        res.redirect('/cliente/explorar/listadoLocalesMayoristas');
+        req.flash("success", "Local calificado correctamente");
     } catch (error) {
         console.log(error);
-        req.flash("message", "Seleccione un local de nuevo")
-        res.redirect("/comerciante/locales/listadoLocales");
+        req.flash("message", "No se puede calificar el local si no ha realizado una compra satisfactoria");
+        res.redirect("/cliente/explorar/listadoLocalesMayoristas");
     }
 });
 

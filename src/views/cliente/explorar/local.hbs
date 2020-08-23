@@ -348,18 +348,6 @@
             <div id="stories" class="storiesWrapper stories"></div>
         </div>
 
-
-        <link rel="stylesheet" href="/StarRating/css/starrr.css">
-        <div class="col-12">
-            <input type="hidden" name="idLocal" value="{{idLocal}}">
-            <form action="/cliente/explorar/calificarLocal" method="post">
-                Calificar: <div id="estrella"><input type="hidden" name="valorEstrella" id="valorEstrella" value=""></div>
-                <button type="submit" class="btn btn-success">Calificar</button>
-            </form>
-            
-        </div>
-
-
         <div class="store-data">
 
             {{{rowsLocalesMayoristas.textoEstaAbierto}}}
@@ -367,10 +355,29 @@
             <div class="text-success" style="font-size: 1.5em;">
                 <i class="fas fa-truck"></i> ${{rowsLocalesMayoristas.precioDomicilio}}
             </div>
+            <div class="text-success" style="font-size: 1.5em;">
+                <i class="fas fa-shopping-bag"></i> Pedido mínimo ${{rowsLocalesMayoristas.montoPedidoMinimo}}
+            </div>
+
             <div class="text-warning" style="font-size: 1.5em;">
                 <i class="fas fa-star"></i> {{rowsLocalesMayoristas.calificacionPromedio}} <small
                     style="color:rgb(168, 168, 168); font-size:17px;"> <i class="far fa-user"></i>
                     {{rowsLocalesMayoristas.calificacionContadorCliente}}</small>
+            </div>
+            <link rel="stylesheet" href="/StarRating/css/starrr.css">
+            <div class=" ml-3">
+                <form action="/cliente/explorar/calificarLocal" method="post">
+                    <input type="hidden" name="idLocal" value="{{localId}}">
+
+                    <br>
+                    <div class="row">
+                        <div id="estrella" style=""><input type="hidden" name="valorEstrella" id="valorEstrella"
+                                value=""></div>
+                        <button type="submit" class="btn btn-link text-warning"
+                            style="font-size:20px; position: relative; bottom:8px">Calificar</button>
+                    </div>
+                </form>
+
             </div>
             <div class="seller-info mt-2" style="font-size: 1.8em;">
                 {{rowsLocalesMayoristas.descripcionLocal}}
@@ -506,10 +513,10 @@
 
 <script>
     $("#estrella").starrr({
-        rating: 0,
+        rating: {{ calificacion }},
         max: 5,
         change: function (e, valor) {
-            $("valorEstrella").val(valor);
+            $("#valorEstrella").val(valor);
         }
     }); 
 </script>

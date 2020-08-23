@@ -19,10 +19,10 @@ router.get('/carrito', esCliente, async (req, res) => {
             req.flash("message", _msg);
         }
         if (_do == "reForm") {
-           
+
         }
         if (_do == "doDefault") {
-        
+
         }
         res.redirect('/cliente/pedidos/carrito');
     }
@@ -114,14 +114,18 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
 router.get('/precomprar', esCliente, async (req, res) => {
     try {
         //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
-        const { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
+        let { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
+        datos = datos[0];
+        if (datos.subtotal < datos.montoPedidoMinimo) {
+            throw new Error("impUsrI-reLocal-El monto total debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
+        }
 
         //datos de pago
 
         /**AQUI VA EL WOMPI DOMPI***/
 
         //cargar vista
-        res.render('cliente/pedidos/precompra', { datos: datos[0], items });
+        res.render('cliente/pedidos/precompra', { datos, items });
     } catch (error) {
         console.log(error);
         var arrayError = error.message.toString().split("-");
@@ -131,8 +135,11 @@ router.get('/precomprar', esCliente, async (req, res) => {
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
-        if (_do == "reForm") {
-            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+        if (_imp == "impUsrI") {
+            req.flash("info", _msg);
+        }
+        if (_do == "reLocal") {
+            res.redirect('/cliente/pedidos/carrito');
         }
         if (_do == "doDefault") {
             res.redirect('/cliente/explorar/listadoLocalesMinoristas');
@@ -144,24 +151,29 @@ router.get('/precomprar', esCliente, async (req, res) => {
 router.post('/comprar', esCliente, async (req, res) => {
     try {
         //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
-        var { datos, items } = await carrito.getCarritoCompra(req.session.idCliente);
-        if (items.length<=0) {
+        let { datos, items } = await carrito.getCarritoCompra(req.session.idCliente);
+        if (items.length <= 0) {
             throw new Error("impUsr-hacker-El tesoro que buscas demanda esfuerzos mayores");
         }
         datos = datos[0];
+        if (datos.subtotal < datos.montoPedidoMinimo) {
+            throw new Error("impUsrI-doDefault-El monto del pedido debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
+        }
         //datos de pago
 
         /**AQUI VA EL WOMPI DOMPI***/
         console.log("los datos ", datos, " y los items ", items);
 
         //crear venta
-        var moment = require("moment");
-        var fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+        let moment = require("moment");
+        let fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const newVenta = {
             fechaHoraVenta,
             fueEmpacado: 0,
             fueEnviado: 0,
             fueEntregado: 0,
+            fueCancelado: 0,
+            fueReclamado: 0,
             precioDomicilioVenta: datos.precioDomicilio,
             direccionCliente: datos.direccionCliente,
             telefonoCliente: datos.telefonoPersonaNatural,
@@ -170,24 +182,24 @@ router.post('/comprar', esCliente, async (req, res) => {
             fkIdLocalComercial: datos.fkIdLocalSeleccionado,
             fkIdCliente: req.session.idCliente
         };
-        const resultInsert=await pool.query("INSERT INTO venta SET ?",[newVenta]);
+        const resultInsert = await pool.query("INSERT INTO venta SET ?", [newVenta]);
         //crear items-venta
         for (let index = 0; index < items.length; index++) {
-            const nombrePresentacionItemVenta=""+items[index].nombrePresentacion;
-            var detallesComerciante=""+items[index].detallesProductoLocal+" | "+items[index].detallesPresentacionProducto;
-            if (items[index].detallesProductoLocal=="" && items[index].detallesPresentacionProducto=="") {
-                detallesComerciante="";
+            const nombrePresentacionItemVenta = "" + items[index].nombrePresentacion;
+            var detallesComerciante = "" + items[index].detallesProductoLocal + " | " + items[index].detallesPresentacionProducto;
+            if (items[index].detallesProductoLocal == "" && items[index].detallesPresentacionProducto == "") {
+                detallesComerciante = "";
             }
             const newItemVenta = {
                 nombrePresentacionItemVenta,
-                cantidadItem:items[index].cantidadItem,
-                precioUnitarioItem:items[index].precioUnitarioPresentacion,
-                detallesCliente:items[index].detallesCarrito,
+                cantidadItem: items[index].cantidadItem,
+                precioUnitarioItem: items[index].precioUnitarioPresentacion,
+                detallesCliente: items[index].detallesCarrito,
                 detallesComerciante,
-                fkIdProducto:items[index].pkIdProducto,
-                fkIdVenta:resultInsert.insertId
+                fkIdProducto: items[index].pkIdProducto,
+                fkIdVenta: resultInsert.insertId
             };
-            await pool.query("INSERT INTO itemventa SET ?",[newItemVenta]);
+            await pool.query("INSERT INTO itemventa SET ?", [newItemVenta]);
             carrito.vaciarCarrito(req.session.idCliente);
         }
         //cargar vista
@@ -201,6 +213,9 @@ router.post('/comprar', esCliente, async (req, res) => {
         var _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
+        }
+        if (_imp == "impUsrI") {
+            req.flash("info", _msg);
         }
         if (_do == "reForm") {
             res.redirect('/cliente/explorar/listadoLocalesMinoristas');
@@ -286,10 +301,24 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
             }
             rowsBuzon[0].mensajes = rowsMensajesBuzon;
         }
+
+        //Validar si la venta fue entregada para realizar un reclamo
+
+        
+        let htmlBotonReclamo = '';
+        const rowFueEntregado = await pool.query("SELECT pkIdVenta, razonReclamo FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?",[1, 1, 1, idPedido]);
+
+        if (rowFueEntregado.length < 1) {
+            htmlBotonReclamo = '<a href="/cliente/pedidos/reclamar/'+idPedido+'" class="btn btn-success mt-2"><i class="fas fa-shopping-bag"></i> Reclamar</a>';
+        } else {
+            htmlBotonReclamo = '<div class="card mt-3 p-3"><div class="form-group"><label for="newReclamo">Razon Reclamo</label><textarea disabled name="newReclamo" id="newReclamo" class="form-control" form="form" cols="1">'+rowFueEntregado[0].razonReclamo+'</textarea></div></div>';
+        }
+
+
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
+        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, htmlBotonReclamo });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
@@ -358,5 +387,40 @@ router.get('/msgCarritoLocalesDiferentes', esCliente, async (req, res) => {
     }
 });
 
+router.get('/reclamar/:idVenta', esCliente, async (req, res) => {
+    try {
+        const {idVenta} = req.params;
+
+        res.render("cliente/pedidos/nuevoReclamo",{idVenta});
+    } catch (error) {
+        console.log(error);
+        res.redirect("/cliente/pedidos/historial");
+    }
+});
+
+
+router.post('/reclamarPedido', esCliente, async (req, res) => {
+    try {
+        const { idVenta, newReclamo } = req.body;
+        const nuevoReclamo = {
+            razonReclamo : newReclamo,
+            fueReclamado : 1
+        };
+
+        const rowFueEntregado = await pool.query("SELECT pkIdVenta FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?",[1, 1, 1, idVenta]);
+
+        if (rowFueEntregado.length < 0) {
+            req.flash("message", "No puede realizar un reclamo hasta que el pedido haya sido entregado");
+            res.redirect("/cliente/pedidos/historial");
+        }
+
+        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?",[nuevoReclamo, idVenta]);
+        req.flash("success", "Reclamo realizado correctamente");
+        res.redirect("/cliente/pedidos/historial");
+    } catch (error) {
+        console.log(error);
+        res.redirect('/cliente/pedidos/historial');
+    }
+});
 
 module.exports = router;

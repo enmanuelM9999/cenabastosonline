@@ -1,6 +1,7 @@
 <div class="container mt-3">
     <div class="row d-flex justify-content-center">
-        <img src="{{rowProducto.rutaImagen}}" class="img-fluid" alt="{{rowProducto.nombreProducto}}" style="width: 100px; height: 100px;">
+        <img src="{{rowProducto.rutaImagen}}" class="img-fluid" alt="{{rowProducto.nombreProducto}}"
+            style="width: 100px; height: 100px;">
     </div>
 
     <div class="row">
@@ -13,16 +14,18 @@
 
                     <div class="form-group">
                         <label for="nameProd">Nombre Producto</label>
-                        <input type="text" class="form-control" value="{{rowProducto.nombreProducto}}" id="nameProd" name="nameProd">
+                        <input type="text" class="form-control" value="{{rowProducto.nombreProducto}}" id="nameProd"
+                            name="nameProd">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="descProd">¿Qué tipo de Categoria es?</label>
-                            <select name="descProd" id="descProd" class="form-control">
-                                {{#each rowsCategorias}}
-                                    <option value="{{pkIdCategoriaProducto}}" {{selected}}>{{descripcionCategoriaProducto}}</option>
-                                {{/each}}  
-                            </select>
+                        <select name="descProd" id="descProd" class="form-control">
+                            {{#each rowsCategorias}}
+                            <option value="{{pkIdCategoriaProducto}}" {{selected}}>{{descripcionCategoriaProducto}}
+                            </option>
+                            {{/each}}
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -31,18 +34,22 @@
                             cols="1">{{rowProducto.cssPropertiesBg}}</textarea>
                     </div>
 
-                    <div class="input-group mb-3">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="imagen" name="imagen">
-                            <label class="custom-file-label" for="imagen" aria-describedby="uploadImg">Elegir Imagen</label>
-                        </div>
-                        <div class="input-group-append">
-                            <span class="input-group-text" id="uploadImg">Subir Imagen</span>
-                        </div>
-                    </div>
-
-
                     <button type="submit" class="btn btn-success">Actualizar</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="col-12 p-2">
+            
+            <div class="card p-4">
+                <b>Cambiar imagen del producto</b>
+                <br>
+                <form action="/administrador/productos/actualizarImagenProducto" method="POST" name="form" id="form" enctype="multipart/form-data">
+                    <input type="hidden" name="producto" value="{{rowProducto.pkIdProducto}}">
+                    <input type="file" name="myFile" id="">
+
+                    <button type="submit" class="btn btn-success">Actualizar imagen</button>
                 </form>
             </div>
 

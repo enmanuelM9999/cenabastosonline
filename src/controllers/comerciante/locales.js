@@ -3,14 +3,6 @@ const router = express.Router();
 const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
-const cloudinary = require("cloudinary");
-const { cloud_name, api_key, api_secret } = require("../../environmentVars");
-cloudinary.config({
-    cloud_name,
-    api_key,
-    api_secret
-});
-
 function localCargado(req) {
     var estaCargado = true;
     if (req.session.idLocalActual == undefined) {
@@ -129,7 +121,10 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             idLocalEnCenabastos: idlocal,
             totalVendido: 0,
             estaAbierto: 1,
-            fkIdBanner: 12
+            fkIdBanner: 12,
+            montoPedidoMinimo:0,
+            horaApertura:"00:00:00",
+            horaCierre:"11:59:59"
         };
         const resultLocalComercial = await pool.query("INSERT INTO localComercial SET ? ", [newLocalComercial]);
         const idLocalComercial = resultLocalComercial.insertId;
@@ -558,7 +553,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
         const cantProductos = rowsProductosLocal.length;
 
         //ajuste de actualizar datos del local
-        const rowsDatosLocal = await pool.query("SELECT localcomercial.idLocalEnCenabastos, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        const rowsDatosLocal = await pool.query("SELECT localcomercial.montoPedidoMinimo,localcomercial.idLocalEnCenabastos, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
         res.render("comerciante/locales/ajustes", { nombreLocalActual: req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
     } catch (error) {
         console.log(error);
@@ -705,14 +700,15 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
             throw "Local no cargado";
         }
         const pkIdLocalComercial = req.session.idLocalActual;
-        const { idlocal, name, descripcion, domicilio } = req.body;
+        const { idlocal, name, descripcion, domicilio,minimo } = req.body;
 
         //Recolectar y actualizar los datos en la BD
         const newLocalComercial = {
             nombreLocal: name,
             precioDomicilio: domicilio,
             descripcionLocal: descripcion,
-            idLocalEnCenabastos: idlocal
+            idLocalEnCenabastos: idlocal,
+            montoPedidoMinimo:minimo
         };
         await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
         req.session.nombreLocalActual = newLocalComercial.nombreLocal;
@@ -788,6 +784,13 @@ router.post('/actualizarBanner', esComercianteAprobado, async (req, res) => {
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
+        const cloudinary = require("cloudinary");
+        const { cloud_name, api_key, api_secret } = require("../../environmentVars");
+        cloudinary.config({
+            cloud_name,
+            api_key,
+            api_secret
+        });
         const size = req.file.size;
         const extension = req.file.mimetype.split("/")[1].toString();
         if (extension.trim() != "png" && extension.trim() != "jpg" && extension.trim() != "jpeg" && extension.trim() != "webp") {
@@ -796,7 +799,7 @@ router.post('/actualizarBanner', esComercianteAprobado, async (req, res) => {
         if (size > 5242880) {
             throw new Error("impUsr-doDefault-Tu imagen no puede pesar más de 5 MB");
         }
-      
+
         const rowLatestImage = await pool.query("SELECT imagen.publicId, imagen.pkIdImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial=?", [req.session.idLocalActual]);
         if (rowLatestImage.length != 1) {
             throw new Error("impUsr-doDefafult-No existe un banner asociado al local o existe más de un banner asociado al local");
