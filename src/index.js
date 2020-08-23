@@ -77,6 +77,7 @@ app.use('/administrador/index', require('./controllers/administrador/index'));
 app.use('/administrador/comerciante', require('./controllers/administrador/comerciante'));
 app.use('/administrador/estadisticas', require('./controllers/administrador/estadisticas'));
 app.use('/administrador/productos', require('./controllers/administrador/productos'));
+app.use('/administrador/reclamos', require('./controllers/administrador/reclamos'));
 //comerciante
 app.use('/comerciante', require('./controllers/comerciante/index'));
 app.use('/comerciante/locales', require('./controllers/comerciante/locales'));

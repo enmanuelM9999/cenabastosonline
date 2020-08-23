@@ -304,9 +304,8 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
 
         //Validar si la venta fue entregada para realizar un reclamo
 
-        
         let htmlBotonReclamo = '';
-        const rowFueEntregado = await pool.query("SELECT pkIdVenta, razonReclamo FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?",[1, 1, 1, idPedido]);
+        const rowFueEntregado = await pool.query("SELECT pkIdVenta, razonReclamo FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND fueReclamado = ? AND pkIdVenta = ?",[1, 1, 1, 1, idPedido]);
 
         if (rowFueEntregado.length < 1) {
             htmlBotonReclamo = '<a href="/cliente/pedidos/reclamar/'+idPedido+'" class="btn btn-success mt-2"><i class="fas fa-shopping-bag"></i> Reclamar</a>';
@@ -314,11 +313,21 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
             htmlBotonReclamo = '<div class="card mt-3 p-3"><div class="form-group"><label for="newReclamo">Razon Reclamo</label><textarea disabled name="newReclamo" id="newReclamo" class="form-control" form="form" cols="1">'+rowFueEntregado[0].razonReclamo+'</textarea></div></div>';
         }
 
+        //Validar si la venta fue entregada para realizar un reclamo
+
+        let htmlCancelado = '';
+        const rowFueCancelado = await pool.query("SELECT pkIdVenta, razonCancelado FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND fueReclamado = ? AND fueCancelado = ? AND pkIdVenta = ?",[1, 1, 1, 1, 1, idPedido]);
+
+        if (rowFueCancelado.length > 0) {
+            htmlCancelado = '<div class="card mt-3 p-3"><div class="form-group"><label for="newCancelado">Razon Cancelado</label><textarea disabled name="newCancelado" id="newCancelado" class="form-control" form="form" cols="1">'+rowFueCancelado[0].razonCancelado+'</textarea></div></div>';
+        }
+
+
 
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, htmlBotonReclamo });
+        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, htmlBotonReclamo, htmlCancelado });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
