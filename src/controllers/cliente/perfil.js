@@ -6,7 +6,15 @@ const pool = require("../../database");
 router.get('/editarPerfil', esCliente, async (req, res) => {
     try {
         //req.session.idCliente
-        const rowDatos = await pool.query("SELECT cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural, personanatural.telefonoPersonaNatural FROM cliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE cliente.pkIdCliente = ?",[req.session.idCliente]);
+        let rowDatos = await pool.query("SELECT cliente.direccionEsFueraDeCucuta,cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural, personanatural.telefonoPersonaNatural FROM cliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE cliente.pkIdCliente = ?",[req.session.idCliente]);
+        let htmlOptions='';
+        if (rowDatos[0].direccionEsFueraDeCucuta==0) {
+            htmlOptions='<option value="0" selected >No</option><option value="1">Sí</option>';
+        }
+        else{
+            htmlOptions='<option value="0">No</option><option value="1" selected>Sí</option>';
+        }
+        rowDatos[0].htmlOptions=htmlOptions;
         res.render("cliente/perfil/actualizarPerfil", {rowDatos:rowDatos[0]});
         
     } catch (error) {
@@ -17,7 +25,7 @@ router.get('/editarPerfil', esCliente, async (req, res) => {
 
 router.post('/editarPerfil', esCliente, async (req, res) => {
     try {
-        const {name, lastName, phone, direccion} = req.body;
+        const {name, lastName, phone, direccion, direccionLejos} = req.body;
 
         const editPersonaNatural = {
             nombresPersonaNatural: name,
@@ -27,7 +35,8 @@ router.post('/editarPerfil', esCliente, async (req, res) => {
         await pool.query("UPDATE personanatural SET ? WHERE pkIdPersonaNatural = ?",[editPersonaNatural, req.session.idPersonaNatural]);
 
         const editCliente = {
-            direccionCliente: direccion
+            direccionCliente: direccion,
+            direccionEsFueraDeCucuta:direccionLejos
         }
         await pool.query("UPDATE cliente SET ? WHERE pkIdCliente = ?",[editCliente, req.session.idCliente]);
 

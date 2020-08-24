@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { esAdmin } = require('../../lib/auth');
 const pool = require("../../database");
+const notificacionesManager = require('../../lib/notificaciones.manager');
 
 router.get('/listaReclamos', esAdmin, async (req, res) => {
     try {

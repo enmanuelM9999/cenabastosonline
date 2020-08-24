@@ -29,6 +29,13 @@
                             cols="1">{{rowDatos.direccionCliente}}</textarea>
                     </div>
 
+                    <div class="form-group">
+                        <label for="direccionLejos">¿Tu dirección referencia un lugar fuera de Cúcuta?</label>
+                        <select name="direccionLejos" id="direccionLejos">{{{rowDatos.htmlOptions}}}</select>
+                    </div>
+
+
+
                     <button type="submit" class="btn btn-success">Actualizar Informacion</button>
                 </form>
             </div>

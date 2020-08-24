@@ -341,7 +341,7 @@
     </div>
     <div class="seller-space">
         <div class="title">
-            <h4>Informacion</h4>
+            <h4>Información</h4>
         </div>
 
         <div class="justify-content-start">
@@ -353,12 +353,15 @@
             {{{rowsLocalesMayoristas.textoEstaAbierto}}}
 
             <div class="text-success" style="font-size: 1.5em;">
-                <i class="fas fa-truck"></i> ${{rowsLocalesMayoristas.precioDomicilio}}
+                <i class="fas fa-truck"></i> Domicilio ${{rowsLocalesMayoristas.precioDomicilio}}
+            </div>
+            <div class="text-success" style="font-size: 1.5em;">
+                <i class="fas fa-trailer"></i><i class="fas fa-truck"></i> Domicilio fuera de Cúcuta
+                ${{rowsLocalesMayoristas.precioDomicilioLejos}}
             </div>
             <div class="text-success" style="font-size: 1.5em;">
                 <i class="fas fa-shopping-bag"></i> Pedido mínimo ${{rowsLocalesMayoristas.montoPedidoMinimo}}
             </div>
-
             <div class="text-warning" style="font-size: 1.5em;">
                 <i class="fas fa-star"></i> {{rowsLocalesMayoristas.calificacionPromedio}} <small
                     style="color:rgb(168, 168, 168); font-size:17px;"> <i class="far fa-user"></i>

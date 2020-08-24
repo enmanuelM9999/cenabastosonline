@@ -46,7 +46,7 @@ clave.recuperarClave = async (correoUsuario) => {
         //configurar Receptor
         let info = await transporter.sendMail({
             from: '"Prami" <prami@lamegaplaza.com>', // sender address,
-            to: email,
+            to: correoUsuario,
             subject: 'Recuperar contraseña',
             // text: 'Contenido'
             html: contentHTML   

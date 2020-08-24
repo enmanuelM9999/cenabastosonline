@@ -48,13 +48,12 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         const { idLocal } = req.params;
         const localId = idLocal;
         //Buscar todos los locales mayoristas
-        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
+        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.precioDomicilioLejos,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
         if (rowsLocalesMayoristas[0].estaAbierto == 1) {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto </div>';
         } else {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
         }
-
         let calificacion;
         const rowCalificacionCliente = await pool.query("SELECT calificacionclientelocal.calificacion FROM localcomercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE calificacionclientelocal.fkIdCliente = ? AND calificacionclientelocal.fkIdLocalComercial = ?",[req.session.idCliente, idLocal]);
         if (rowCalificacionCliente.length < 1) {

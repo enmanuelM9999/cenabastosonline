@@ -553,7 +553,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
         const cantProductos = rowsProductosLocal.length;
 
         //ajuste de actualizar datos del local
-        const rowsDatosLocal = await pool.query("SELECT localcomercial.montoPedidoMinimo,localcomercial.idLocalEnCenabastos, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
+        const rowsDatosLocal = await pool.query("SELECT localcomercial.precioDomicilioLejos ,localcomercial.montoPedidoMinimo,localcomercial.idLocalEnCenabastos, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
         res.render("comerciante/locales/ajustes", { nombreLocalActual: req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
     } catch (error) {
         console.log(error);
@@ -700,12 +700,13 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
             throw "Local no cargado";
         }
         const pkIdLocalComercial = req.session.idLocalActual;
-        const { idlocal, name, descripcion, domicilio,minimo } = req.body;
+        const { idlocal, name, descripcion, domicilio,domicilioLejos,minimo } = req.body;
 
         //Recolectar y actualizar los datos en la BD
         const newLocalComercial = {
             nombreLocal: name,
             precioDomicilio: domicilio,
+            precioDomicilioLejos:domicilioLejos,
             descripcionLocal: descripcion,
             idLocalEnCenabastos: idlocal,
             montoPedidoMinimo:minimo

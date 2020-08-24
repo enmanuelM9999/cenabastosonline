@@ -151,7 +151,7 @@ passport.use('cliente.logup', new LocalStrategy({
   passReqToCallback: true
 }, async (req, email, password, done) => {
   try {
-    const { name, lastname, tipoDoc, doc, phone, direccion } = req.body;
+    const { name, lastname, tipoDoc, doc, phone, direccion, direccionLejos } = req.body;
 
     //Verificar si existe
     const rowsUsuariosAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario WHERE usuario.correoUsuario=?", [email]);
@@ -182,7 +182,8 @@ passport.use('cliente.logup', new LocalStrategy({
     //Crear y Registrar en BD el nuevo Cliente
     let newCliente = {
       fkIdPersonaNatural: idPersonaNatural,
-      direccionCliente: direccion
+      direccionCliente: direccion,
+      direccionEsFueraDeCucuta: direccionLejos
     };
     const resultNewCliente = await pool.query("INSERT INTO cliente SET ?", [newCliente]);
     const idCliente = resultNewCliente.insertId;
@@ -194,6 +195,8 @@ passport.use('cliente.logup', new LocalStrategy({
     req.session.tipoUsuario = 3;
 
     //Carrito
+    const carrito = require("../lib/carrito.manager");
+    carrito.crearCarrito(idCliente);
 
     //Terminar regitro
     const usuario = { id: idUser };
@@ -230,9 +233,7 @@ passport.use('cliente.login', new LocalStrategy({
     req.session.idCliente = rowsUsuario[0].pkIdCliente;
     req.session.tipoUsuario = 3;
 
-    //Carrito
-    const carrito = require("../lib/carrito.manager");
-    carrito.crearCarrito(rowsUsuario[0].pkIdCliente);
+
     //Terminar inicio sesion
     const usuario = { id: rowsUsuario[0].pkIdUsuario };
     done(null, usuario);

@@ -3,6 +3,7 @@ const router = express.Router();
 const { esCliente } = require('../../lib/auth');
 const pool = require("../../database");
 const carrito = require("../../lib/carrito.manager");
+const notificaciones = require("../../lib/notificaciones.manager");
 
 
 router.get('/carrito', esCliente, async (req, res) => {
@@ -232,20 +233,24 @@ router.get('/historial', esCliente, async (req, res) => {
     try {
         const idCliente = req.session.idCliente;
         //Buscar el historial de pedidos de un cliente
-        var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
+        var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado, venta.fueReclamado, venta.fueCancelado FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
         /* var moment = require("moment");
          moment.locale("es-us");
          rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
 
         for (let index = 0; index < rowsHistorialPedidos.length; index++) {
-            if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 0) {
+            if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 0 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
                 rowsHistorialPedidos[index].estado = "Nuevo";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+            } else if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0) {
                 rowsHistorialPedidos[index].estado = "Empacado";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
                 rowsHistorialPedidos[index].estado = "Enviado";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1) {
+            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
                 rowsHistorialPedidos[index].estado = "Entregado";
+            }   else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 1 && rowsHistorialPedidos[index].fueCancelado == 0) {
+                rowsHistorialPedidos[index].estado = "Reclamado";
+            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 1 && rowsHistorialPedidos[index].fueCancelado == 1) {
+                rowsHistorialPedidos[index].estado = "Cancelado";
             }
 
         }
@@ -424,6 +429,15 @@ router.post('/reclamarPedido', esCliente, async (req, res) => {
         }
 
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?",[nuevoReclamo, idVenta]);
+
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+
+        const rowDatosAdmin = await pool.query("SELECT usuario.correoUsuario FROM admin INNER JOIN usuario ON usuario.pkIdUsuario = admin.fkIdUsuario WHERE admin.pkIdAdmin = ?", [1]);
+        notificaciones.notificarAdmin("Reclamo Nuevo", "Tiene un nuevo reclamo, por favor revisar el apartado de notificaciones", rowDatosAdmin[0].correoUsuario);
+        const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
+        notificaciones.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario, "Reclamo", "Tiene un nuevo reclamo", 97, "comerciante/locales/informacionPedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+
         req.flash("success", "Reclamo realizado correctamente");
         res.redirect("/cliente/pedidos/historial");
     } catch (error) {

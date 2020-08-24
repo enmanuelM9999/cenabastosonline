@@ -1,7 +1,7 @@
 var carrito = {};
 const pool = require("../database");
 
-carrito.crearCarrito = async (fkIdCliente, req, res) => {
+carrito.crearCarrito = async (fkIdCliente) => {
     try {
         //¿Ya existe un carrito para ese cliente?
         const rowsCarrito = await pool.query("SELECT pkIdCarrito FROM carrito WHERE fkIdCliente=?", [fkIdCliente]);
@@ -202,10 +202,14 @@ carrito.getCarritoPrecompra = async (idCliente) => {
             venta.fkIdCliente
             fechas y estados
         */
-        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.montoPedidoMinimo, localcomercial.nombreLocal,localcomercial.precioDomicilio, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
+        let rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.montoPedidoMinimo, localcomercial.nombreLocal,localcomercial.precioDomicilio,localcomercial.precioDomicilioLejos,cliente.direccionEsFueraDeCucuta, cliente.direccionCliente,personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
 
         if (rowCarrito[0].contadorItems <= 0) {
             throw new Error("impDev-doDefault-El carrito está vacío, no se puede comprar nada");
+        }
+        //precio domicilio
+        if (rowCarrito[0].direccionEsFueraDeCucuta==1) {
+            rowCarrito[0].precioDomicilio=rowCarrito[0].precioDomicilioLejos;
         }
         //items
         var rowsItemCarrito = await pool.query("SELECT itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.pkIdProducto,producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.nombrePresentacion, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
@@ -252,10 +256,14 @@ carrito.getCarritoCompra = async (idCliente) => {
             venta.fkIdCliente
             fechas y estados
         */
-        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.nombreLocal,localcomercial.precioDomicilio,localcomercial.montoPedidoMinimo, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
+        const rowCarrito = await pool.query("SELECT carrito.contadorItems, carrito.fkIdLocalSeleccionado,localcomercial.nombreLocal,localcomercial.precioDomicilio,localcomercial.montoPedidoMinimo,localcomercial.precioDomicilioLejos,cliente.direccionEsFueraDeCucuta, cliente.direccionCliente, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural,personanatural.telefonoPersonaNatural, personanatural.numeroDocumento, tipodocumento.descripcionTipoDocumento,usuario.correoUsuario FROM carrito INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial=carrito.fkIdLocalSeleccionado INNER JOIN cliente ON cliente.pkIdCliente=carrito.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural INNER JOIN tipodocumento ON personanatural.fkIdTipoDocumento=tipodocumento.pkIdTipoDocumento INNER JOIN usuario ON usuario.pkIdUsuario=personanatural.fkIdUsuario WHERE carrito.fkIdCliente=?", [idCliente]);
 
         if (rowCarrito[0].contadorItems <= 0) {
             throw new Error("impDev-doDefault-El carrito está vacío, no se puede comprar nada");
+        }
+        //precio domicilio
+        if (rowCarrito[0].direccionEsFueraDeCucuta==1) {
+            rowCarrito[0].precioDomicilio=rowCarrito[0].precioDomicilioLejos;
         }
         //items
         var rowsItemCarrito = await pool.query("SELECT itemcarrito.pkIdItemCarrito ,itemcarrito.detallesCarrito,itemcarrito.cantidadItem, producto.pkIdProducto,producto.cssPropertiesBg ,producto.nombreProducto, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto,presentacionproducto.nombrePresentacion, productolocal.detallesProductoLocal, imagen.rutaImagen FROM carrito INNER JOIN itemcarrito ON itemcarrito.fkIdCarrito=carrito.pkIdCarrito INNER JOIN presentacionproducto ON presentacionproducto.pkIdPresentacionProducto=itemcarrito.fkIdPresentacion INNER JOIN productolocal ON productolocal.pkIdProductoLocal= presentacionproducto.fkIdProductoLocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen=producto.fkIdImagen WHERE carrito.fkIdCliente=? ORDER BY producto.nombreProducto ASC ", [idCliente]);
