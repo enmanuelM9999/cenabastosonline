@@ -162,7 +162,17 @@
             </div>
             {{/each}}
 
-            {{{htmlBotonReclamo}}}
+            {{#each rowFueEntregado}}
+                <div class="card mt-3 p-3">
+                    <div class="form-group">
+                        <label for="newReclamo">Razon Reclamo</label>
+                        <textarea disabled name="newReclamo" id="newReclamo" class="form-control" form="form" cols="1">{{razonReclamo}}</textarea>
+                    </div>
+                    <a href="/administrador/reclamos/rechazarReclamo/{{pkIdVenta}}"
+                                    class="btn btn-success w-100 mt-2">Rechazar Reclamo <i class="fas fa-window-close"></i></a>
+                </div>
+            {{/each}}
+
         </div>
 
         

@@ -114,11 +114,22 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
 
 router.get('/precomprar', esCliente, async (req, res) => {
     try {
+
+        
         //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
         let { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
         datos = datos[0];
         if (datos.subtotal < datos.montoPedidoMinimo) {
             throw new Error("impUsrI-reLocal-El monto total debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
+        }
+
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("HH:mm:ss").toString();
+
+        const validacion = await carrito.validarHoraYEstaAbierto(moment, datos.fkIdLocalSeleccionado);
+
+        if (!validacion) {
+            throw new Error("El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
         }
 
         //datos de pago
@@ -160,6 +171,17 @@ router.post('/comprar', esCliente, async (req, res) => {
         if (datos.subtotal < datos.montoPedidoMinimo) {
             throw new Error("impUsrI-doDefault-El monto del pedido debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
         }
+
+        var moment2 = require("moment");
+        moment2 = moment2.utc().subtract(4, "hours").format("HH:mm:ss").toString();
+
+        const validacion = await carrito.validarHoraYEstaAbierto(moment2, datos.fkIdLocalSeleccionado);
+
+        if (!validacion) {
+            throw new Error("El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
+        }
+
+
         //datos de pago
 
         /**AQUI VA EL WOMPI DOMPI***/
@@ -436,7 +458,7 @@ router.post('/reclamarPedido', esCliente, async (req, res) => {
         const rowDatosAdmin = await pool.query("SELECT usuario.correoUsuario FROM admin INNER JOIN usuario ON usuario.pkIdUsuario = admin.fkIdUsuario WHERE admin.pkIdAdmin = ?", [1]);
         notificaciones.notificarAdmin("Reclamo Nuevo", "Tiene un nuevo reclamo, por favor revisar el apartado de notificaciones", rowDatosAdmin[0].correoUsuario);
         const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
-        notificaciones.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario, "Reclamo", "Tiene un nuevo reclamo", 97, "comerciante/locales/informacionPedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+        notificaciones.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario, "Reclamo Nuevo", "Tiene un nuevo reclamo", 97, "comerciante/locales/informacionPedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
 
         req.flash("success", "Reclamo realizado correctamente");
         res.redirect("/cliente/pedidos/historial");

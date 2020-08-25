@@ -63,15 +63,15 @@ router.get('/detallesPedido/:idPedido', esAdmin, async (req, res) => {
         //Validar si la venta fue entregada para realizar un reclamo
 
         
-        let htmlBotonReclamo = '';
+    //    let htmlBotonReclamo = '';
         const rowFueEntregado = await pool.query("SELECT pkIdVenta, razonReclamo FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?",[1, 1, 1, idPedido]);
 
-        if (rowFueEntregado.length > 0) {
+    /*    if (rowFueEntregado.length > 0) {
             htmlBotonReclamo = '<div class="card mt-3 p-3"><div class="form-group"><label for="newReclamo">Razon Reclamo</label><textarea disabled name="newReclamo" id="newReclamo" class="form-control" form="form" cols="1">'+rowFueEntregado[0].razonReclamo+'</textarea></div></div>';
-        }
+        }*/
 
         //Renderizar vista
-        res.render("administrador/reclamos/detallesPedido", {rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, htmlBotonReclamo });
+        res.render("administrador/reclamos/detallesPedido", {rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, rowFueEntregado });
     } catch (error) {
         console.log(error);
         res.redirect("/administrador/index");
@@ -102,11 +102,50 @@ router.post('/cancelarPedido', esAdmin, async (req, res) => {
         
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?", [updateEstado, idVenta]);
 
+        //Enviar Notificacion de cancelado a cliente y comerciante
+
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+
+        const rowDatosCliente = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
+        notificacionesManager.notificarCliente(rowDatosCliente[0].fkIdCliente,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", 97, "cliente/pedidos/detallesPedido/"+idVenta, moment, rowDatosCliente[0].correoUsuario);
+
+        const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
+        notificacionesManager.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", 97, "comerciante/locales/pedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+
+
         //Espacio publicitario para devolver el dinero
 
 
 
         //Renderizar vista
+        res.redirect("/administrador/reclamos/listaReclamos");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/administrador/index");
+    }
+});
+
+router.get('/rechazarReclamo/:idVenta', esAdmin, async (req, res) => {
+    try {
+        const {idVenta} = req.params;
+
+        //Actualizar estado reclamo
+        const rechazarReclamo = {
+            fueReclamado : 0
+        };
+        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?", [rechazarReclamo, idVenta]);
+
+        //Enviar Notificacion
+        var moment = require("moment");
+        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+
+        const rowDatosCliente = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
+        notificacionesManager.notificarCliente(rowDatosCliente[0].fkIdCliente,"Reclamo Rechazado","Tiene un reclamo rechazado, por favor revisar el apartado de notificaciones", 97, "cliente/pedidos/detallesPedido/"+idVenta, moment, rowDatosCliente[0].correoUsuario);
+
+        const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
+        notificacionesManager.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario,"Reclamo Rechazado","Tiene un reclamo rechazado, por favor revisar el apartado de notificaciones", 97, "comerciante/locales/pedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+
         res.redirect("/administrador/reclamos/listaReclamos");
     } catch (error) {
         console.log(error);

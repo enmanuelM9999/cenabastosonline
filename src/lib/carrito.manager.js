@@ -297,8 +297,18 @@ carrito.getCarritoCompra = async (idCliente) => {
     }
 }
 
-
-
+carrito.validarHoraYEstaAbierto = async (horaPedido, idLocal) => {
+    try {
+        let valido = false;
+        const rowValidarHora = await pool.query("SELECT pkIdLocalComercial FROM localcomercial WHERE estaAbierto = ? AND pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre",[1, idLocal, horaPedido]);
+        if(rowValidarHora.length == 1){
+            valido = true;
+        }
+    return valido;
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 
 module.exports = carrito;

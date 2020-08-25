@@ -3,6 +3,7 @@ const router = express.Router();
 const { esCliente } = require('../../lib/auth');
 const carrito = require("../../lib/carrito.manager");
 const pool = require("../../database");
+const { json } = require('body-parser');
 
 
 router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
@@ -22,23 +23,49 @@ router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
 router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
     try {
         //Buscar todos los locales minoristas
-        const rowsLocalesMinoristas = await pool.query("SELECT localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
+        let rowsLocalesMinoristas = await pool.query("SELECT localcomercial.tagsCategorias,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 0");
+        if (rowsLocalesMinoristas.length <= 0) {
+            throw new Error("impDev-doDefault-No existen locales minoristas");
+
+        }
+
+        //crear json de los locales
+        let jsonLocales = rowsLocalesMinoristas.map(function (local) {
+            let jsonLocal = {};
+            jsonLocal.id = rowsLocalesMinoristas[0].pkIdLocalComercial;
+            jsonLocal.nombre = rowsLocalesMinoristas[0].nombreLocal;
+            jsonLocal.ruta = "/cliente/explorar/local/" + rowsLocalesMinoristas[0].pkIdLocalComercial;
+            jsonLocal.portada = rowsLocalesMinoristas[0].rutaImagen;
+            jsonLocal.domicilio = rowsLocalesMinoristas[0].precioDomicilio;
+            jsonLocal.estrellas = rowsLocalesMinoristas[0].calificacionPromedio;
+            jsonLocal.calificadores = rowsLocalesMinoristas[0].calificacionContadorCliente;
+            jsonLocal.descripcion = rowsLocalesMinoristas[0].descripcionLocal;
+            jsonLocal.categorias = rowsLocalesMinoristas[0].tagsCategorias;
+            return jsonLocal;
+        });
+
+        jsonLocales = JSON.stringify(jsonLocales);
+
+        //categorias
+        const rowsCategorias = await pool.query("SELECT categoriaproducto.descripcionCategoriaProducto,categoriaproducto.pkIdCategoriaProducto,imagen.rutaImagen FROM categoriaproducto INNER JOIN imagen ON categoriaproducto.fkIdImagen=imagen.pkIdImagen");
+        if (rowsCategorias.length <= 0) {
+            throw new Error("impDev-doDefault-No existen categorias creadas");
+        }
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/listadoLocalesMinoristas", { rowsLocalesMinoristas, cantItemsCarrito });
+        res.render("cliente/explorar/listadoLocalesMinoristas", { jsonLocales, rowsCategorias, rowsLocalesMinoristas, cantItemsCarrito });
     } catch (error) {
         console.log(error);
-
     }
 });
 
-function existeCategoria(arrayCategorias,idCategoria){
-    var existe=false;
+function existeCategoria(arrayCategorias, idCategoria) {
+    var existe = false;
     for (let index = 0; index < arrayCategorias.length; index++) {
-        if (arrayCategorias[index].id==idCategoria) {
-            existe=true;
+        if (arrayCategorias[index].id == idCategoria) {
+            existe = true;
             break;
-        } 
+        }
     }
     return existe;
 }
@@ -55,41 +82,41 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
             rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
         }
         let calificacion;
-        const rowCalificacionCliente = await pool.query("SELECT calificacionclientelocal.calificacion FROM localcomercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE calificacionclientelocal.fkIdCliente = ? AND calificacionclientelocal.fkIdLocalComercial = ?",[req.session.idCliente, idLocal]);
+        const rowCalificacionCliente = await pool.query("SELECT calificacionclientelocal.calificacion FROM localcomercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE calificacionclientelocal.fkIdCliente = ? AND calificacionclientelocal.fkIdLocalComercial = ?", [req.session.idCliente, idLocal]);
         if (rowCalificacionCliente.length < 1) {
             calificacion = 0;
         } else {
             calificacion = rowCalificacionCliente[0].calificacion;
         }
 
-
+        //productos
         const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, categoriaproducto.pkIdCategoriaProducto,categoriaproducto.descripcionCategoriaProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN categoriaproducto ON producto.fkIdCategoriaProducto=categoriaproducto.pkIdCategoriaProducto INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? ORDER BY  producto.nombreProducto ASC", [idLocal]);
 
         //htmlProductos
         var categorias = [];
-        var productos=[];
+        var productos = [];
         for (let index = 0; index < rowsProductoLocal.length; index++) {
-            if (!existeCategoria(categorias,rowsProductoLocal[index].pkIdCategoriaProducto)) {
+            if (!existeCategoria(categorias, rowsProductoLocal[index].pkIdCategoriaProducto)) {
                 categorias.push({ id: rowsProductoLocal[index].pkIdCategoriaProducto, name: rowsProductoLocal[index].descripcionCategoriaProducto });
             }
-            var producto={
+            var producto = {
                 id_presentacion: rowsProductoLocal[index].pkIdPresentacionProducto,
-                nombre_presentacion:rowsProductoLocal[index].nombrePresentacion,
-                precio:rowsProductoLocal[index].precioUnitarioPresentacion,
-                id_pl:rowsProductoLocal[index].pkIdProductoLocal,
-                nombre_producto:rowsProductoLocal[index].nombreProducto,
-                css:rowsProductoLocal[index].cssPropertiesBg,
-                img_path:rowsProductoLocal[index].rutaImagen,
-                categoria:rowsProductoLocal[index].pkIdCategoriaProducto
+                nombre_presentacion: rowsProductoLocal[index].nombrePresentacion,
+                precio: rowsProductoLocal[index].precioUnitarioPresentacion,
+                id_pl: rowsProductoLocal[index].pkIdProductoLocal,
+                nombre_producto: rowsProductoLocal[index].nombreProducto,
+                css: rowsProductoLocal[index].cssPropertiesBg,
+                img_path: rowsProductoLocal[index].rutaImagen,
+                categoria: rowsProductoLocal[index].pkIdCategoriaProducto
             }
             productos.push(producto);
-            
+
         }
-        var htmlProductos= JSON.stringify(productos);
+        var htmlProductos = JSON.stringify(productos);
         var htmlCategorias = JSON.stringify(categorias);
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito , localId, calificacion});
+        res.render("cliente/explorar/local", { rowsLocalesMayoristas: rowsLocalesMayoristas[0], rowsProductoLocal, htmlProductos, htmlCategorias, categorias, cantItemsCarrito, localId, calificacion });
     } catch (error) {
         console.log(error);
         req.flash("info", "Acceso no permitido");
@@ -147,7 +174,7 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
 
 router.post('/calificarLocal', esCliente, async (req, res) => {
     try {
-        const { valorEstrella, idLocal} = req.body;
+        const { valorEstrella, idLocal } = req.body;
 
         console.log("el local es " + idLocal);
 
@@ -155,15 +182,15 @@ router.post('/calificarLocal', esCliente, async (req, res) => {
 
         if (rowsVenta.length < 1) {
             throw new Error("No se puede calificar el local si no ha realizado una compra satisfactoria");
-        } 
+        }
 
         const rowCalificacion = await pool.query("SELECT calificacion FROM  calificacionclientelocal WHERE fkIdCliente = ? AND fkIdLocalComercial = ?", [req.session.idCliente, idLocal]);
 
         if (rowCalificacion.length < 1) {
             const newCalificacion = {
-                fkIdCliente : req.session.idCliente,
-                fkIdLocalComercial : idLocal,
-                calificacion : valorEstrella
+                fkIdCliente: req.session.idCliente,
+                fkIdLocalComercial: idLocal,
+                calificacion: valorEstrella
             };
             await pool.query("INSERT INTO calificacionclientelocal SET ?", [newCalificacion]);
 
@@ -171,22 +198,22 @@ router.post('/calificarLocal', esCliente, async (req, res) => {
             const calificacionPromedioLocal = rowCalificacionLocal[0].calificacion / (rowCalificacionLocal[0].calificacionContadorCliente + 1);
 
             const newCalificacionLocal = {
-                calificacionPromedio : calificacionPromedioLocal,
-                calificacionContadorCliente : rowCalificacionLocal[0].calificacionContadorCliente + 1
+                calificacionPromedio: calificacionPromedioLocal,
+                calificacionContadorCliente: rowCalificacionLocal[0].calificacionContadorCliente + 1
             };
             await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial = ?", [newCalificacionLocal, idLocal]);
 
         } else {
             const updateCalificacion = {
-                calificacion : valorEstrella
+                calificacion: valorEstrella
             };
-            await pool.query("UPDATE calificacionclientelocal SET ? WHERE fkIdCliente = ? AND fkIdLocalComercial = ?",[updateCalificacion, req.session.idCliente, idLocal]);
+            await pool.query("UPDATE calificacionclientelocal SET ? WHERE fkIdCliente = ? AND fkIdLocalComercial = ?", [updateCalificacion, req.session.idCliente, idLocal]);
 
             const rowCalificacionLocal = await pool.query("SELECT SUM(calificacion)calificacion, localcomercial.calificacionContadorCliente FROM calificacionclientelocal INNER JOIN localcomercial on localcomercial.pkIdLocalComercial = calificacionclientelocal.fkIdLocalComercial WHERE fkIdLocalComercial = ?", [idLocal]);
             const calificacionPromedioLocal = rowCalificacionLocal[0].calificacion / rowCalificacionLocal[0].calificacionContadorCliente;
 
             const newCalificacionLocal = {
-                calificacionPromedio : calificacionPromedioLocal
+                calificacionPromedio: calificacionPromedioLocal
             };
             await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial = ?", [newCalificacionLocal, idLocal]);
         }
