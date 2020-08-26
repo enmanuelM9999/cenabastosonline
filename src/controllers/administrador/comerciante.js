@@ -116,4 +116,51 @@ router.post('/editarInformacionLocal', esAdmin, async (req, res) => {
     }   
 });
 
+router.get('/actualizarHoras', esAdmin, async (req, res) => {
+    try {
+        const rowsListadoComerciantesAprobar = await pool.query("SELECT horaAperturaMayorista, horaAperturaMinorista, horaCierreMayorista, horaCierreMinorista FROM admin WHERE pkIdAdmin = ?",[req.session.idAdmin]);
+        res.render("administrador/comerciante/editarHoras",{rowsListadoComerciantesAprobar:rowsListadoComerciantesAprobar[0]});
+    } catch (error) {
+        console.log(error);
+        res.redirect("/administrador/index");
+    }   
+});
+
+router.post('/actualizarHoraMayorista', esAdmin, async (req, res) => {
+    try {
+        const { horaA, horaC } = req.body;
+
+        const updateHora = {
+            horaAperturaMayorista:horaA,
+            horaCierreMayorista:horaC
+        };
+        await pool.query("UPDATE admin SET ? WHERE pkIdAdmin = ?",[updateHora,req.session.idAdmin]);
+
+        req.flash("success","Horas de locales mayoristas actualizadas");
+        res.redirect("/administrador/comerciante/actualizarHoras");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/administrador/index");
+    }   
+});
+
+router.post('/actualizarHoraMinorista', esAdmin, async (req, res) => {
+    try {
+        const { horaA, horaC } = req.body;
+
+        const updateHora = {
+            horaAperturaMinorista:horaA,
+            horaCierreMinorista:horaC
+        };
+        await pool.query("UPDATE admin SET ? WHERE pkIdAdmin = ?",[updateHora,req.session.idAdmin]);
+
+        req.flash("success","Horas de locales minoristas actualizadas");
+        res.redirect("/administrador/comerciante/actualizarHoras");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/administrador/index");
+    }   
+});
+
+
 module.exports = router;

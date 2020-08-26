@@ -177,6 +177,7 @@
                                     <form method="POST" action="/comerciante/locales/actualizarDatos" class=""
                                         name="form" id="form">
                                         {{#each rowsDatosLocal}}
+                                        <input type="hidden" name="tipoLocal" id="tipoLocal" value="{{esMayorista}}">
                                         <div class="form-group">
                                             <label for="idlocal">ID Local en Cenabastos</label>
                                             <input class="form-control" type="text" value="{{idLocalEnCenabastos}}"
@@ -191,6 +192,14 @@
                                             <label for="descripcion">Descripcion al público</label>
                                             <textarea name="descripcion" id="descripcion" class="form-control"
                                                 form="form">{{descripcionLocal}}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="horaA">Hora Apertura Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de apertura debe ser despues de las {{horaAperturaMayorista}}, y que si el local es <b>Minorista</b> la hora de apertura debe ser despues de las {{horaAperturaMinorista}}</small> </label>
+                                            <input type="time" class="form-control" id="horaA" name="horaA" value="{{horaApertura}}">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="horaC">Hora Cierre Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de cierre debe ser antes de las {{horaCierreMayorista}}, y que si el local es <b>Minorista</b> la hora de cierre debe ser antes de las {{horaCierreMinorista}}</small></label>
+                                            <input type="time" class="form-control" id="horaC" name="horaC" value="{{horaCierre}}">
                                         </div>
                                         <div class="form-group">
                                             <label for="domicilio">Precio del domicilio</label>
@@ -208,6 +217,7 @@
                                                 value="{{montoPedidoMinimo}}" name="minimo" id="minimo">
                                         </div>
                                         {{/each}}
+                                        
                                         <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save"></i>
                                             Actualizar datos</button>
                                     </form>

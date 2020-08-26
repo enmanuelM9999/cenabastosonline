@@ -8,15 +8,40 @@ const { json } = require('body-parser');
 
 router.get('/listadoLocalesMayoristas', esCliente, async (req, res) => {
     try {
-        //Buscar todos los locales mayoristas
-        const rowsLocalesMayoristas = await pool.query("SELECT localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 1");
+        //Buscar todos los locales minoristas
+        let rowsLocalesMayoristas = await pool.query("SELECT localcomercial.tagsCategorias,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.esMayorista = 1");
 
+        //crear json de los locales
+        let jsonLocales = [];
+        if (rowsLocalesMayoristas.length > 0) {
+            jsonLocales = rowsLocalesMayoristas.map(function (local) {
+                let jsonLocal = {};
+                jsonLocal.id = local.pkIdLocalComercial;
+                jsonLocal.nombre = local.nombreLocal;
+                jsonLocal.ruta = "/cliente/explorar/local/" + local.pkIdLocalComercial;
+                jsonLocal.portada = local.rutaImagen;
+                jsonLocal.domicilio = local.precioDomicilio;
+                jsonLocal.estrellas = local.calificacionPromedio;
+                jsonLocal.calificadores = local.calificacionContadorCliente;
+                jsonLocal.descripcion = local.descripcionLocal;
+                jsonLocal.categorias = local.tagsCategorias;
+                return jsonLocal;
+            });
+        }
+
+        jsonLocales = JSON.stringify(jsonLocales);
+
+        //categorias
+        const rowsCategorias = await pool.query("SELECT categoriaproducto.descripcionCategoriaProducto,categoriaproducto.pkIdCategoriaProducto,imagen.rutaImagen FROM categoriaproducto INNER JOIN imagen ON categoriaproducto.fkIdImagen=imagen.pkIdImagen");
+        if (rowsCategorias.length <= 0) {
+            throw new Error("impDev-doDefault-No existen categorias creadas");
+        }
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
-        res.render("cliente/explorar/listadoLocalesMayoristas", { rowsLocalesMayoristas, cantItemsCarrito });
+        res.render("cliente/explorar/listadoLocalesMayoristas", { jsonLocales, rowsCategorias, rowsLocalesMayoristas, cantItemsCarrito });
     } catch (error) {
         console.log(error);
-
+        res.redirect("/");
     }
 });
 
@@ -32,17 +57,18 @@ router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
         //crear json de los locales
         let jsonLocales = rowsLocalesMinoristas.map(function (local) {
             let jsonLocal = {};
-            jsonLocal.id = rowsLocalesMinoristas[0].pkIdLocalComercial;
-            jsonLocal.nombre = rowsLocalesMinoristas[0].nombreLocal;
-            jsonLocal.ruta = "/cliente/explorar/local/" + rowsLocalesMinoristas[0].pkIdLocalComercial;
-            jsonLocal.portada = rowsLocalesMinoristas[0].rutaImagen;
-            jsonLocal.domicilio = rowsLocalesMinoristas[0].precioDomicilio;
-            jsonLocal.estrellas = rowsLocalesMinoristas[0].calificacionPromedio;
-            jsonLocal.calificadores = rowsLocalesMinoristas[0].calificacionContadorCliente;
-            jsonLocal.descripcion = rowsLocalesMinoristas[0].descripcionLocal;
-            jsonLocal.categorias = rowsLocalesMinoristas[0].tagsCategorias;
+            jsonLocal.id = local.pkIdLocalComercial;
+            jsonLocal.nombre = local.nombreLocal;
+            jsonLocal.ruta = "/cliente/explorar/local/" + local.pkIdLocalComercial;
+            jsonLocal.portada = local.rutaImagen;
+            jsonLocal.domicilio = local.precioDomicilio;
+            jsonLocal.estrellas = local.calificacionPromedio;
+            jsonLocal.calificadores = local.calificacionContadorCliente;
+            jsonLocal.descripcion = local.descripcionLocal;
+            jsonLocal.categorias = local.tagsCategorias;
             return jsonLocal;
         });
+
 
         jsonLocales = JSON.stringify(jsonLocales);
 
@@ -56,6 +82,7 @@ router.get('/listadoLocalesMinoristas', esCliente, async (req, res) => {
         res.render("cliente/explorar/listadoLocalesMinoristas", { jsonLocales, rowsCategorias, rowsLocalesMinoristas, cantItemsCarrito });
     } catch (error) {
         console.log(error);
+        res.redirect("/");
     }
 });
 

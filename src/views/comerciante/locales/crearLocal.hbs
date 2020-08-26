@@ -44,6 +44,15 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="horaA">Hora Apertura Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de apertura debe ser despues de las {{rowHorasLocales.horaAperturaMayorista}}, y que si el local es <b>Minorista</b> la hora de apertura debe ser despues de las {{rowHorasLocales.horaAperturaMinorista}}</small> </label>
+                                <input type="time" class="form-control" id="horaA" name="horaA">
+                            </div>
+                            <div class="form-group">
+                                <label for="horaC">Hora Cierre Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de cierre debe ser antes de las {{rowHorasLocales.horaCierreMayorista}}, y que si el local es <b>Minorista</b> la hora de cierre debe ser antes de las {{rowHorasLocales.horaCierreMinorista}}</small></label>
+                                <input type="time" class="form-control" id="horaC" name="horaC">
+                            </div>
+
+                            <div class="form-group">
                                 <label for="domicilio">Precio del domicilio (se puede modificar después)</label>
                                 <input class="form-control" type="number" step="50" placeholder="Ejemplo: 10000"
                                     name="domicilio" id="domicilio">
