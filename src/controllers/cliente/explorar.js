@@ -101,13 +101,47 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
     try {
         const { idLocal } = req.params;
         const localId = idLocal;
+
+        //Validar horas
+        var moment = require("moment");
+        horaA = moment.utc().subtract(5, "hours").format("HH:mm").toString();
+        console.log(horaA);
+        const rowHorasLocales = await pool.query("SELECT horaApertura FROM localcomercial WHERE pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre",[localId, horaA]);
+        
         //Buscar todos los locales mayoristas
-        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.precioDomicilioLejos,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
-        if (rowsLocalesMayoristas[0].estaAbierto == 1) {
-            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto </div>';
-        } else {
-            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado </div>';
+        var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.esMayorista, localcomercial.horaApertura, localcomercial.horaCierre, localcomercial.precioDomicilioLejos,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
+        
+        //Validar horarios de admin
+        let esHoraValidaAdmin;
+        if (rowsLocalesMayoristas[0].esMayorista == 0) {
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND pkIdAdmin = ?",[horaA, 1]);
+            if (rowHoraAdmin.length == 1) {
+                esHoraValidaAdmin=true;
+            }
         }
+
+        if (rowsLocalesMayoristas[0].esMayorista == 1) {
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND pkIdAdmin = ?",[horaA, 1]);
+            if (rowHoraAdmin.length == 1) {
+                esHoraValidaAdmin=true;
+            }
+        }
+
+        //Convertir hora para mostrar en local
+        let tempHora= moment(rowsLocalesMayoristas[0].horaApertura,"HH:mm").format("LT").toString();
+        rowsLocalesMayoristas[0].horaApertura=tempHora;
+
+        tempHora= moment(rowsLocalesMayoristas[0].horaCierre,"HH:mm").format("LT").toString();
+        rowsLocalesMayoristas[0].horaCierre=tempHora;
+
+        
+        if (rowsLocalesMayoristas[0].estaAbierto == 1 && rowHorasLocales.length == 1 && esHoraValidaAdmin) {
+            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto  <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaApertura+' - <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaCierre+' </div>';
+        } else {
+            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaApertura+' - <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaCierre+' </div>';
+        }
+
+        //Calificacion del local
         let calificacion;
         const rowCalificacionCliente = await pool.query("SELECT calificacionclientelocal.calificacion FROM localcomercial INNER JOIN calificacionclientelocal ON calificacionclientelocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial WHERE calificacionclientelocal.fkIdCliente = ? AND calificacionclientelocal.fkIdLocalComercial = ?", [req.session.idCliente, idLocal]);
         if (rowCalificacionCliente.length < 1) {

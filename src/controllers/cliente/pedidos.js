@@ -124,7 +124,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
         }
 
         var moment = require("moment");
-        moment = moment.utc().subtract(4, "hours").format("HH:mm:ss").toString();
+        moment = moment.utc().subtract(4, "hours").format("HH:mm").toString();
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment, datos.fkIdLocalSeleccionado);
 
@@ -173,7 +173,7 @@ router.post('/comprar', esCliente, async (req, res) => {
         }
 
         var moment2 = require("moment");
-        moment2 = moment2.utc().subtract(4, "hours").format("HH:mm:ss").toString();
+        moment2 = moment2.utc().subtract(4, "hours").format("HH:mm").toString();
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment2, datos.fkIdLocalSeleccionado);
 

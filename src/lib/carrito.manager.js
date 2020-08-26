@@ -300,8 +300,27 @@ carrito.getCarritoCompra = async (idCliente) => {
 carrito.validarHoraYEstaAbierto = async (horaPedido, idLocal) => {
     try {
         let valido = false;
-        const rowValidarHora = await pool.query("SELECT pkIdLocalComercial FROM localcomercial WHERE estaAbierto = ? AND pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre",[1, idLocal, horaPedido]);
-        if(rowValidarHora.length == 1){
+        let esHoraValidaAdmin = false;
+
+        const rowValidarHora = await pool.query("SELECT esMayorista FROM localcomercial WHERE estaAbierto = ? AND pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre",[1, idLocal, horaPedido]);
+        
+        if (rowValidarHora[0].esMayorista == 0) {
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND pkIdAdmin = ?",[horaPedido, 1]);
+            if (rowHoraAdmin.length == 1) {
+                esHoraValidaAdmin=true;
+            }
+        }
+
+        if (rowValidarHora[0].esMayorista == 1) {
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND pkIdAdmin = ?",[horaPedido, 1]);
+            if (rowHoraAdmin.length == 1) {
+                esHoraValidaAdmin=true;
+            }
+        }
+        
+        
+        
+        if(rowValidarHora.length == 1 && esHoraValidaAdmin){
             valido = true;
         }
     return valido;

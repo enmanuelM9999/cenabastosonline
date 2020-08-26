@@ -10,5 +10,5 @@ router.get('/index', esComercianteAprobado, async (req, res) => {
 router.get('/noAprobado',esComerciante, async (req, res) => {
     res.render('comerciante/noAprobado');
 });
-//aaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 module.exports = router;

@@ -105,7 +105,7 @@ router.post('/cancelarPedido', esAdmin, async (req, res) => {
         //Enviar Notificacion de cancelado a cliente y comerciante
 
         var moment = require("moment");
-        moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
+        moment = moment.utc().subtract(5, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
 
         const rowDatosCliente = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
         notificacionesManager.notificarCliente(rowDatosCliente[0].fkIdCliente,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", 97, "cliente/pedidos/detallesPedido/"+idVenta, moment, rowDatosCliente[0].correoUsuario);
