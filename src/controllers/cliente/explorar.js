@@ -106,39 +106,39 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         var moment = require("moment");
         horaA = moment.utc().subtract(5, "hours").format("HH:mm").toString();
         console.log(horaA);
-        const rowHorasLocales = await pool.query("SELECT horaApertura FROM localcomercial WHERE pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre",[localId, horaA]);
-        
+        const rowHorasLocales = await pool.query("SELECT horaApertura FROM localcomercial WHERE pkIdLocalComercial = ? AND ? BETWEEN horaApertura AND horaCierre", [localId, horaA]);
+
         //Buscar todos los locales mayoristas
         var rowsLocalesMayoristas = await pool.query("SELECT localcomercial.esMayorista, localcomercial.horaApertura, localcomercial.horaCierre, localcomercial.precioDomicilioLejos,localcomercial.calificacionContadorCliente,localcomercial.pkIdLocalComercial, localcomercial.nombreLocal, localcomercial.precioDomicilio, localcomercial.calificacionPromedio, localcomercial.descripcionLocal,localcomercial.montoPedidoMinimo, localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen = localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [idLocal]);
-        
+
         //Validar horarios de admin
         let esHoraValidaAdmin;
         if (rowsLocalesMayoristas[0].esMayorista == 0) {
-            const rowHoraAdmin = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND pkIdAdmin = ?",[horaA, 1]);
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND pkIdAdmin = ?", [horaA, 1]);
             if (rowHoraAdmin.length == 1) {
-                esHoraValidaAdmin=true;
+                esHoraValidaAdmin = true;
             }
         }
 
         if (rowsLocalesMayoristas[0].esMayorista == 1) {
-            const rowHoraAdmin = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND pkIdAdmin = ?",[horaA, 1]);
+            const rowHoraAdmin = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND pkIdAdmin = ?", [horaA, 1]);
             if (rowHoraAdmin.length == 1) {
-                esHoraValidaAdmin=true;
+                esHoraValidaAdmin = true;
             }
         }
 
         //Convertir hora para mostrar en local
-        let tempHora= moment(rowsLocalesMayoristas[0].horaApertura,"HH:mm").format("LT").toString();
-        rowsLocalesMayoristas[0].horaApertura=tempHora;
+        let tempHora = moment(rowsLocalesMayoristas[0].horaApertura, "HH:mm").format("LT").toString();
+        rowsLocalesMayoristas[0].horaApertura = tempHora;
 
-        tempHora= moment(rowsLocalesMayoristas[0].horaCierre,"HH:mm").format("LT").toString();
-        rowsLocalesMayoristas[0].horaCierre=tempHora;
+        tempHora = moment(rowsLocalesMayoristas[0].horaCierre, "HH:mm").format("LT").toString();
+        rowsLocalesMayoristas[0].horaCierre = tempHora;
 
-        
+
         if (rowsLocalesMayoristas[0].estaAbierto == 1 && rowHorasLocales.length == 1 && esHoraValidaAdmin) {
-            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto  <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaApertura+' - <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaCierre+' </div>';
+            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-success" style="font-size: 1.5em;"><i class="fas fa-door-open"></i> Abierto  <i class="far fa-clock"></i> ' + rowsLocalesMayoristas[0].horaApertura + ' - <i class="far fa-clock"></i> ' + rowsLocalesMayoristas[0].horaCierre + ' </div>';
         } else {
-            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaApertura+' - <i class="far fa-clock"></i> '+rowsLocalesMayoristas[0].horaCierre+' </div>';
+            rowsLocalesMayoristas[0].textoEstaAbierto = '<div class="text-danger" style="font-size: 1.5em;"><i class="fas fa-door-closed"></i> Cerrado <i class="far fa-clock"></i> ' + rowsLocalesMayoristas[0].horaApertura + ' - <i class="far fa-clock"></i> ' + rowsLocalesMayoristas[0].horaCierre + ' </div>';
         }
 
         //Calificacion del local
@@ -236,13 +236,10 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
 router.post('/calificarLocal', esCliente, async (req, res) => {
     try {
         const { valorEstrella, idLocal } = req.body;
-
-        console.log("el local es " + idLocal);
-
         const rowsVenta = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 1, 1, 1]);
 
         if (rowsVenta.length < 1) {
-            throw new Error("No se puede calificar el local si no ha realizado una compra satisfactoria");
+            throw new Error("No se puede calificar el local si no ha realizado una compra");
         }
 
         const rowCalificacion = await pool.query("SELECT calificacion FROM  calificacionclientelocal WHERE fkIdCliente = ? AND fkIdLocalComercial = ?", [req.session.idCliente, idLocal]);

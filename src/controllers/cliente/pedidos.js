@@ -129,7 +129,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
         const validacion = await carrito.validarHoraYEstaAbierto(moment, datos.fkIdLocalSeleccionado);
 
         if (!validacion) {
-            throw new Error("El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
+            throw new Error("impUsr-doDefault-El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
         }
 
         //datos de pago
@@ -153,10 +153,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
         if (_do == "reLocal") {
             res.redirect('/cliente/pedidos/carrito');
         }
-        if (_do == "doDefault") {
-            res.redirect('/cliente/explorar/listadoLocalesMinoristas');
-        }
-        res.redirect('/cliente/explorar/listadoLocalesMinoristas');
+        res.redirect('/cliente/pedidos/carrito');
     }
 });
 
@@ -178,7 +175,7 @@ router.post('/comprar', esCliente, async (req, res) => {
         const validacion = await carrito.validarHoraYEstaAbierto(moment2, datos.fkIdLocalSeleccionado);
 
         if (!validacion) {
-            throw new Error("El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
+            throw new Error("impUsr-doDefault-El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
         }
 
 

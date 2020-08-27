@@ -1,15 +1,18 @@
 <a href="/cliente/explorar/listadoLocalesMinoristas" class="text-decoration-none">
-    <div class="col-12 row pl-4 pt-5 pb-5 bg-success"
-        style=" border-bottom-right-radius: 65% 65%;border-top-right-radius: 0% 65%">
+    <div class="col-12 w-100 row pl-4 pt-5 pb-5 bg-success"
+        style=" border-bottom-right-radius: 65% 65%;border-top-right-radius: 0% 65%; background-image: url('/static/fruits-bg.png');background-size: cover;">
+        <img src="/static/logocenabastos.png" alt="Logo Cenabastos P.H." class="mb-3"
+            style="width: 150px; height: 100px; ">
         <div class="col-12 col-sm-9" style="">
             <h5 class="text-light">Cenabastos Online</h5>
-            <h1 class="text-light" style="font-size:50px;"><b class="text-dark">Cúcuta</b>, pide tu mercado a domicilio
+            <h1 class="text-light" style="font-size:50px;"><b class="">Cúcuta</b>, pide tu mercado a domicilio
             </h1>
-            <div class="text-light">
+            <div class="text-light font-weight-bold">
                 La mayor variedad de frutas frescas, y verduras de excelente calidad y a bajos precios.
             </div>
             <br>
-            <a href="/cliente/explorar/listadoLocalesMinoristas" class="btn btn-light"><i class="fas fa-store"></i> Explorar</a>
+            <a href="/cliente/explorar/listadoLocalesMinoristas" class="btn btn-light"><i class="fas fa-store"></i>
+                Explorar</a>
 
         </div>
         <div class="col-12 col-sm-3">
@@ -17,12 +20,13 @@
         </div>
     </div>
 
-    <div class="col-12 p-2 pt-5 mt-3 ">
+    <div class="col-12 pt-5 mt-3 ">
         <h2 class="text-center">¿Cómo funciona?</h2>
-        <div class="row w-100 p-3">
-            <div class="col-12 col-md-3 col-sm-6 p-2">
+        <div class="row p-2">
+            <div class="col-12 col-md-3 col-sm-6">
                 <div class="card border-0 shadow-sm" style="width: 100%;">
-                    <img src="/static/addToCart.png" class="card-img-top" alt="">
+                    <img src="/static/addToCart.png" class="card-img-top mx-auto" alt=""
+                        style="width: 200px ;height: 250px;">
                     <div class="card-body">
                         <div class="card-text text-dark">
                             <h5>1. Explora</h5>
@@ -34,8 +38,9 @@
                 </div>
             </div>
             <div class="col-12 col-md-3 col-sm-6 p-2">
-                <div class="card border-0 shadow-sm" style="width: 100%;">
-                    <img src="/static/pagos.png" class="card-img-top" alt="">
+                <div class="card border-0 shadow-sm pt-2" style="width: 100%;">
+                    <img src="/static/pagos.png" class="card-img-top mx-auto" alt=""
+                        style="width: 200px ;height: 250px;">
                     <div class="card-body">
                         <div class="card-text text-dark">
                             <h5>2. Paga</h5>
@@ -52,14 +57,15 @@
                             - Tarjeta digital Nequi.
                             <br>
                             - Botón Bancolombia.
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-3 col-sm-6 p-2">
-                <div class="card border-0 shadow-sm" style="width: 100%;">
-                    <img src="/static/delivery.png" class="card-img-top" alt="">
+                <div class="card border-0 shadow-sm pt-2" style="width: 100%;">
+                    <img src="/static/delivery.png" class="card-img-top mx-auto" alt=""
+                        style="width: 200px ;height: 250px;">
                     <div class="card-body">
                         <h5>3. Recibe</h5>
                         Haz el seguimiento de tu pedido y recibelo en tu casa en el trancurso del mismo día que lo
@@ -71,25 +77,28 @@
                 </div>
             </div>
             <div class="col-12 col-md-3 col-sm-6 p-2">
-                <div class="card border-0 shadow-sm" style="width: 100%;">
-                    <img src="/static/horarios.png" class="card-img-top" alt="">
+                <div class="card border-0 shadow-sm pt-2" style="width: 100%;">
+                    <img src="/static/horarios.png" class="card-img-top mx-auto" alt=""
+                        style="width: 200px ;height: 250px;">
                     <div class="card-body">
                         <h5>Horarios</h5>
-                        Los locales minoristas pueden abrir a las <i class="far fa-clock"></i> {{rowsAdmin.horaAperturaMinorista}} y cerrar a las <i
-                            class="far fa-clock"></i> {{rowsAdmin.horaCierreMinorista}}
+                        Los locales minoristas abren a las <i class="far fa-clock"></i>
+                        {{rowsAdmin.horaAperturaMinorista}} y cerrar a las <i class="far fa-clock"></i>
+                        {{rowsAdmin.horaCierreMinorista}}
                         <br>
                         <br>
-                        Los locales mayoristas pueden abrir a las <i class="far fa-clock"></i> {{rowsAdmin.horaAperturaMayorista}} y cerrar a las <i
-                            class="far fa-clock"></i> {{rowsAdmin.horaCierreMayorista}}
+                        Los locales mayoristas abren a las <i class="far fa-clock"></i>
+                        {{rowsAdmin.horaAperturaMayorista}} y cerrar a las <i class="far fa-clock"></i>
+                        {{rowsAdmin.horaCierreMayorista}}
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <div class="col-12 p-2 pt-5 mt-3 ">
+        <div class="col-12 pt-5 mt-3">
             <h2 class="text-center">Todas las categorías</h2>
-            <div class="row w-100 p-3">
+            <div class="row p-2">
                 <div class="col-12 col-md-3 col-sm-6 p-2">
                     <div class="card border-0 shadow-sm" style="width: 100%;">
                         <img src="/static/categoriaHortalizas.png" class="card-img-top" alt="">
@@ -126,7 +135,8 @@
 
         </div>
         <div class="col-12 p-4 pt-0">
-            <a href="/cliente/explorar/listadoLocalesMinoristas" class="btn btn-outline-dark font-weight-bold" style="font-size: 20px ;"><i class="fas fa-store"></i> Explorar</a>
+            <a href="/cliente/explorar/listadoLocalesMinoristas" class="btn btn-outline-dark font-weight-bold"
+                style="font-size: 20px ;"><i class="fas fa-store"></i> Explorar</a>
         </div>
         <div class="col-12 p-2">
             <iframe
