@@ -276,8 +276,8 @@ router.post('/calificarLocal', esCliente, async (req, res) => {
             await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial = ?", [newCalificacionLocal, idLocal]);
         }
 
-        res.redirect('/cliente/explorar/listadoLocalesMayoristas');
-        req.flash("success", "Local calificado correctamente");
+        req.flash("success", "Recibimos tu calificación");
+        res.redirect('/cliente/explorar/local/'+idLocal);
     } catch (error) {
         console.log(error);
         req.flash("message", "No se puede calificar el local si no ha realizado una compra satisfactoria");
