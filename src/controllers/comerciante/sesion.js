@@ -27,7 +27,7 @@ router.post("/logup", (req, res, next) => {
     res.redirect("/comerciante/sesion/logup");
   }
   passport.authenticate("comerciante.logup", {
-    successRedirect: "/comerciante/localesListadoLocales",
+    successRedirect: "/comerciante/locales/listadoLocales",
     failureRedirect: "/comerciante/sesion/logup",
     failureFlash: true
   })(req, res, next);
