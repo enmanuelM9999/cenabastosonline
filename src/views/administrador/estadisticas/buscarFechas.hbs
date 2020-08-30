@@ -6,12 +6,12 @@
         <div class="col-12 p-2">
 
             <div class="card p-4">
-                <form action="/administrador/estadisticas/editarInformacionLocal" method="POST" name="form" id="form">
-                    <div class="d-flex col-12 row">    
+                <form action="/administrador/estadisticas/buscarVendidoPorFechas" method="POST" name="form" id="form">
+                    <div class="d-flex col-12 row">
                         <div class="col-12 col-md-5">
                             <div class="form-group">
-                            <label for="dateInicio">Fecha Inicio</label>
-                            <input type="date" class="form-control" value="" id="dateInicio" name="dateInicio">
+                                <label for="dateInicio">Fecha Inicio</label>
+                                <input type="date" class="form-control" value="" id="dateInicio" name="dateInicio">
                             </div>
                         </div>
 
@@ -29,9 +29,10 @@
                 </form>
             </div>
 
-            {{#if totalMostar}}
-                <h4>Total vendido: ${{totalMostar}}</h4>
-            {{/if}}
+            {{{rangoBuscado}}}
+
+            <h4 class="mt-3">Total vendido: ${{totalMostar}}</h4>
+
 
         </div>
     </div>

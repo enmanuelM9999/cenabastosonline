@@ -9,6 +9,9 @@
             <a class="nav-item nav-link text-success" id="nav-buzon-tab"
                 href="/administrador/estadisticas/buscarTodosLocales" role="tab" aria-controls="nav-profile"
                 aria-selected="false">Vendido En Total Por Todos los Locales</a>
+            <a class="nav-item nav-link text-success" id="nav-buzon-tab"
+                href="/administrador/estadisticas/totalVendidoFechas" role="tab" aria-controls="nav-profile"
+                aria-selected="false">Total Vendido por fechas</a>
         </div>
     </nav>
 
@@ -50,7 +53,7 @@
                                                 <div class="card-body">
                                                     <a href="/administrador/estadisticas/buscarFechas/{{pkIdLocalComercial}}" class="btn btn-success p-0 pr-2 pl-2" style="font-size: 20px;" data-toggle="tooltip" title="Ver Local">Buscar por Fechas <i class="fas fa-search-dollar"></i> </a>
                                                     <br>
-                                                    <label>Total Vendido por el local: ${{totalMostar}}</label>
+                                                    <label>Total Vendido por el local: ${{totalVendido}}</label>
                                                 </div>
                                             </div>
                                         </div>

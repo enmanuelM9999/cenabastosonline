@@ -32,7 +32,8 @@
 <div class="container mt-4">
     <h2 class="">Explorar</h2>
     <div class="mt-4 tabs d-flex w-100" style="overflow-x: auto;">
-        <a class="tab text-dark px-3 active" style="text-decoration:none;" href="/cliente/explorar/listadoLocalesMinoristas">
+        <a class="tab text-dark px-3 active" style="text-decoration:none;"
+            href="/cliente/explorar/listadoLocalesMinoristas">
             <b>Minoristas</b>
         </a>
         <a class="tab text-dark px-3" style="text-decoration:none;" href="/cliente/explorar/listadoLocalesMayoristas">
@@ -45,29 +46,17 @@
         <div class="row">
 
             <div class="col-12"><i class="fas fa-filter"></i> Filtrar por</div>
-            <div class="container-categorias col-12 mt-3 mb-4 pr-5 d-flex" style="overflow-x: auto;"
-                id="container-categorias">
-                <div class="categoria-de-producto " style="" id="0">
-                    <div class="flex-{grow|shrink}-0 card border-0 text-white ml-2 mr-2"
-                        style="overflow:hidden; border-radius: 15px;cursor: pointer; width: 120px;height: 120px; flex-shrink: 0;background: rgb(195,238,190);background: linear-gradient(180deg, rgba(3,170,0,1) 17%, rgba(77,255,79,1) 76%);">
-                        <img src="/static/categoriaTodo.png" class="img-categoria-producto" alt="Ver todo"
-                            style="width: 100%; height: 100%;">
-                    </div>
-                    <div class="p-2" style="width: 120px;">
-                        <small class="font-weight-bold mx-auto" style="text-align: center;">Ver todo</small>
-                    </div>
+            <div class="container-categorias col-12 mt-3 mb-4 pr-5 d-flex" style="overflow-x: auto;"  id="container-categorias">
+
+                 <div class="categoria-de-producto btn btn-outline-secondary text-nowrap mx-2" id="0" >
+                    Ver todos
                 </div>
                 {{#each rowsCategorias}}
-                <div class="categoria-de-producto" style="" id="{{pkIdCategoriaProducto}}">
-                    <div class="flex-{grow|shrink}-0 card border-0 text-white ml-2 mr-2"
-                        style="overflow:hidden; border-radius: 15px;cursor: pointer; width: 120px;height: 120px; flex-shrink: 0;background: rgb(195,238,190);background: linear-gradient(180deg, rgba(3,170,0,1) 17%, rgba(77,255,79,1) 76%);">
-                        <img src="{{rutaImagen}}" class="img-categoria-producto" alt="{{descripcionCategoriaProducto}}"
-                            style="width: 100%; height: 100%;">
-                    </div>
-                    <div class="p-1 mx-auto" style="width: 120px;">
-                        <small class="font-weight-bold mx-auto" style="text-align: center;">{{descripcionCategoriaProducto}}</small>
-                    </div>
+
+                <div class="categoria-de-producto btn btn-outline-secondary text-nowrap mx-2" id="{{pkIdCategoriaProducto}}" >
+                    {{descripcionCategoriaProducto}}
                 </div>
+
                 {{else}}
                 Error grave
                 {{/each}}
@@ -100,7 +89,7 @@
                             <div class="card-text" style="overflow-x: auto; max-height: 100px;min-height: 30px;">
                                 {{descripcionLocal}}
                             </div>
-                            <div class="btn btn-light w-100 mt-2">Explorar <i class="fas fa-angle-right"></i>
+                            <div class="btn btn-light w-100 mt-2">Ver <i class="fas fa-angle-right"></i>
                             </div>
                         </div>
                     </a>
@@ -118,8 +107,11 @@
         //variables del documento
         const arrayLocales = {{{ jsonLocales }}};
         $("#container-categorias").on("click", ".categoria-de-producto", function () {
-            $(this).addClass("categoria-seleccionada");
-            $(this).siblings().removeClass("categoria-seleccionada");
+            $(this).removeClass("btn-secondary btn-outline-secondary");
+            $(this).siblings().removeClass("btn-secondary btn-outline-secondary");
+            $(this).addClass("btn-secondary");
+            $(this).siblings().addClass("btn-outline-secondary");
+
             const categoriaSeleccionada = $(this).attr("id");
             console.log("la categoria seleccionada es ", categoriaSeleccionada);
 
