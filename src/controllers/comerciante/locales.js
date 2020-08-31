@@ -545,24 +545,6 @@ router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (r
     }
 });
 
-router.get('/buzon', esComercianteAprobado, async (req, res) => {
-    try {
-        if (!localCargado(req)) {
-            throw "Local no cargado";
-        }
-        const buzon = require("../../lib/buzon.component");
-        const msg = buzon.getMessageBubble("ole perro hpta, el tomate llegó picho", "2020-07-30 21:14:00", true);
-        const msg2 = buzon.getMessageBubble("Y qué quiere que haga", "2020-07-30 21:16:00", false);
-        const msg3 = buzon.getMessageBubble("Vieja lerda", "2020-07-30 21:16:10", false);
-        const msg4 = buzon.getMessageBubble("hágame la hpta devolución", "2020-07-30 21:20:00", true);
-        const msg5 = buzon.getMessageBubble("Esta le voy a devolver", "2020-07-31 13:02:10", false);
-        res.render("comerciante/locales/buzon", { nombreLocalActual: req.session.nombreLocalActual, msg, msg2, msg3, msg4, msg5 });
-    } catch (error) {
-        console.log(error);
-        req.flash("message", "Seleccione un local de nuevo")
-        res.redirect("/comerciante/locales/listadoLocales");
-    }
-});
 
 router.get('/ajustes', esComercianteAprobado, async (req, res) => {
     try {
@@ -693,6 +675,49 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         res.redirect("/comerciante/locales/listadoLocales");
     }
 });
+
+
+router.get('/buscarFechas', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const id = req.session.idLocalActual;
+        const totalMostar=0;
+        res.render("comerciante/locales/buscarPorFechas",{id, nombreLocalActual: req.session.nombreLocalActual, totalMostar});
+    } catch (error) {
+        console.log(error);
+        res.redirect("/comerciante/locales/ajustes");
+    }
+});
+
+router.post('/buscarVendidoPorFechas', esComercianteAprobado, async (req, res) => {
+    try {
+        const {idLocal, dateInicio, dateFin} = req.body;
+        req.check("dateInicio", "Ingrese Fecha Inicio de Busqueda").notEmpty();
+        req.check("dateFin", "Ingrese Fecha Fin de Busqueda").notEmpty();
+        const id = idLocal;
+
+        const newDateInicio = dateInicio+' 00:00:00';
+        const newDateFin = dateFin+' 23:59:59';
+
+        let totalMostar = 0;
+        const rowsVendidios = await pool.query("SELECT montoTotal FROM venta WHERE fkIdLocalComercial = ? AND fueEntregado = ? AND fueEmpacado = ? AND fueEnviado = ? AND fechaHoraEntrega BETWEEN ? AND ?", [idLocal, 1, 1, 1, newDateInicio, newDateFin]);
+        for (let j = 0; j < rowsVendidios.length; j++) {
+            totalMostar += rowsVendidios[j].montoTotal;
+        }
+        //const rowNombreLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal FROM localcomercial WHERE pkIdLocalComercial = ?",[idLocal]);
+
+        const rangoBuscado = '<div class="mt-3"> El rango de fechas a buscar fue entre <i class="fas fa-calendar-day"></i> '+ newDateInicio +' - <i class="fas fa-calendar-day"></i> '+newDateFin+' </div>';
+
+
+        res.render("comerciante/locales/buscarPorFechas", {totalMostar, nombreLocalActual: req.session.nombreLocalActual, rangoBuscado, id});
+    } catch (error) {
+        console.log(error);
+        res.redirect("/comerciante/locales/ajustes");
+    }
+});
+
 
 //pendiente
 router.get('/actualizarProductos', esComercianteAprobado, async (req, res) => {

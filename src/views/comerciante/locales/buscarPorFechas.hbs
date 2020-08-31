@@ -1,0 +1,60 @@
+<div class="container mt-3">
+    <h4>{{nombreLocalActual}}</h4>
+    <nav class="mt-4 border-0">
+        <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/comerciante/locales/pedidos"
+                role="tab" aria-controls="nav-home" aria-selected="false"><i class="far fa-clipboard"></i> Pedidos</a>
+            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/comerciante/locales/buscarFechas" role="tab"
+                aria-controls="nav-profile" aria-selected="true"><i class="fas fa-calendar-alt"></i> Buscar por Fechas</a>
+            <a class="nav-item nav-link text-success " id="nav-ajustes-tab" href="/comerciante/locales/ajustes"
+                role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fas fa-cog"></i>
+                Ajustes</a>
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+
+        <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
+            
+                <div class="row">
+
+                    <div class="col-12 p-2">
+
+                        <div class="card p-4">
+                            <form action="/comerciante/locales/buscarVendidoPorFechas" method="POST" name="form" id="form">
+                                <div class="d-flex col-12 row">
+                                    <div class="col-12 col-md-5">
+                                        <div class="form-group">
+                                            <label for="dateInicio">Fecha Inicio</label>
+                                            <input type="date" class="form-control" value="" id="dateInicio" name="dateInicio">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-5">
+                                        <div class="form-group">
+                                            <label for="dateFin">Fecha Fin</label>
+                                            <input type="date" class="form-control" value="" id="dateFin" name="dateFin">
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="idLocal" value="{{id}}">
+                                    <div class="col-2 mt-auto mb-auto flex-shrink-1">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {{{rangoBuscado}}}
+
+                        <h4 class="mt-3">Total vendido: ${{totalMostar}}</h4>
+
+
+                    </div>
+                </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+{{>navegacionComerciante}}
