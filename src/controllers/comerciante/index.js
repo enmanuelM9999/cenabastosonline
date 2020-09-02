@@ -1,11 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { esComerciante,esComercianteAprobado } = require('../../lib/auth');
-
-
-router.get('/index', esComercianteAprobado, async (req, res) => {
-    res.render('comerciante/index');
-});
+const { esComerciante} = require('../../lib/auth');
 
 router.get('/noAprobado',esComerciante, async (req, res) => {
     res.render('comerciante/noAprobado');
