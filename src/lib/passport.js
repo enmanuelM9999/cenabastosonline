@@ -17,12 +17,12 @@ passport.use('administrador.login', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, admin.pkIdAdmin FROM usuario INNER JOIN admin ON admin.fkIdUsuario = usuario.pkIdUsuario WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "impDev-doDefault-No existe un usuario para el correo " + email;
+      throw new Error("impDev-doDefault-No existe un usuario para el correo " + email);
     }
 
     //Comprobar si las contraseña es correcta
     if (rowsUsuario[0].claveUsuario != password) {
-      throw "1-Las contraseñas no coinciden";
+      throw new Error("impDev-doDefault-Las contraseñas no coinciden");
     }
 
     //Guardar variables en sesion
@@ -53,12 +53,12 @@ passport.use('comerciante.logup', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuariosNoAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE comerciante.estaAprobado=0 AND usuario.correoUsuario=?", [email]);
     if (rowsUsuariosNoAceptados.length > 0) {
-      throw "impUsr-doDefault-Ya existe un usuario pendiente para ser aceptado, por favor inicie sesión";
+      throw new Error("impUsr-doDefault-Ya existe un usuario pendiente para ser aceptado, por favor inicie sesión");
     }
     //Verificar si existe y esta aceptado
     const rowsUsuariosAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE comerciante.estaAprobado=1 AND usuario.correoUsuario=?", [email]);
     if (rowsUsuariosAceptados.length > 0) {
-      throw "impUsr-doDefault-Ya existe un usuario activo, por favor inicie sesión";
+      throw new Error("impUsr-doDefault-Ya existe un usuario activo, por favor inicie sesión");
     }
     //Crear y Registrar en BD el nuevo Usuario
     let newUser = {
@@ -67,7 +67,11 @@ passport.use('comerciante.logup', new LocalStrategy({
     };
 
     const resultNewUser = await pool.query('INSERT INTO usuario (correoUsuario,claveUsuario) VALUES ( ? ,aes_encrypt("' + newUser.claveUsuario + '","' + newUser.claveUsuario + '"))', [newUser.correoUsuario]);
+    if (resultNewUser.affectedRows != 1) {
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta al usuario " + email + " en el registro de comerciante");
+    }
     const idUser = resultNewUser.insertId;
+
 
     //Crear y Registrar en BD la nueva Persona Natural
     let newPersonaNatural = {
@@ -79,6 +83,10 @@ passport.use('comerciante.logup', new LocalStrategy({
       fkIdUsuario: idUser
     };
     const resultNewPersonaNatural = await pool.query("INSERT INTO personaNatural SET ?", [newPersonaNatural]);
+    if (resultNewPersonaNatural.affectedRows != 1) {
+      await pool.query("DELETE FROM usuario WHERE pkIdUsuario = ?", [idUser]);
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta una Persona Natural " + email + " en el registro de comerciante");
+    }
     const idPersonaNatural = resultNewPersonaNatural.insertId;
 
     //Crear y Registrar en BD el nuevo Comerciante
@@ -87,6 +95,11 @@ passport.use('comerciante.logup', new LocalStrategy({
       estaAprobado: 0
     };
     const resultNewComerciante = await pool.query("INSERT INTO comerciante SET ?", [newComerciante]);
+    if (resultNewComerciante.affectedRows != 1) {
+      await pool.query("DELETE FROM personaNatural WHERE pkIdPersonaNatural = ?", [idPersonaNatural]);
+      await pool.query("DELETE FROM usuario WHERE pkIdUsuario = ?", [idUser]);
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta un Comerciante " + email + " en el registro de comerciante");
+    }
     const idComerciante = resultNewComerciante.insertId;
 
     //Guardar variables en sesion
@@ -103,6 +116,13 @@ passport.use('comerciante.logup', new LocalStrategy({
 
   } catch (error) {
     console.log(error);
+    let arrayE = error.message.split("-");
+    let _imp = arrayE[0];
+    let _do = arrayE[1];
+    let _msg = arrayE[2];
+    if (_imp == "impUsr") {
+      return done(null, null, req.flash("message", _msg));
+    }
     return done(null, null, req.flash('message', "Error procesando datos"));
   }
 }));
@@ -115,14 +135,14 @@ passport.use('comerciante.login', new LocalStrategy({
   try {
 
     //Verificar si existe y no esta aceptado
-    const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, personaNatural.pkIdPersonaNatural, personaNatural.nombresPersonaNatural, comerciante.pkIdComerciante, comerciante.estaAprobado FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE usuario.correoUsuario=?", [email]);
+    const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario,'" + password + "')AS CHAR(200))claveUsuario, personaNatural.pkIdPersonaNatural, personaNatural.nombresPersonaNatural, comerciante.pkIdComerciante, comerciante.estaAprobado FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN comerciante ON personanatural.pkIdPersonaNatural=comerciante.fkIdPersonaNatural WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "impUsr-doDefault-No existe un usuario para el correo " + email;
+      throw new Error("impUsr-doDefault-No existe un comerciante para el correo " + email);
     }
 
     //Comprobar si las contraseña es correcta
     if (rowsUsuario[0].claveUsuario != password) {
-      throw "impUsr-doDefault-Las contraseñas no coinciden";
+      throw new Error("impUsr-doDefault-Las contraseñas no coinciden");
     }
 
     //Guardar variables en sesion
@@ -138,6 +158,13 @@ passport.use('comerciante.login', new LocalStrategy({
 
   } catch (error) {
     console.log(error);
+    let arrayE = error.message.split("-");
+    let _imp = arrayE[0];
+    let _do = arrayE[1];
+    let _msg = arrayE[2];
+    if (_imp == "impUsr") {
+      return done(null, null, req.flash("message", _msg));
+    }
     return done(null, null, req.flash('message', "Error procesando datos"));
   }
 }));
@@ -156,7 +183,7 @@ passport.use('cliente.logup', new LocalStrategy({
     //Verificar si existe
     const rowsUsuariosAceptados = await pool.query("SELECT usuario.pkIdUsuario FROM usuario WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuariosAceptados.length > 0) {
-      throw "impUsr-doDefault-Ya existe un usuario, por favor inicie sesión";
+      throw new Error("impUsr-doDefault-Ya existe un usuario, por favor inicie sesión");
     }
     //Crear y Registrar en BD el nuevo Usuario
     let newUser = {
@@ -165,6 +192,9 @@ passport.use('cliente.logup', new LocalStrategy({
     };
 
     const resultNewUser = await pool.query('INSERT INTO usuario (correoUsuario,claveUsuario) VALUES ( ? ,aes_encrypt("' + newUser.claveUsuario + '","' + newUser.claveUsuario + '"))', [newUser.correoUsuario]);
+    if (resultNewUser.affectedRows != 1) {
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta al usuario " + email + " en el registro de comerciante");
+    }
     const idUser = resultNewUser.insertId;
 
     //Crear y Registrar en BD la nueva Persona Natural
@@ -177,6 +207,10 @@ passport.use('cliente.logup', new LocalStrategy({
       fkIdUsuario: idUser
     };
     const resultNewPersonaNatural = await pool.query("INSERT INTO personaNatural SET ?", [newPersonaNatural]);
+    if (resultNewUser.affectedRows != 1) {
+      await pool.query("DELETE FROM usuario WHERE pkIdUsuario = ?", [idUser]);
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta al usuario " + email + " en el registro de cliente");
+    }
     const idPersonaNatural = resultNewPersonaNatural.insertId;
 
     //Crear y Registrar en BD el nuevo Cliente
@@ -186,6 +220,11 @@ passport.use('cliente.logup', new LocalStrategy({
       direccionEsFueraDeCucuta: direccionLejos
     };
     const resultNewCliente = await pool.query("INSERT INTO cliente SET ?", [newCliente]);
+    if (resultNewCliente.affectedRows != 1) {
+      await pool.query("DELETE FROM personanatural WHERE pkIdPersonaNatural = ?", [idPersonaNatural]);
+      await pool.query("DELETE FROM usuario WHERE pkIdUsuario = ?", [idUser]);
+      throw new Error("impDev-doDefault-No se pudo efectuar la consulta que inserta al usuario " + email + " en el registro de cliente");
+    }
     const idCliente = resultNewCliente.insertId;
 
     //Guardar variables en sesion
@@ -204,6 +243,13 @@ passport.use('cliente.logup', new LocalStrategy({
 
   } catch (error) {
     console.log(error);
+    let arrayE = error.message.split("-");
+    let _imp = arrayE[0];
+    let _do = arrayE[1];
+    let _msg = arrayE[2];
+    if (_imp == "impUsr") {
+      return done(null, null, req.flash("message", _msg));
+    }
     return done(null, null, req.flash('message', "Error procesando datos"));
   }
 }));
@@ -219,12 +265,12 @@ passport.use('cliente.login', new LocalStrategy({
     //Verificar si existe y no esta aceptado
     const rowsUsuario = await pool.query("SELECT usuario.pkIdUsuario, usuario.correoUsuario, CAST(aes_decrypt(claveUsuario," + password + ")AS CHAR(200))claveUsuario, personaNatural.pkIdPersonaNatural, personaNatural.nombresPersonaNatural, cliente.pkIdCliente FROM usuario INNER JOIN personanatural ON personanatural.fkIdUsuario=usuario.pkIdUsuario INNER JOIN cliente ON personanatural.pkIdPersonaNatural=cliente.fkIdPersonaNatural WHERE usuario.correoUsuario=?", [email]);
     if (rowsUsuario.length == 0) {
-      throw "impUsr-doDefault-No existe un usuario para el correo " + email;
+      throw new Error("impUsr-doDefault-No existe un usuario para el correo " + email);
     }
 
     //Comprobar si las contraseña es correcta
     if (rowsUsuario[0].claveUsuario != password) {
-      throw "impUsr-doDefault-Las contraseñas no coinciden";
+      throw new Error("impUsr-doDefault-Las contraseñas no coinciden");
     }
 
     //Guardar variables en sesion
@@ -240,6 +286,13 @@ passport.use('cliente.login', new LocalStrategy({
 
   } catch (error) {
     console.log(error);
+    let arrayE = error.message.split("-");
+    let _imp = arrayE[0];
+    let _do = arrayE[1];
+    let _msg = arrayE[2];
+    if (_imp == "impUsr") {
+      return done(null, null, req.flash("message", _msg));
+    }
     return done(null, null, req.flash('message', "Error procesando datos"));
   }
 }));

@@ -1,5 +1,6 @@
 var clave = {};
 const pool = require("../database");
+const { email_host, email_port, email_secure, email_user, email_pass, email_rejectUnauthorized } = require("../environmentVars");
 
 clave.recuperarClave = async (correoUsuario) => {
     try {
@@ -19,6 +20,7 @@ clave.recuperarClave = async (correoUsuario) => {
 
         //Correos coinciden, crear nuvea clave
         const nuevaClave = Math.random().toString(36).substring(7);
+        console.log("la nueva clave es ", nuevaClave);
 
         //Actualizar clave
         await pool.query('UPDATE usuario SET claveUsuario = (aes_encrypt("' + nuevaClave + '","' + nuevaClave + '")) WHERE pkIdUsuario=' + usuario.pkIdUsuario + ';');
@@ -31,37 +33,35 @@ clave.recuperarClave = async (correoUsuario) => {
 
         //Configurar Emisor
         let transporter = nodemailer.createTransport({
-            host: 'mail.lamegaplaza.com',
-            port: 587,
-            secure: false,
+            
             auth: {
-            user: 'prami@lamegaplaza.com',
-            pass: 'pramipassprami'
+                user: email_user,
+                pass: email_pass
             },
             tls: {
-            rejectUnauthorized: false
+                rejectUnauthorized: email_rejectUnauthorized
             }
         });
 
         //configurar Receptor
         let info = await transporter.sendMail({
-            from: '"Prami" <prami@lamegaplaza.com>', // sender address,
+            from: '"Cenabastos P.H." <' + email_user + '>', // sender address,
             to: correoUsuario,
             subject: 'Recuperar contraseña',
             // text: 'Contenido'
-            html: contentHTML   
+            html: contentHTML
         })
 
-        console.log('Message sent: %s', info.messageId);
+        console.log('el mensaje enviado fue. ', info.messageId);
         // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
         // Preview only available when sending through an Ethereal account
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-        return {error:false};
+        return { error: false };
 
     } catch (error) {
-        return {error:true, msg:error.message}
+        return { error: true, msg: error.message }
         console.log(error);
     }
 }

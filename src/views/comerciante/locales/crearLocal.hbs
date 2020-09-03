@@ -21,41 +21,39 @@
                             <div class="form-group">
                                 <label for="idlocal">ID Local en Cenabastos</label>
                                 <input class="form-control" type="text" placeholder="Ejemplo: e-104" name="idlocal"
-                                    id="idlocal">
+                                    id="idlocal" required>
                             </div>
                             <div class="form-group">
                                 <label for="name">¿Cómo se llama el local?</label>
                                 <input class="form-control" type="text" placeholder="Ejemplo: Fruver Don jacinto"
-                                    name="name" id="name">
+                                    name="name" id="name" required>
                             </div>
                             <div class="form-group">
                                 <label for="descripcion">Descripcion al público</label>
                                 <textarea name="descripcion" id="descripcion" class="form-control"
                                     placeholder="Ejemplo: Las mejores frutas y verduras de la ciudad"
-                                    form="form"> </textarea>
+                                    form="form" required> </textarea>
                             </div>
                             <div class="form-group">
                                 <label for="tipoLocal">¿Qué tipo de local es?</label>
                                 <select name="tipoLocal" id="tipoLocal" class="form-control">
-
                                     <option value="0">Minorista</option>
                                     <option value="1">Mayorista</option>
-
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="horaA">Hora Apertura Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de apertura debe ser despues de las {{rowHorasLocales.horaAperturaMayorista}}, y que si el local es <b>Minorista</b> la hora de apertura debe ser despues de las {{rowHorasLocales.horaAperturaMinorista}}</small> </label>
-                                <input type="time" class="form-control" id="horaA" name="horaA">
+                                <input type="time" class="form-control" id="horaA" name="horaA" required>
                             </div>
                             <div class="form-group">
                                 <label for="horaC">Hora Cierre Local. <br> <small>Recuerde que si el local es <b>Mayorista</b> la hora de cierre debe ser antes de las {{rowHorasLocales.horaCierreMayorista}}, y que si el local es <b>Minorista</b> la hora de cierre debe ser antes de las {{rowHorasLocales.horaCierreMinorista}}</small></label>
-                                <input type="time" class="form-control" id="horaC" name="horaC">
+                                <input type="time" class="form-control" id="horaC" name="horaC" required>
                             </div>
 
                             <div class="form-group">
                                 <label for="domicilio">Precio del domicilio (se puede modificar después)</label>
                                 <input class="form-control" type="number" step="50" placeholder="Ejemplo: 10000"
-                                    name="domicilio" id="domicilio">
+                                    name="domicilio" id="domicilio" required>
                             </div>
                         </div>
                     </div>

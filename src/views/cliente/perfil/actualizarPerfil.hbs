@@ -10,22 +10,22 @@
 
                     <div class="form-group">
                         <label for="name">Nombres</label>
-                        <input type="text" class="form-control" value="{{rowDatos.nombresPersonaNatural}}" id="name" name="name">
+                        <input type="text" class="form-control" value="{{rowDatos.nombresPersonaNatural}}" id="name" name="name" required>
                     </div>
 
                     <div class="form-group">
                         <label for="lastName">Apellidos</label>
-                        <input type="text" class="form-control" value="{{rowDatos.apellidosPersonaNatural}}" id="lastName" name="lastName">
+                        <input required type="text" class="form-control" value="{{rowDatos.apellidosPersonaNatural}}" id="lastName" name="lastName">
                     </div>
                     
                     <div class="form-group">
                         <label for="phone">Telefono</label>
-                        <input type="number" class="form-control" value="{{rowDatos.telefonoPersonaNatural}}" id="phone" name="phone">
+                        <input required type="number" class="form-control" value="{{rowDatos.telefonoPersonaNatural}}" id="phone" name="phone">
                     </div>
 
                     <div class="form-group">
                         <label for="direccion">Direccion</label>
-                        <textarea name="direccion" id="direccion" class="form-control" form="form"
+                        <textarea required name="direccion" id="direccion" class="form-control" form="form"
                             cols="1">{{rowDatos.direccionCliente}}</textarea>
                     </div>
 
@@ -47,12 +47,12 @@
 
                     <div class="form-group">
                         <label for="lastP">Contraseña Antigua</label>
-                        <input type="password" class="form-control" id="lastP" name="lastP">
+                        <input required type="password" class="form-control" id="lastP" name="lastP">
                     </div>
 
                     <div class="form-group">
                         <label for="newP">Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="newP" name="newP">
+                        <input required type="password" class="form-control" id="newP" name="newP">
                     </div>
 
                     <button type="submit" class="btn btn-success">Actualizar Contraseña</button>
