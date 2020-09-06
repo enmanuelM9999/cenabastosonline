@@ -21,8 +21,7 @@ notificacionesManager.notificarComerciante = async (comerciante, titulo, descrip
 
             contentHTML = `
             <h1>${titulo}</h1>
-            <p>${descripcion}</p>
-            `;
+            <p>${descripcion}</p>`;
 
                 //Configurar Emisor
                 let transporter = nodemailer.createTransport({

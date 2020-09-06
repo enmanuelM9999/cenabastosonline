@@ -32,8 +32,10 @@ clave.recuperarClave = async (correoUsuario) => {
         `;
 
         //Configurar Emisor
-        let transporter = nodemailer.createTransport({
-            
+        let config={
+            host: email_host,
+            port: email_port,
+            secure: email_secure,
             auth: {
                 user: email_user,
                 pass: email_pass
@@ -41,7 +43,11 @@ clave.recuperarClave = async (correoUsuario) => {
             tls: {
                 rejectUnauthorized: email_rejectUnauthorized
             }
-        });
+        }
+        console.log("config ",config);
+        let transporter = nodemailer.createTransport(config);
+        
+        
 
         //configurar Receptor
         let info = await transporter.sendMail({
