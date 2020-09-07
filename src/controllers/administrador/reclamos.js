@@ -3,6 +3,7 @@ const router = express.Router();
 const { esAdmin } = require('../../lib/auth');
 const pool = require("../../database");
 const notificacionesManager = require('../../lib/notificaciones.manager');
+const {defaultNotificationsImage}=require("../../environmentVars");
 
 router.get('/listaReclamos', esAdmin, async (req, res) => {
     try {
@@ -108,10 +109,10 @@ router.post('/cancelarPedido', esAdmin, async (req, res) => {
         moment = moment.utc().subtract(5, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
 
         const rowDatosCliente = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
-        notificacionesManager.notificarCliente(rowDatosCliente[0].fkIdCliente,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", 97, "cliente/pedidos/detallesPedido/"+idVenta, moment, rowDatosCliente[0].correoUsuario);
+        notificacionesManager.notificarCliente(rowDatosCliente[0].fkIdCliente,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", defaultNotificationsImage, "cliente/pedidos/detallesPedido/"+idVenta, moment, rowDatosCliente[0].correoUsuario);
 
         const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
-        notificacionesManager.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", 97, "comerciante/locales/pedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+        notificacionesManager.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario,"Cancelacion Nueva","Tiene una cancelacion nueva, por favor revisar el apartado de notificaciones", defaultNotificationsImage, "comerciante/locales/pedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
 
 
         //Espacio publicitario para devolver el dinero

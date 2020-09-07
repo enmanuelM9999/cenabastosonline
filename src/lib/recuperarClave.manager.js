@@ -1,7 +1,7 @@
-var clave = {};
+let clave = {};
 const pool = require("../database");
 const { email_host, email_port, email_secure, email_user, email_pass, email_rejectUnauthorized } = require("../environmentVars");
-
+const nodemailer=require("nodemailer");
 clave.recuperarClave = async (correoUsuario) => {
     try {
 
@@ -9,7 +9,7 @@ clave.recuperarClave = async (correoUsuario) => {
         const rowsUsuario = await pool.query('SELECT pkIdUsuario,correoUsuario FROM usuario WHERE correoUsuario = ?', [correoUsuario]);
         //Si la consulta arrojó 1 resultado...
         if (rowsUsuario.length != 1) {
-            throw new Error("Ya existe un usuario asignados a este correo");
+            throw new Error("No se encontró el usuario");
         }
 
         const usuario = rowsUsuario[0];
@@ -17,10 +17,11 @@ clave.recuperarClave = async (correoUsuario) => {
         if (usuario.correoUsuario != correoUsuario) {
             throw new Error("Los correos no coinciden");
         }
+        //console.log("bd ",rowsUsuario[0].correoUsuario," input ",correoUsuario );
 
         //Correos coinciden, crear nuvea clave
         const nuevaClave = Math.random().toString(36).substring(7);
-        console.log("la nueva clave es ", nuevaClave);
+        //console.log("la nueva clave es ", nuevaClave);
 
         //Actualizar clave
         await pool.query('UPDATE usuario SET claveUsuario = (aes_encrypt("' + nuevaClave + '","' + nuevaClave + '")) WHERE pkIdUsuario=' + usuario.pkIdUsuario + ';');
@@ -44,11 +45,10 @@ clave.recuperarClave = async (correoUsuario) => {
                 rejectUnauthorized: email_rejectUnauthorized
             }
         }
-        console.log("config ",config);
+        //console.log("config ",config);
         let transporter = nodemailer.createTransport(config);
         
         
-
         //configurar Receptor
         let info = await transporter.sendMail({
             from: '"Cenabastos P.H." <' + email_user + '>', // sender address,
@@ -64,11 +64,12 @@ clave.recuperarClave = async (correoUsuario) => {
         // Preview only available when sending through an Ethereal account
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+        //console.log("12345");
         return { error: false };
 
     } catch (error) {
-        return { error: true, msg: error.message }
         console.log(error);
+        return { error: true, msg: error.message }
     }
 }
 

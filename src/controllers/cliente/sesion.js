@@ -84,7 +84,8 @@ router.post('/recuperarClave', async (req, res) => {
   try {
     const claveManager = require("../../lib/recuperarClave.manager");
     const { email } = req.body;
-    const result=claveManager.recuperarClave(email);
+    const result=await claveManager.recuperarClave(email);
+    console.log("el result chido ", result);
     if (result.error) {
       throw new Error(result.msg);
     }
@@ -93,7 +94,7 @@ router.post('/recuperarClave', async (req, res) => {
   } catch (error) {
     console.log(error)
     req.flash("message",error.message);
-    res.redirect("/cliente/session/login");
+    res.redirect("/cliente/sesion/login");
   }
 
 });
