@@ -60,43 +60,7 @@
     <div class="row mt-2">
         <div class="col-lg-6 col-sm-12 p-2">
 
-            <div class="card p-3">
-                <h4>Estado del Pedido</h4>
-                <div class="table-responsive-lg" style="border-top: 0;">
-                    <!--Para encerrar la tabla responsive-->
-                    <table class="table b-0">
-
-                        <tbody>
-
-                            <tr>
-                                <th scope="row"></th>
-                                <td></td>
-                            </tr>
-
-                            <tr>
-                                <th scope="row"><i class="fas fa-shopping-cart"></i> Fecha y Hora de Compra</th>
-                                <td>{{rowEstadoPedido.fechaHoraVenta}}</td>
-                            </tr>
-
-                            <tr>
-                                <th scope="row"><i class="fas fa-box"></i> Fecha y Hora de Empacado</th>
-                                <td>{{rowEstadoPedido.fechaHoraEmpacado}}</td>
-                            </tr>
-
-                            <tr>
-                                <th scope="row"><i class="fa fa-truck"></i> Fecha y Hora de Envio</th>
-                                <td>{{rowEstadoPedido.fechaHoraEnvio}}</td>
-                            </tr>
-
-                            <tr>
-                                <th scope="row"><i class="fas fa-dollar-sign"></i> Fecha y Hora de Entrega</th>
-                                <td>{{rowEstadoPedido.fechaHoraEntrega}}</td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {{{componentEstado}}}
 
 
         </div>

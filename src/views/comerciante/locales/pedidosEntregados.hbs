@@ -1,0 +1,61 @@
+<div class="container pt-1">
+
+    <a class="back p-0 mt-2" style="font-size: 45px; color:rgb(37, 37, 37);"
+        href="/comerciante/locales/pedidos"><i class="fas fa-angle-left"></i></a>
+
+    <h3 class="mt-3">{{nombreLocalActual}}</h3>
+
+    <br>
+    
+    <h5>Entregados (recibidos y pagos)</h5>
+
+    <div class="row">
+        <div class="col-12 p-2">
+            <div class="card ">
+                <div class="table-responsive-lg mt-1 pt-1">
+                    <!--Para encerrar la tabla responsive-->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID Pedido</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each rowsPedidosEntregados}}
+                            <tr>
+                                <th scope="row">{{pkIdVenta}}</th>
+                                <td>{{nombresPersonaNatural}} {{apellidosPersonaNatural}}</td>
+                                <td>${{montoTotal}}</td>
+                                <td><!-- <a href="/comerciante/locales/pedidos/devolerAEnviado/{{pkIdVenta}}" class="btn btn-warning p-0 pr-2 pl-2"
+                                        style="font-size: 20px;"> <i class="fas fa-chevron-circle-up"
+                                            data-toggle="tooltip" title="Mover a Enviados"></i>
+                                    </a> -->
+                                    <a href="/comerciante/locales/pedido/{{pkIdVenta}}"
+                                        class="btn btn-success p-0 pr-2 pl-2" style="font-size: 20px;"
+                                        data-toggle="tooltip" title="Ver pedido"><i
+                                            class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td>No hay Pedidos Recibidos y pagos</td>
+                            </tr>
+                            {{/each}}
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+{{>navegacionComerciante}}

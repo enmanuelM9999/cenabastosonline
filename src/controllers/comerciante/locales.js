@@ -11,6 +11,39 @@ function localCargado(req) {
     return estaCargado;
 }
 
+async function  actualizarTagsLocal  (idLocal) {
+    let categorias = [];
+    const rowsProductos = await pool.query("SELECT producto.fkIdCategoriaProducto FROM productolocal INNER JOIN producto ON producto.pkIdProducto=productolocal.fkIdProducto WHERE productolocal.fkIdLocalComercial=?", [idLocal]);
+    for (let index = 0; index < rowsProductos.length; index++) {
+        if (!existeCategoria(categorias, rowsProductos[index].fkIdCategoriaProducto)) {
+            categorias.push("" + rowsProductos[index].fkIdCategoriaProducto);
+        }
+
+    }
+    let stringCategorias = "";
+    for (let index = 0; index < categorias.length; index++) {
+        stringCategorias += categorias[index];
+        if ((index + 1) < (categorias.length)) {
+            stringCategorias += "-";
+        }
+    }
+    const newLocal={tagsCategorias:stringCategorias};
+    await pool.query("UPDATE localcomercial SET ? WHERE pkIdLocalComercial=?",[newLocal,idLocal]);
+}
+
+function existeCategoria(arrayCategorias, idCategoria) {
+    var existe = false;
+    for (let index = 0; index < arrayCategorias.length; index++) {
+        if (arrayCategorias[index].id == idCategoria) {
+            existe = true;
+            break;
+        }
+    }
+    return existe;
+}
+
+
+
 router.get('/local/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
@@ -83,23 +116,23 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
 router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
         const rowsProductos = await pool.query("SELECT producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM producto  INNER JOIN imagen ON producto.fkIdImagen=imagen.pkIdImagen ORDER BY nombreProducto ASC");
-        let rowHorasLocales = await pool.query("SELECT horaAperturaMayorista, horaAperturaMinorista, horaCierreMayorista, horaCierreMinorista FROM admin WHERE pkIdAdmin = ?",[1]);
-        
-        let moment=require("moment");
-        let tempHora= moment(rowHorasLocales[0].horaAperturaMayorista,"HH:mm").format("LT").toString();
-        rowHorasLocales[0].horaAperturaMayorista=tempHora;
+        let rowHorasLocales = await pool.query("SELECT horaAperturaMayorista, horaAperturaMinorista, horaCierreMayorista, horaCierreMinorista FROM admin WHERE pkIdAdmin = ?", [1]);
 
-        tempHora= moment(rowHorasLocales[0].horaAperturaMinorista,"HH:mm").format("LT").toString();
-        rowHorasLocales[0].horaAperturaMinorista=tempHora;
+        let moment = require("moment");
+        let tempHora = moment(rowHorasLocales[0].horaAperturaMayorista, "HH:mm").format("LT").toString();
+        rowHorasLocales[0].horaAperturaMayorista = tempHora;
 
-        tempHora= moment(rowHorasLocales[0].horaCierreMayorista,"HH:mm").format("LT").toString();
-        rowHorasLocales[0].horaCierreMayorista=tempHora;
+        tempHora = moment(rowHorasLocales[0].horaAperturaMinorista, "HH:mm").format("LT").toString();
+        rowHorasLocales[0].horaAperturaMinorista = tempHora;
 
-        tempHora= moment(rowHorasLocales[0].horaCierreMinorista,"HH:mm").format("LT").toString();
-        rowHorasLocales[0].horaCierreMinorista=tempHora;
+        tempHora = moment(rowHorasLocales[0].horaCierreMayorista, "HH:mm").format("LT").toString();
+        rowHorasLocales[0].horaCierreMayorista = tempHora;
 
-        
-        res.render("comerciante/locales/crearLocal", { rowsProductos, rowHorasLocales:rowHorasLocales[0] });
+        tempHora = moment(rowHorasLocales[0].horaCierreMinorista, "HH:mm").format("LT").toString();
+        rowHorasLocales[0].horaCierreMinorista = tempHora;
+
+
+        res.render("comerciante/locales/crearLocal", { rowsProductos, rowHorasLocales: rowHorasLocales[0] });
     } catch (error) {
         console.log(error);
     }
@@ -116,14 +149,14 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
         req.check("horaC", "Ingrese la hora de cierre de su local").notEmpty();
 
         if (tipoLocal == 0) {
-            const rowHorasLocales = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND ? BETWEEN horaAperturaMinorista AND horaCierreMinorista",[horaA, horaC]);
+            const rowHorasLocales = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND ? BETWEEN horaAperturaMinorista AND horaCierreMinorista", [horaA, horaC]);
             if (rowHorasLocales.length == 0) {
                 throw new Error("impUsr-doDefault-No se puede crear local porque no se encuentra entre la hora de apertura u hora de cierre adecuado");
             }
         }
 
         if (tipoLocal == 1) {
-            const rowHorasLocales = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND ? BETWEEN horaAperturaMayorista AND horaCierreMayorista",[horaA, horaC]);
+            const rowHorasLocales = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND ? BETWEEN horaAperturaMayorista AND horaCierreMayorista", [horaA, horaC]);
             if (rowHorasLocales.length == 0) {
                 throw new Error("impUsr-doDefault-No se puede crear local porque no se encuentra entre la hora de apertura u hora de cierre adecuado");
             }
@@ -154,9 +187,9 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             totalVendido: 0,
             estaAbierto: 1,
             fkIdBanner: 12,
-            montoPedidoMinimo:0,
-            horaApertura:horaA,
-            horaCierre:horaC
+            montoPedidoMinimo: 0,
+            horaApertura: horaA,
+            horaCierre: horaC
         };
         const resultLocalComercial = await pool.query("INSERT INTO localComercial SET ? ", [newLocalComercial]);
         const idLocalComercial = resultLocalComercial.insertId;
@@ -167,6 +200,7 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [idLocalComercial, productos[i]]);
             i++;
         }
+        actualizarTagsLocal(req.session.idLocalActual);
         res.redirect('/comerciante/locales/listadoLocales');
     } catch (error) {
         console.log(error);
@@ -181,7 +215,7 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
             if (_do === "reForm") {
                 res.redirect('/comerciante/locales/crearLocal');
             }
-        
+
         }
         res.redirect('/comerciante/locales/listadoLocales');
     }
@@ -249,6 +283,7 @@ router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => 
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [req.session.idLocalActual, productosAgregables[index]]);
             index++;
         }
+        actualizarTagsLocal(req.session.idLocalActual);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
@@ -272,10 +307,25 @@ router.get('/pedidos', esComercianteAprobado, async (req, res) => {
         const rowsPedidosEnviados = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [1, 0, 1, idLocal]);
         const totalRowsPedidosEnviados = rowsPedidosEnviados.length;
 
-        const rowsPedidosEntregados = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [1, 1, 1, idLocal]);
+        const rowsPedidosEntregados = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [1, 1, 1, idLocal]);
         const totalRowsPedidosEntregados = rowsPedidosEntregados.length;
 
         res.render("comerciante/locales/pedidos", { nombreLocalActual: req.session.nombreLocalActual, rowsNuevosPedidos, totalRowsNuevosPedidos, rowsPedidosEmpacados, totalRowsPedidosEmpacados, rowsPedidosEnviados, totalRowsPedidosEnviados, rowsPedidosEntregados, totalRowsPedidosEntregados });
+    } catch (error) {
+        console.log(error);
+        req.flash("message", "Seleccione un local de nuevo")
+        res.redirect("/comerciante/locales/listadoLocales");
+    }
+});
+
+router.get('/pedidosEntregados', esComercianteAprobado, async (req, res) => {
+    try {
+        if (!localCargado(req)) {
+            throw "Local no cargado";
+        }
+        const idLocal = req.session.idLocalActual;
+        const rowsPedidosEntregados = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural WHERE venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueEmpacado = ? AND venta.fkIdLocalComercial = ?", [1, 1, 1, idLocal]);
+        res.render("comerciante/locales/pedidosEntregados", { nombreLocalActual: req.session.nombreLocalActual, rowsPedidosEntregados});
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")
@@ -303,6 +353,8 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
 
         const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
 
+        let managerEstadoPedido = require("../../lib/estadoPedido.component");
+
         //Estado del pedido
         var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
@@ -310,25 +362,25 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
                 '<i class="fas fa-chevron-circle-down" data-toggle="tooltip" title="Mover a Empacados"></i> </a>';
             rowEstadoPedido[0].nuevoEmpacadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/" + idPedido + "' class='btn btn-primary p-0 pr-2 pl-2'" +
+            /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/" + idPedido + "' class='btn btn-primary p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Nuevos'></i></a>";
-            rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;
+            rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;*/
 
             const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEnviados/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Enviado'></i></a>";
             rowEstadoPedido[0].nuevoEnviadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/" + idPedido + "' class='btn btn-danger p-0 pr-2 pl-2'" +
+            /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/" + idPedido + "' class='btn btn-danger p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Empacado'></i></a>";
-            rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;
+            rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;*/
 
             const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEntregado/" + idPedido + "' class='btn btn-success p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Recibidos'></i></a>";
             rowEstadoPedido[0].nuevoEntregadoHtml = htmlBotonMover;
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 1 && rowEstadoPedido[0].fueEmpacado == 1) {
-            const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
+            /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Enviados'></i></a>";
-            rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;
+            rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;*/
         }
 
         //Buzon
@@ -441,7 +493,7 @@ router.get('/pedidos/moverAEmpacado/:idPedido', esComercianteAprobado, async (re
     }
 });
 
-router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req, res) => {
+/* router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
         if (!localCargado(req)) {
             throw "Local no cargado";
@@ -459,7 +511,7 @@ router.get('/pedidos/moverANuevos/:idPedido', esComercianteAprobado, async (req,
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
     }
-});
+}); */
 
 router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
@@ -483,7 +535,7 @@ router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (re
     }
 });
 
-router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async (req, res) => {
+/* router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
         if (!localCargado(req)) {
             throw "Local no cargado";
@@ -501,7 +553,7 @@ router.get('/pedidos/devolverAEmpacado/:idPedido', esComercianteAprobado, async 
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
     }
-});
+});*/
 
 router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
@@ -525,7 +577,7 @@ router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (r
     }
 });
 
-router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (req, res) => {
+/* router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (req, res) => {
     try {
         if (!localCargado(req)) {
             throw "Local no cargado";
@@ -543,7 +595,7 @@ router.get('/pedidos/devolerAEnviado/:idPedido', esComercianteAprobado, async (r
         req.flash("message", "Seleccione un local de nuevo")
         res.redirect("/comerciante/locales/listadoLocales");
     }
-});
+}); */
 
 
 router.get('/ajustes', esComercianteAprobado, async (req, res) => {
@@ -564,23 +616,23 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
         const cantProductos = rowsProductosLocal.length;
 
         //hora de apertura y cierre 
-        let rowHorasLocales = await pool.query("SELECT horaAperturaMayorista, horaAperturaMinorista, horaCierreMayorista, horaCierreMinorista FROM admin WHERE pkIdAdmin = ?",[1]);
+        let rowHorasLocales = await pool.query("SELECT horaAperturaMayorista, horaAperturaMinorista, horaCierreMayorista, horaCierreMinorista FROM admin WHERE pkIdAdmin = ?", [1]);
 
         //ajuste de actualizar datos del local
         let rowsDatosLocal = await pool.query("SELECT localcomercial.esMayorista, localcomercial.horaApertura, localcomercial.horaCierre, localcomercial.precioDomicilioLejos ,localcomercial.montoPedidoMinimo, localcomercial.nombreLocal, localcomercial.descripcionLocal, localcomercial.precioDomicilio,imagen.rutaImagen,imagen.publicId FROM localcomercial INNER JOIN imagen ON imagen.pkIdImagen=localcomercial.fkIdBanner WHERE localcomercial.pkIdLocalComercial = ?", [pkIdLocalComercial]);
-        
-        let moment=require("moment");
-        let tempHora= moment(rowHorasLocales[0].horaAperturaMayorista,"HH:mm").format("LT").toString();
-        rowsDatosLocal[0].horaAperturaMayorista=tempHora;
 
-        tempHora= moment(rowHorasLocales[0].horaAperturaMinorista,"HH:mm").format("LT").toString();
-        rowsDatosLocal[0].horaAperturaMinorista=tempHora;
+        let moment = require("moment");
+        let tempHora = moment(rowHorasLocales[0].horaAperturaMayorista, "HH:mm").format("LT").toString();
+        rowsDatosLocal[0].horaAperturaMayorista = tempHora;
 
-        tempHora= moment(rowHorasLocales[0].horaCierreMayorista,"HH:mm").format("LT").toString();
-        rowsDatosLocal[0].horaCierreMayorista=tempHora;
+        tempHora = moment(rowHorasLocales[0].horaAperturaMinorista, "HH:mm").format("LT").toString();
+        rowsDatosLocal[0].horaAperturaMinorista = tempHora;
 
-        tempHora= moment(rowHorasLocales[0].horaCierreMinorista,"HH:mm").format("LT").toString();
-        rowsDatosLocal[0].horaCierreMinorista=tempHora;
+        tempHora = moment(rowHorasLocales[0].horaCierreMayorista, "HH:mm").format("LT").toString();
+        rowsDatosLocal[0].horaCierreMayorista = tempHora;
+
+        tempHora = moment(rowHorasLocales[0].horaCierreMinorista, "HH:mm").format("LT").toString();
+        rowsDatosLocal[0].horaCierreMinorista = tempHora;
 
 
         res.render("comerciante/locales/ajustes", { nombreLocalActual: req.session.nombreLocalActual, rowsDatosLocal, rowsProductosLocal, cantProductos });
@@ -683,8 +735,8 @@ router.get('/buscarFechas', esComercianteAprobado, async (req, res) => {
             throw "Local no cargado";
         }
         const id = req.session.idLocalActual;
-        const totalMostar=0;
-        res.render("comerciante/locales/buscarPorFechas",{id, nombreLocalActual: req.session.nombreLocalActual, totalMostar});
+        const totalMostar = 0;
+        res.render("comerciante/locales/buscarPorFechas", { id, nombreLocalActual: req.session.nombreLocalActual, totalMostar });
     } catch (error) {
         console.log(error);
         res.redirect("/comerciante/locales/ajustes");
@@ -693,13 +745,13 @@ router.get('/buscarFechas', esComercianteAprobado, async (req, res) => {
 
 router.post('/buscarVendidoPorFechas', esComercianteAprobado, async (req, res) => {
     try {
-        const {idLocal, dateInicio, dateFin} = req.body;
+        const { idLocal, dateInicio, dateFin } = req.body;
         req.check("dateInicio", "Ingrese Fecha Inicio de Busqueda").notEmpty();
         req.check("dateFin", "Ingrese Fecha Fin de Busqueda").notEmpty();
         const id = idLocal;
 
-        const newDateInicio = dateInicio+' 00:00:00';
-        const newDateFin = dateFin+' 23:59:59';
+        const newDateInicio = dateInicio + ' 00:00:00';
+        const newDateFin = dateFin + ' 23:59:59';
 
         let totalMostar = 0;
         const rowsVendidios = await pool.query("SELECT montoTotal FROM venta WHERE fkIdLocalComercial = ? AND fueEntregado = ? AND fueEmpacado = ? AND fueEnviado = ? AND fechaHoraEntrega BETWEEN ? AND ?", [idLocal, 1, 1, 1, newDateInicio, newDateFin]);
@@ -708,10 +760,10 @@ router.post('/buscarVendidoPorFechas', esComercianteAprobado, async (req, res) =
         }
         //const rowNombreLocal = await pool.query("SELECT idLocalEnCenabastos, nombreLocal FROM localcomercial WHERE pkIdLocalComercial = ?",[idLocal]);
 
-        const rangoBuscado = '<div class="mt-3"> El rango de fechas a buscar fue entre <i class="fas fa-calendar-day"></i> '+ newDateInicio +' - <i class="fas fa-calendar-day"></i> '+newDateFin+' </div>';
+        const rangoBuscado = '<div class="mt-3"> El rango de fechas a buscar fue entre <i class="fas fa-calendar-day"></i> ' + newDateInicio + ' - <i class="fas fa-calendar-day"></i> ' + newDateFin + ' </div>';
 
 
-        res.render("comerciante/locales/buscarPorFechas", {totalMostar, nombreLocalActual: req.session.nombreLocalActual, rangoBuscado, id});
+        res.render("comerciante/locales/buscarPorFechas", { totalMostar, nombreLocalActual: req.session.nombreLocalActual, rangoBuscado, id });
     } catch (error) {
         console.log(error);
         res.redirect("/comerciante/locales/ajustes");
@@ -742,6 +794,7 @@ router.get('/local/borrarProducto/:id', esComercianteAprobado, async (req, res) 
         const { id } = req.params;
         await pool.query("DELETE pp FROM presentacionproducto pp INNER JOIN productolocal ON productolocal.pkIdProductoLocal = pp.fkIdProductoLocal INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = productolocal.fkIdLocalComercial WHERE pp.fkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario = ?", [id, req.session.idComerciante]);
         await pool.query("DELETE pl FROM productolocal pl INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = pl.fkIdLocalComercial WHERE pl.pkIdProductoLocal = ? AND localcomercial.fkIdComerciantePropietario", [id, req.session.idComerciante]);
+        actualizarTagsLocal(req.session.idLocalActual);
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
@@ -772,17 +825,17 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
             throw "Local no cargado";
         }
         const pkIdLocalComercial = req.session.idLocalActual;
-        const { name, descripcion, domicilio,domicilioLejos,minimo, horaA, horaC, tipoLocal } = req.body;
+        const { name, descripcion, domicilio, domicilioLejos, minimo, horaA, horaC, tipoLocal } = req.body;
 
         if (tipoLocal == 0) {
-            const rowHorasLocales = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND ? BETWEEN horaAperturaMinorista AND horaCierreMinorista",[horaA, horaC]);
+            const rowHorasLocales = await pool.query("SELECT horaAperturaMinorista FROM admin WHERE ? BETWEEN horaAperturaMinorista AND horaCierreMinorista AND ? BETWEEN horaAperturaMinorista AND horaCierreMinorista", [horaA, horaC]);
             if (rowHorasLocales.length == 0) {
                 throw new Error("impUsr-doDefault-No se puede actualizar horas porque no se encuentra entre la hora de apertura u hora de cierre adecuado");
             }
         }
 
         if (tipoLocal == 1) {
-            const rowHorasLocales = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND ? BETWEEN horaAperturaMayorista AND horaCierreMayorista",[horaA, horaC]);
+            const rowHorasLocales = await pool.query("SELECT horaAperturaMayorista FROM admin WHERE ? BETWEEN horaAperturaMayorista AND horaCierreMayorista AND ? BETWEEN horaAperturaMayorista AND horaCierreMayorista", [horaA, horaC]);
             if (rowHorasLocales.length == 0) {
                 throw new Error("impUsr-doDefault-No se puede actualizar horas porque no se encuentra entre la hora de apertura u hora de cierre adecuado");
             }
@@ -792,11 +845,11 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
         const newLocalComercial = {
             nombreLocal: name,
             precioDomicilio: domicilio,
-            precioDomicilioLejos:domicilioLejos,
+            precioDomicilioLejos: domicilioLejos,
             descripcionLocal: descripcion,
-            montoPedidoMinimo:minimo,
-            horaApertura:horaA,
-            horaCierre:horaC
+            montoPedidoMinimo: minimo,
+            horaApertura: horaA,
+            horaCierre: horaC
         };
         await pool.query("UPDATE localComercial SET ? WHERE pkIdLocalComercial = ?", [newLocalComercial, pkIdLocalComercial]);
         req.session.nombreLocalActual = newLocalComercial.nombreLocal;

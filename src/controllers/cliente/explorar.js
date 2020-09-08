@@ -153,7 +153,7 @@ router.get('/local/:idLocal', esCliente, async (req, res) => {
         //productos
         const rowsProductoLocal = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion,presentacionproducto.precioUnitarioPresentacion,productolocal.pkIdProductoLocal, producto.nombreProducto, producto.cssPropertiesBg, imagen.rutaImagen, categoriaproducto.pkIdCategoriaProducto,categoriaproducto.descripcionCategoriaProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen INNER JOIN categoriaproducto ON producto.fkIdCategoriaProducto=categoriaproducto.pkIdCategoriaProducto INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productolocal.pkIdProductoLocal WHERE localcomercial.pkIdLocalComercial = ? GROUP BY productolocal.pkIdProductoLocal ORDER BY producto.nombreProducto ASC", [idLocal]);
 
-        //htmlProductos
+        //htmlProductos y categorias
         var categorias = [];
         var productos = [];
         for (let index = 0; index < rowsProductoLocal.length; index++) {

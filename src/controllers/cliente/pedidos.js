@@ -115,12 +115,12 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
 router.get('/precomprar', esCliente, async (req, res) => {
     try {
 
-        
+
         //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
         let { datos, items } = await carrito.getCarritoPrecompra(req.session.idCliente);
         datos = datos[0];
         if (datos.subtotal < datos.montoPedidoMinimo) {
-            throw new Error("impUsrI-reLocal-El monto total debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
+            throw new Error("impUsrI-reLocal-El monto total debe ser mínimo $" + datos.montoPedidoMinimo + " (sin domicilio)");
         }
 
         var moment = require("moment");
@@ -128,10 +128,11 @@ router.get('/precomprar', esCliente, async (req, res) => {
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment, datos.fkIdLocalSeleccionado);
 
+        /*
         if (!validacion) {
             throw new Error("impUsr-doDefault-El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
         }
-
+        */
         //datos de pago
 
         /**AQUI VA EL WOMPI DOMPI***/
@@ -166,7 +167,7 @@ router.post('/comprar', esCliente, async (req, res) => {
         }
         datos = datos[0];
         if (datos.subtotal < datos.montoPedidoMinimo) {
-            throw new Error("impUsrI-doDefault-El monto del pedido debe ser mínimo $" + datos.montoPedidoMinimo+" (sin domicilio)");
+            throw new Error("impUsrI-doDefault-El monto del pedido debe ser mínimo $" + datos.montoPedidoMinimo + " (sin domicilio)");
         }
 
         var moment2 = require("moment");
@@ -174,10 +175,11 @@ router.post('/comprar', esCliente, async (req, res) => {
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment2, datos.fkIdLocalSeleccionado);
 
+        /*
         if (!validacion) {
             throw new Error("impUsr-doDefault-El local se encuentra cerrado o se encuentra realizando una compra fuera del horario de atencion");
         }
-
+        */
 
         //datos de pago
 
@@ -189,11 +191,8 @@ router.post('/comprar', esCliente, async (req, res) => {
         let fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const newVenta = {
             fechaHoraVenta,
-            fueEmpacado: 0,
-            fueEnviado: 0,
-            fueEntregado: 0,
-            fueCancelado: 0,
-            fueReclamado: 0,
+            fueNoPago: 1,
+            fueNuevo: 1,
             precioDomicilioVenta: datos.precioDomicilio,
             direccionCliente: datos.direccionCliente,
             telefonoCliente: datos.telefonoPersonaNatural,
@@ -257,22 +256,6 @@ router.get('/historial', esCliente, async (req, res) => {
          moment.locale("es-us");
          rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
 
-        for (let index = 0; index < rowsHistorialPedidos.length; index++) {
-            if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 0 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
-                rowsHistorialPedidos[index].estado = "Nuevo";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 0 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0) {
-                rowsHistorialPedidos[index].estado = "Empacado";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 0 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
-                rowsHistorialPedidos[index].estado = "Enviado";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 0 && rowsHistorialPedidos[index].fueCancelado == 0) {
-                rowsHistorialPedidos[index].estado = "Entregado";
-            }   else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 1 && rowsHistorialPedidos[index].fueCancelado == 0) {
-                rowsHistorialPedidos[index].estado = "Reclamado";
-            } else if (rowsHistorialPedidos[index].fueEnviado == 1 && rowsHistorialPedidos[index].fueEntregado == 1 && rowsHistorialPedidos[index].fueEmpacado == 1 && rowsHistorialPedidos[index].fueReclamado == 1 && rowsHistorialPedidos[index].fueCancelado == 1) {
-                rowsHistorialPedidos[index].estado = "Cancelado";
-            }
-
-        }
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         res.render("cliente/pedidos/historial", { rowsHistorialPedidos, cantItemsCarrito });
@@ -304,11 +287,8 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
         rowDatos[0].fechaHoraVenta = moment(rowDatos[0].fechaHoraVenta).format("LLLL");
 
         //Estado del pedido
-        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
-        rowEstadoPedido[0].fechaHoraVenta = moment(rowEstadoPedido[0].fechaHoraVenta).format("LLLL");
-        rowEstadoPedido[0].fechaHoraEnvio = moment(rowEstadoPedido[0].fechaHoraEnvio).format("LLLL");
-        rowEstadoPedido[0].fechaHoraEntrega = moment(rowEstadoPedido[0].fechaHoraEntrega).format("LLLL");
-        rowEstadoPedido[0].fechaHoraEmpacado = moment(rowEstadoPedido[0].fechaHoraEmpacado).format("LLLL");
+        let componentEstado = require("../../lib/estadoPedido.component");
+        componentEstado=await componentEstado.getEstadoDelPedido(idPedido);
 
         //Buzon
         var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
@@ -329,29 +309,18 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
         //Validar si la venta fue entregada para realizar un reclamo
 
         let htmlBotonReclamo = '';
-        const rowFueEntregado = await pool.query("SELECT pkIdVenta, razonReclamo FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND fueReclamado = ? AND pkIdVenta = ?",[1, 1, 1, 1, idPedido]);
-
-        if (rowFueEntregado.length < 1) {
-            htmlBotonReclamo = '<a href="/cliente/pedidos/reclamar/'+idPedido+'" class="btn btn-success mt-2"><i class="fas fa-shopping-bag"></i> Reclamar</a>';
-        } else {
-            htmlBotonReclamo = '<div class="card mt-3 p-3"><div class="form-group"><label for="newReclamo">Razon Reclamo</label><textarea disabled name="newReclamo" id="newReclamo" class="form-control" form="form" cols="1">'+rowFueEntregado[0].razonReclamo+'</textarea></div></div>';
-        }
+        
+        
 
         //Validar si la venta fue entregada para realizar un reclamo
 
         let htmlCancelado = '';
-        const rowFueCancelado = await pool.query("SELECT pkIdVenta, razonCancelado FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND fueReclamado = ? AND fueCancelado = ? AND pkIdVenta = ?",[1, 1, 1, 1, 1, idPedido]);
-
-        if (rowFueCancelado.length > 0) {
-            htmlCancelado = '<div class="card mt-3 p-3"><div class="form-group"><label for="newCancelado">Razon Cancelado</label><textarea disabled name="newCancelado" id="newCancelado" class="form-control" form="form" cols="1">'+rowFueCancelado[0].razonCancelado+'</textarea></div></div>';
-        }
-
-
+        
 
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, htmlBotonReclamo, htmlCancelado });
+        res.render("cliente/pedidos/detallesPedido", { componentEstado, cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowsBuzon, htmlBotonReclamo, htmlCancelado });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
@@ -422,9 +391,9 @@ router.get('/msgCarritoLocalesDiferentes', esCliente, async (req, res) => {
 
 router.get('/reclamar/:idVenta', esCliente, async (req, res) => {
     try {
-        const {idVenta} = req.params;
+        const { idVenta } = req.params;
 
-        res.render("cliente/pedidos/nuevoReclamo",{idVenta});
+        res.render("cliente/pedidos/nuevoReclamo", { idVenta });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
@@ -436,26 +405,26 @@ router.post('/reclamarPedido', esCliente, async (req, res) => {
     try {
         const { idVenta, newReclamo } = req.body;
         const nuevoReclamo = {
-            razonReclamo : newReclamo,
-            fueReclamado : 1
+            razonReclamo: newReclamo,
+            fueReclamado: 1
         };
 
-        const rowFueEntregado = await pool.query("SELECT pkIdVenta FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?",[1, 1, 1, idVenta]);
+        const rowFueEntregado = await pool.query("SELECT pkIdVenta FROM venta WHERE fueEmpacado = ? AND fueEnviado = ? AND fueEntregado = ? AND pkIdVenta = ?", [1, 1, 1, idVenta]);
 
         if (rowFueEntregado.length < 0) {
             req.flash("message", "No puede realizar un reclamo hasta que el pedido haya sido entregado");
             res.redirect("/cliente/pedidos/historial");
         }
 
-        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?",[nuevoReclamo, idVenta]);
+        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?", [nuevoReclamo, idVenta]);
 
         var moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
 
         const rowDatosAdmin = await pool.query("SELECT usuario.correoUsuario FROM admin INNER JOIN usuario ON usuario.pkIdUsuario = admin.fkIdUsuario WHERE admin.pkIdAdmin = ?", [1]);
         notificaciones.notificarAdmin("Reclamo Nuevo", "Tiene un nuevo reclamo, por favor revisar el apartado de notificaciones", rowDatosAdmin[0].correoUsuario);
-        const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?",[idVenta]);
-        notificaciones.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario, "Reclamo Nuevo", "Tiene un nuevo reclamo", 97, "comerciante/locales/informacionPedido/"+idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
+        const rowDatosComerciante = await pool.query("SELECT localcomercial.fkIdComerciantePropietario, usuario.correoUsuario FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial INNER JOIN comerciante ON comerciante.pkIdComerciante = localcomercial.fkIdComerciantePropietario INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = comerciante.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE venta.pkIdVenta = ?", [idVenta]);
+        notificaciones.notificarComerciante(rowDatosComerciante[0].fkIdComerciantePropietario, "Reclamo Nuevo", "Tiene un nuevo reclamo", 97, "comerciante/locales/informacionPedido/" + idVenta, moment, rowDatosComerciante[0].correoUsuario, 1);
 
         req.flash("success", "Reclamo realizado correctamente");
         res.redirect("/cliente/pedidos/historial");

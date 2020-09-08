@@ -41,10 +41,11 @@ notificacionesManager.notificarComerciante = async (comerciante, titulo, descrip
             // Preview only available when sending through an Ethereal account
             console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-            return { error: false };
-        }
-    } catch (error) {
 
+        }
+        return { error: false };
+    } catch (error) {
+        return { error: true };
     }
 };
 
@@ -87,10 +88,11 @@ notificacionesManager.notificarCliente = async (cliente, titulo, descripcion, id
             // Preview only available when sending through an Ethereal account
             console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-            return { error: false };
-        }
-    } catch (error) {
 
+        }
+        return { error: false };
+    } catch (error) {
+        return { error: true };
     }
 };
 
@@ -107,7 +109,7 @@ notificacionesManager.notificarAdmin = async (titulo, descripcion, correoUsuario
 
         //configurar Receptor
         let info = await transporter.sendMail({
-            from: '"Prami" ' + email_user, // sender address,
+            from: '"Cenabastos P.H." ' + email_user, // sender address,
             to: correoUsuario,
             subject: titulo,
             // text: 'Contenido'
