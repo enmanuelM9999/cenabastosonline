@@ -1,0 +1,45 @@
+<div class="container mt-3">
+    <div class="row d-flex justify-content-center">
+        <img src="{{rowCategoria.rutaImagen}}" class="img-fluid" alt="{{rowCategoria.nombreProducto}}"
+            style="width: 100px; height: 100px;">
+    </div>
+
+    <div class="row">
+
+        <div class="col-12 p-2">
+
+            <div class="card p-4">
+                <form action="/administrador/productos/editarCategoria" method="POST" name="form" id="form">
+                    <input type="hidden" name="id" value="{{rowCategoria.pkIdCategoriaProducto}}">
+
+                    <div class="form-group">
+                        <label for="nameCatProd">Nombre Categoria Producto</label>
+                        <input type="text" class="form-control" value="{{rowCategoria.descripcionCategoriaProducto}}" id="nameCatProd"
+                            name="nameCatProd">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Actualizar</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="col-12 p-2">
+            
+            <div class="card p-4">
+                <b>Cambiar imagen del producto</b>
+                <br>
+                <form action="/administrador/productos/actualizarImagenCategoriaProducto" method="POST" name="form" id="form" enctype="multipart/form-data">
+                    <input type="hidden" name="producto" value="{{rowCategoria.pkIdCategoriaProducto}}">
+                    <input type="file" name="myFile" id="">
+
+                    <button type="submit" class="btn btn-success">Actualizar imagen</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{{>navegacionAdmin}}

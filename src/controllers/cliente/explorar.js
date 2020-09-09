@@ -236,6 +236,7 @@ router.get('/productoLocal/:productoYPresentacion', esCliente, async (req, res) 
 router.post('/calificarLocal', esCliente, async (req, res) => {
     try {
         const { valorEstrella, idLocal } = req.body;
+        //@here usar los nuevos estados
         const rowsVenta = await pool.query("SELECT venta.pkIdVenta FROM venta INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.fkIdCliente = ? AND venta.fkIdLocalComercial = ? AND venta.fueEntregado = ? AND venta.fueEnviado = ? AND venta.fueEmpacado = ?", [req.session.idCliente, idLocal, 1, 1, 1]);
 
         if (rowsVenta.length < 1) {

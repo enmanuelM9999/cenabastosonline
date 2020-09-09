@@ -7,6 +7,7 @@ const {defaultNotificationsImage}=require("../../environmentVars");
 
 router.get('/listaReclamos', esAdmin, async (req, res) => {
     try {
+        //@here usar los nuevos estados
         const rowsListaReclamos = await pool.query("SELECT venta.pkIdVenta, personanatural.nombresPersonaNatural, personanatural.apellidosPersonaNatural, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.fueEmpacado = ? AND venta.fueEnviado = ? AND venta.fueEntregado = ? AND venta.fueReclamado = ? AND venta.fueCancelado = 0 ORDER BY venta.pkIdVenta DESC",[1,1,1,1,0]);
         res.render("administrador/reclamos/listaReclamos",{rowsListaReclamos});
     } catch (error) {
@@ -39,14 +40,17 @@ router.get('/detallesPedido/:idPedido', esAdmin, async (req, res) => {
         rowDatos[0].fechaHoraVenta = moment(rowDatos[0].fechaHoraVenta).format("LLLL");
 
 
-        let managerEstadoPedido = require("../../lib/estadoPedido.component");
+        
 
         //Estado del pedido
-        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
+        let componentEstado = require("../../lib/estadoPedido.component");
+        const htmlEstado = await componentEstado.getHtmlCard(idPedido);
+
+        /*var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         rowEstadoPedido[0].fechaHoraVenta = moment(rowEstadoPedido[0].fechaHoraVenta).format("LLLL");
         rowEstadoPedido[0].fechaHoraEnvio = moment(rowEstadoPedido[0].fechaHoraEnvio).format("LLLL");
         rowEstadoPedido[0].fechaHoraEntrega = moment(rowEstadoPedido[0].fechaHoraEntrega).format("LLLL");
-        rowEstadoPedido[0].fechaHoraEmpacado = moment(rowEstadoPedido[0].fechaHoraEmpacado).format("LLLL");
+        rowEstadoPedido[0].fechaHoraEmpacado = moment(rowEstadoPedido[0].fechaHoraEmpacado).format("LLLL");*/
 
         //Buzon
         var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
@@ -75,7 +79,7 @@ router.get('/detallesPedido/:idPedido', esAdmin, async (req, res) => {
         }*/
 
         //Renderizar vista
-        res.render("administrador/reclamos/detallesPedido", {rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon, rowFueEntregado });
+        res.render("administrador/reclamos/detallesPedido", {rowsItemVenta, rowDatos: rowDatos[0], rowsBuzon, rowFueEntregado, htmlEstado });
     } catch (error) {
         console.log(error);
         res.redirect("/administrador/index");

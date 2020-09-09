@@ -1,0 +1,59 @@
+<div class="container mt-3">
+
+    <h2>Categorias</h2>
+    <nav class="mt-4 border-0">
+        <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/administrador/productos/listadoProductos" role="tab"
+                aria-controls="nav-home" aria-selected="false">Listado de Productos</a>
+            <a class="nav-item nav-link text-success" id="nav-buzon-tab" href="/administrador/productos/crearProducto" role="tab"
+                aria-controls="nav-profile" aria-selected="false">Crear Nuevo Producto</a>
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/administrador/productos/listadoCategorias" role="tab"
+                aria-controls="nav-home" aria-selected="false">Listado de Categorias</a>
+            <a class="nav-item nav-link text-success active" id="nav-buzon-tab" href="/administrador/productos/crearCategoria" role="tab"
+                aria-controls="nav-profile" aria-selected="true">Crear Nueva Categoria</a>
+        </div>
+    </nav>
+
+    <div class="tab-content" id="nav-tabContent">
+
+        <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
+            <div class="card border-0 pt-3" style="background-color: rgb(250, 250, 250);">
+
+                <div class="row">
+
+
+                    <div class="col-12 p-2">
+                        <div class="card p-4">
+                            
+                            <form action="/administrador/productos/crearCategoria" method="POST" name="form" id="form" enctype="multipart/form-data">
+
+                                <div class="form-group">
+                                    <label for="nameCatProd"> Nombre Categoria Producto</label>
+                                    <input type="text" class="form-control" id="nameCatProd" name="nameCatProd">
+                                </div>
+
+                                <div class=" mb-3">
+                                    <div>Subir imagen de la categoria producto</div>
+                                    <br>
+                                    <small class="text-muted">Se recomienda que la imagen sea cuadrada</small>
+                                    <input type="file" name="myFile" id="myFile">
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Crear Categoria Producto</button>
+                            </form>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{{>navegacionAdmin}}

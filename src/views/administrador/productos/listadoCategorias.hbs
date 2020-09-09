@@ -3,12 +3,12 @@
     <h2>Productos</h2>
     <nav class="mt-4 border-0">
         <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link text-success active" id="nav-pedidos-tab" href="/administrador/productos/listadoProductos" role="tab"
-                aria-controls="nav-home" aria-selected="true">Listado de Productos</a>
+            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/administrador/productos/listadoProductos" role="tab"
+                aria-controls="nav-home" aria-selected="false">Listado de Productos</a>
             <a class="nav-item nav-link text-success" id="nav-buzon-tab" href="/administrador/productos/crearProducto" role="tab"
                 aria-controls="nav-profile" aria-selected="false">Crear Nuevo Producto</a>
-            <a class="nav-item nav-link text-success" id="nav-pedidos-tab" href="/administrador/productos/listadoCategorias" role="tab"
-                aria-controls="nav-home" aria-selected="false">Listado de Categorias</a>
+            <a class="nav-item nav-link text-success active" id="nav-pedidos-tab" href="/administrador/productos/listadoCategorias" role="tab"
+                aria-controls="nav-home" aria-selected="true">Listado de Categorias</a>
             <a class="nav-item nav-link text-success" id="nav-buzon-tab" href="/administrador/productos/crearCategoria" role="tab"
                 aria-controls="nav-profile" aria-selected="false">Crear Nueva Categoria</a>
         </div>
@@ -30,19 +30,17 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Imagen</th>
-                                            <th scope="col">Producto</th>
-                                            <th scope="col">Categoria</th>
+                                            <th scope="col">Descripcion</th>
                                             <th scope="col">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {{#each rowsListado}}
                                         <tr>
-                                            <th scope="row"><img src="{{rutaImagen}}" class="img-fluid" alt="{{nombreProducto}}" style="width: 100px; height: 100px;"></th>
-                                            <td>{{nombreProducto}}</td>
+                                            <th scope="row"><img src="{{rutaImagen}}" class="img-fluid" alt="{{descripcionCategoriaProducto}}" style="width: 100px; height: 100px;"></th>
                                             <td>{{descripcionCategoriaProducto}}</td>
                                             <td>
-                                                <a href="/administrador/productos/actualizarProducto/{{pkIdProducto}}"
+                                                <a href="/administrador/productos/actualizarCategoriaProducto/{{pkIdCategoriaProducto}}"
                                                         class="btn btn-success p-0 pr-2 pl-2" style="font-size: 20px;"
                                                         data-toggle="tooltip" title="Actualizar Producto"><i class="fas fa-edit"></i>
                                                 </a>
@@ -51,7 +49,7 @@
                                         </tr>
                                         {{else}}
                                         <tr>
-                                            <td>No hay Productos</td>
+                                            <td>No hay Categorias Productos</td>
                                         </tr>
                                         {{/each}}
 

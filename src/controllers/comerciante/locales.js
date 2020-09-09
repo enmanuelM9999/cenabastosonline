@@ -353,9 +353,11 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
 
         const rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
 
-        let managerEstadoPedido = require("../../lib/estadoPedido.component");
-
         //Estado del pedido
+        let componentEstado = require("../../lib/estadoPedido.component");
+        const htmlEstado = await componentEstado.getHtmlCard(idPedido);
+
+        /*
         var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
             const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/' + idPedido + '" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
@@ -364,7 +366,7 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         } else if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
             /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/moverANuevos/" + idPedido + "' class='btn btn-primary p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Nuevos'></i></a>";
-            rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;*/
+            rowEstadoPedido[0].devolverNuevoHtml = htmlBotonDevolver;
 
             const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEnviados/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Enviado'></i></a>";
@@ -372,7 +374,7 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 1) {
             /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolverAEmpacado/" + idPedido + "' class='btn btn-danger p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Empacado'></i></a>";
-            rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;*/
+            rowEstadoPedido[0].devolverEmpacadoHtml = htmlBotonDevolver;
 
             const htmlBotonMover = "<a href='/comerciante/locales/pedidos/moverAEntregado/" + idPedido + "' class='btn btn-success p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-down' data-toggle='tooltip' title='Mover a Recibidos'></i></a>";
@@ -380,8 +382,8 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         } else if (rowEstadoPedido[0].fueEnviado == 1 && rowEstadoPedido[0].fueEntregado == 1 && rowEstadoPedido[0].fueEmpacado == 1) {
             /*const htmlBotonDevolver = "<a href='/comerciante/locales/pedidos/devolerAEnviado/" + idPedido + "' class='btn btn-warning p-0 pr-2 pl-2'" +
                 "style='font-size: 20px;'> <i class='fas fa-chevron-circle-up' data-toggle='tooltip' title='Mover a Enviados'></i></a>";
-            rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;*/
-        }
+            rowEstadoPedido[0].devolverEnviadoHtml = htmlBotonDevolver;
+        } */
 
         //Buzon
         var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
@@ -399,7 +401,7 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
             rowsBuzon[0].mensajes = rowsMensajesBuzon;
         }
         //Renderizar vista
-        res.render("comerciante/locales/informacionPedido", { nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos: rowDatos[0], rowEstadoPedido: rowEstadoPedido[0], rowsBuzon });
+        res.render("comerciante/locales/informacionPedido", { nombreLocalActual: req.session.nombreLocalActual, rowsItemVenta, rowDatos: rowDatos[0], htmlEstado, rowsBuzon });
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")

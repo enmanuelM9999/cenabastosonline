@@ -12,10 +12,10 @@ router.get('/carrito', esCliente, async (req, res) => {
         res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal, local });
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
@@ -50,10 +50,10 @@ router.get('/carrito/borrarItemCarrito/:idItem', esCliente, async (req, res) => 
         res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
@@ -72,10 +72,10 @@ router.get('/carrito/vaciarCarrito', esCliente, async (req, res) => {
         res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
@@ -93,11 +93,11 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
         res.redirect("/cliente/pedidos/carrito");
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
+        let arrayError = error.message.toString().split("-");
         if (arrayError.length >= 3) {
-            var _imp = arrayError[0];
-            var _do = arrayError[1];
-            var _msg = arrayError[2];
+            let _imp = arrayError[0];
+            let _do = arrayError[1];
+            let _msg = arrayError[2];
             if (_imp == "impUsr") {
                 req.flash("message", _msg);
             }
@@ -123,7 +123,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
             throw new Error("impUsrI-reLocal-El monto total debe ser mínimo $" + datos.montoPedidoMinimo + " (sin domicilio)");
         }
 
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("HH:mm").toString();
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment, datos.fkIdLocalSeleccionado);
@@ -141,10 +141,10 @@ router.get('/precomprar', esCliente, async (req, res) => {
         res.render('cliente/pedidos/precompra', { datos, items });
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
@@ -170,7 +170,7 @@ router.post('/comprar', esCliente, async (req, res) => {
             throw new Error("impUsrI-doDefault-El monto del pedido debe ser mínimo $" + datos.montoPedidoMinimo + " (sin domicilio)");
         }
 
-        var moment2 = require("moment");
+        let moment2 = require("moment");
         moment2 = moment2.utc().subtract(4, "hours").format("HH:mm").toString();
 
         const validacion = await carrito.validarHoraYEstaAbierto(moment2, datos.fkIdLocalSeleccionado);
@@ -205,7 +205,7 @@ router.post('/comprar', esCliente, async (req, res) => {
         //crear items-venta
         for (let index = 0; index < items.length; index++) {
             const nombrePresentacionItemVenta = "" + items[index].nombrePresentacion;
-            var detallesComerciante = "" + items[index].detallesProductoLocal + " | " + items[index].detallesPresentacionProducto;
+            let detallesComerciante = "" + items[index].detallesProductoLocal + " | " + items[index].detallesPresentacionProducto;
             if (items[index].detallesProductoLocal == "" && items[index].detallesPresentacionProducto == "") {
                 detallesComerciante = "";
             }
@@ -226,10 +226,10 @@ router.post('/comprar', esCliente, async (req, res) => {
         res.redirect('/cliente/pedidos/historial');
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
         if (_imp == "impUsr") {
             req.flash("message", _msg);
         }
@@ -251,8 +251,8 @@ router.get('/historial', esCliente, async (req, res) => {
     try {
         const idCliente = req.session.idCliente;
         //Buscar el historial de pedidos de un cliente
-        var rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado, venta.fueReclamado, venta.fueCancelado FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
-        /* var moment = require("moment");
+        let rowsHistorialPedidos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal FROM venta WHERE venta.fkIdCliente = ? ORDER BY venta.pkIdVenta DESC", [idCliente]);
+        /* let moment = require("moment");
          moment.locale("es-us");
          rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");*/
 
@@ -267,35 +267,35 @@ router.get('/historial', esCliente, async (req, res) => {
 
 router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
     try {
-        var moment = require("moment");
+        let moment = require("moment");
         moment.locale("es-us");
         const { idPedido } = req.params;
         const idCliente = req.session.idCliente;
 
         //Informacion de la venta
-        var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
+        let rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         const tamanioRowsItemVenta = rowsItemVenta.length;
 
         for (let index = 0; index < tamanioRowsItemVenta; index++) {
-            var totalItemVenta = 0;
+            let totalItemVenta = 0;
             totalItemVenta = rowsItemVenta[index].precioUnitarioItem * rowsItemVenta[index].cantidadItem;
             rowsItemVenta[index].totalItemVenta = totalItemVenta;
         }
 
         //Datos adicionales
-        var rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
+        let rowDatos = await pool.query("SELECT venta.pkIdVenta, venta.montoTotal, venta.precioDomicilioVenta, venta.fechaHoraVenta, venta.telefonoCliente, venta.direccionCliente, personaNatural.nombresPersonaNatural, personaNatural.apellidosPersonaNatural, usuario.correoUsuario, localcomercial.pkIdLocalComercial, localcomercial.nombreLocal FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personaNatural ON personaNatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personaNatural.fkIdUsuario INNER JOIN localcomercial ON localcomercial.pkIdLocalComercial = venta.fkIdLocalComercial WHERE venta.pkIdVenta = ? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         rowDatos[0].fechaHoraVenta = moment(rowDatos[0].fechaHoraVenta).format("LLLL");
 
         //Estado del pedido
         let componentEstado = require("../../lib/estadoPedido.component");
-        componentEstado=await componentEstado.getEstadoDelPedido(idPedido);
+        const htmlEstado = await componentEstado.getHtmlCard(idPedido);
 
         //Buzon
-        var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
+        let rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdCliente = ?", [idPedido, idCliente]);
         if (rowsBuzon.length == 1) {
-            var rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
+            let rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
             for (let index = 0; index < rowsMensajesBuzon.length; index++) {
-                var leftRight = false;
+                let leftRight = false;
                 if (rowsMensajesBuzon[index].esCliente == 1) {
                     leftRight = true;
                 }
@@ -320,7 +320,7 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
-        res.render("cliente/pedidos/detallesPedido", { componentEstado, cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowsBuzon, htmlBotonReclamo, htmlCancelado });
+        res.render("cliente/pedidos/detallesPedido", { componentEstado, cantItemsCarrito, rowsItemVenta, rowDatos: rowDatos[0], rowsBuzon, htmlBotonReclamo, htmlCancelado, htmlEstado });
     } catch (error) {
         console.log(error);
         res.redirect("/cliente/pedidos/historial");
@@ -353,7 +353,7 @@ router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
         if (mensaje.trim() === "") {
             throw new Error("01-" + idVenta + "-Mensaje en blanco");
         }
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const newMensajeBuzon = {
             mensajeBuzon: mensaje,
@@ -365,7 +365,7 @@ router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
         res.redirect("/cliente/pedidos/detallesPedido/" + idVenta);
     } catch (error) {
         console.log(error);
-        var codError = error.message.toString().split("-");
+        let codError = error.message.toString().split("-");
 
         switch (codError[0]) {
             case "01":
@@ -418,7 +418,7 @@ router.post('/reclamarPedido', esCliente, async (req, res) => {
 
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ?", [nuevoReclamo, idVenta]);
 
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
 
         const rowDatosAdmin = await pool.query("SELECT usuario.correoUsuario FROM admin INNER JOIN usuario ON usuario.pkIdUsuario = admin.fkIdUsuario WHERE admin.pkIdAdmin = ?", [1]);
