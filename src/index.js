@@ -62,6 +62,7 @@ app.use(multer({
 
 // Global variables
 app.use((req, res, next) => {
+  console.log(req.session);
   app.locals.message = req.flash('message');
   app.locals.success = req.flash('success');
   app.locals.info = req.flash('info');

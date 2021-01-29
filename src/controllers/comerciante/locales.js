@@ -4,7 +4,7 @@ const { esComerciante, esComercianteAprobado } = require('../../lib/auth');
 const pool = require("../../database");
 
 function localCargado(req) {
-    var estaCargado = true;
+    let estaCargado = true;
     if (req.session.idLocalActual == undefined) {
         estaCargado = false;
     }
@@ -32,7 +32,7 @@ async function  actualizarTagsLocal  (idLocal) {
 }
 
 function existeCategoria(arrayCategorias, idCategoria) {
-    var existe = false;
+    let existe = false;
     for (let index = 0; index < arrayCategorias.length; index++) {
         if (arrayCategorias[index].id == idCategoria) {
             existe = true;
@@ -63,7 +63,7 @@ router.get('/local/:id', esComercianteAprobado, async (req, res) => {
 router.get('/listadoLocales', esComercianteAprobado, async (req, res) => {
     try {
         //Obtener locales de la base de datos
-        var rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto,imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE localcomercial.fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        let rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto,imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE localcomercial.fkIdComerciantePropietario =?", [req.session.idComerciante]);
         //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
         const rowsLocalesImprimibles = rowsLocales.map(function (local) {
             const mayomino = local.esMayorista;
@@ -86,7 +86,7 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
     try {
         const { id } = req.params;
         //Obtener locales de la base de datos
-        var rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
+        let rowsLocales = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE fkIdComerciantePropietario =?", [req.session.idComerciante]);
         //Agregar mensaje de "mayorista" o "minorista" segun el boolean de la base de datos
         const rowsLocalesImprimibles = rowsLocales.map(function (local) {
             const mayomino = local.esMayorista;
@@ -98,8 +98,8 @@ router.get('/listadoLocales/:id', esComercianteAprobado, async (req, res) => {
             return local;
         });
         //Enviar el primer local
-        var primerLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
-        var tempLocal = primerLocal[0];
+        let primerLocal = await pool.query("SELECT localcomercial.pkIdLocalComercial,localcomercial.nombreLocal,localcomercial.esMayorista,localcomercial.precioDomicilio,localcomercial.descripcionLocal,localcomercial.calificacionPromedio,localcomercial.calificacionContadorCliente,localcomercial.idLocalEnCenabastos,localcomercial.totalVendido,localcomercial.estaAbierto, imagen.rutaImagen FROM localcomercial INNER JOIN imagen ON localcomercial.fkIdBanner=imagen.pkIdImagen WHERE pkIdLocalComercial=? AND fkIdComerciantePropietario=?", [id, req.session.idComerciante]);
+        let tempLocal = primerLocal[0];
         const mayomino = primerLocal.esMayorista;
         if (mayomino == 0) {
             primerLocal.mayoMino = "Minorista";
@@ -140,7 +140,7 @@ router.get('/crearLocal', esComercianteAprobado, async (req, res) => {
 
 router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
     try {
-        var { name, descripcion, tipoLocal, productos, idlocal, domicilio, horaA, horaC } = req.body;
+        let { name, descripcion, tipoLocal, productos, idlocal, domicilio, horaA, horaC } = req.body;
         req.check("idlocal", "Ingrese el id que identifica su local en Cenabastos P.H.").notEmpty();
         req.check("name", "Ingrese el nombre de su local comercial").notEmpty();
         req.check("tipoLocal", "Seleccione un tipo de local").notEmpty();
@@ -204,11 +204,11 @@ router.post('/crearLocal', esComercianteAprobado, async (req, res) => {
         res.redirect('/comerciante/locales/listadoLocales');
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
+        let arrayError = error.message.toString().split("-");
         if (arrayError.length >= 3) {
-            var _imp = arrayError[0];
-            var _do = arrayError[1];
-            var _msg = arrayError[2];
+            let _imp = arrayError[0];
+            let _do = arrayError[1];
+            let _msg = arrayError[2];
             if (_imp === "impUsr") {
                 req.flash("message", _msg);
             }
@@ -231,7 +231,7 @@ router.get('/agregarProductoLocal', esComercianteAprobado, async (req, res) => {
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]);
         //checked
         const productosImprimibles = rowsProductos.map(function (producto) {
-            var esProductoLocal = false;
+            let esProductoLocal = false;
             producto.checked = "";
             for (let index = 0; index < rowsProductosLocal.length; index++) {
                 if (rowsProductosLocal[index].fkIdProducto == producto.pkIdProducto) {
@@ -257,7 +257,7 @@ router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => 
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        var { productosAAgregar } = req.body;
+        let { productosAAgregar } = req.body;
         if (!Array.isArray(productosAAgregar)) {
             productosAAgregar = [productosAAgregar];
         }
@@ -268,7 +268,7 @@ router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => 
         const rowsProductosLocal = await pool.query("SELECT productolocal.fkIdProducto FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial=localcomercial.pkIdLocalComercial WHERE localcomercial.pkIdLocalComercial=? AND localcomercial.fkIdComerciantePropietario=?", [req.session.idLocalActual, req.session.idComerciante]); let i = 0;
         //filtrar
         const productosAgregables = productosAAgregar.filter(function (productoAAgregar) {
-            var esAgregable = true;
+            let esAgregable = true;
             for (let index = 0; index < rowsProductosLocal.length; index++) {
                 if (rowsProductosLocal[index].fkIdProducto == productoAAgregar) {
                     esAgregable = false;
@@ -278,7 +278,7 @@ router.post('/agregarProductoLocal', esComercianteAprobado, async (req, res) => 
             return esAgregable;
         });
 
-        var index = 0;
+        let index = 0;
         while (index < productosAgregables.length) {
             await pool.query("INSERT INTO productoLocal (fkIdLocalComercial, fkIdProducto) VALUES (?,?)", [req.session.idLocalActual, productosAgregables[index]]);
             index++;
@@ -342,11 +342,11 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         const { idPedido } = req.params;
 
         //Informacion de la venta
-        var rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
+        let rowsItemVenta = await pool.query("SELECT itemventa.nombrePresentacionItemVenta, itemventa.precioUnitarioItem, itemventa.cantidadItem, producto.nombreProducto, imagen.rutaImagen FROM venta INNER JOIN itemventa ON itemventa.fkIdVenta = venta.pkIdVenta INNER JOIN producto ON producto.pkIdProducto = itemventa.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE itemventa.fkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         const tamanioRowsItemVenta = rowsItemVenta.length;
 
         for (let index = 0; index < tamanioRowsItemVenta; index++) {
-            var totalItemVenta = 0;
+            let totalItemVenta = 0;
             totalItemVenta = rowsItemVenta[index].precioUnitarioItem * rowsItemVenta[index].cantidadItem;
             rowsItemVenta[index].totalItemVenta = totalItemVenta;
         }
@@ -358,7 +358,7 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         const htmlEstado = await componentEstado.getHtmlCard(idPedido);
 
         /*
-        var rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
+        let rowEstadoPedido = await pool.query("SELECT venta.fechaHoraVenta, venta.fechaHoraEnvio, venta.fechaHoraEntrega, venta.fechaHoraEmpacado, venta.fueEnviado, venta.fueEntregado, venta.fueEmpacado FROM venta WHERE venta.pkIdVenta = ? AND venta.fkIdLocalComercial = ?", [idPedido, idLocal]);
         if (rowEstadoPedido[0].fueEnviado == 0 && rowEstadoPedido[0].fueEntregado == 0 && rowEstadoPedido[0].fueEmpacado == 0) {
             const htmlBotonMover = '<a href="/comerciante/locales/pedidos/moverAEmpacado/' + idPedido + '" class="btn btn-danger p-0 pr-2 pl-2" style="font-size: 20px;">' +
                 '<i class="fas fa-chevron-circle-down" data-toggle="tooltip" title="Mover a Empacados"></i> </a>';
@@ -386,11 +386,11 @@ router.get('/pedido/:idPedido', esComercianteAprobado, async (req, res) => {
         } */
 
         //Buzon
-        var rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
+        let rowsBuzon = await pool.query("SELECT venta.pkIdVenta,buzon.pkIdBuzon,buzon.buzonLeido FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=? AND venta.fkIdLocalComercial=? ", [idPedido, idLocal]);
         if (rowsBuzon.length == 1) {
-            var rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
+            let rowsMensajesBuzon = await pool.query("SELECT mensajebuzon.fechaHoraMensajeBuzon,mensajebuzon.esCliente,mensajebuzon.mensajeBuzon FROM mensajebuzon WHERE fkIdBuzon=?", [rowsBuzon[0].pkIdBuzon]);
             for (let index = 0; index < rowsMensajesBuzon.length; index++) {
-                var leftRight = true;
+                let leftRight = true;
                 if (rowsMensajesBuzon[index].esCliente == 1) {
                     leftRight = false;
                 }
@@ -442,7 +442,7 @@ router.post('/pedidos/enviarMensaje', esComercianteAprobado, async (req, res) =>
         if (mensaje.trim() === "") {
             throw new Error("01-" + idVenta + "-Mensaje en blanco");
         }
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const newMensajeBuzon = {
             mensajeBuzon: mensaje,
@@ -454,7 +454,7 @@ router.post('/pedidos/enviarMensaje', esComercianteAprobado, async (req, res) =>
         res.redirect("/comerciante/locales/pedido/" + idVenta);
     } catch (error) {
         console.log(error);
-        var codError = error.message.toString().split("-");
+        let codError = error.message.toString().split("-");
 
         switch (codError[0]) {
             case "01":
@@ -478,15 +478,22 @@ router.get('/pedidos/moverAEmpacado/:idPedido', esComercianteAprobado, async (re
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
-        const fueEmpacado = {
+        
+        const rowDatosNoti = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE pkIdVenta = ?",[idPedido]);
+
+        let notificaciones = require("../../lib/notificaciones.manager");
+        notificaciones.notificarCliente(rowDatosNoti[0].fkIdCliente,"Nuevo Pedido Empacado","Su pedido a sido empacado y esta listo para el envio",97,"cliente/pedidos/detallesPedido/"+idPedido,moment,rowDatosNoti[0].correoUsuario, true);
+    /*    const fueEmpacado = {
             fueEmpacado: 1,
             fechaHoraEmpacado: moment
         };
-        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);
+        await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEmpacado, idPedido, idLocal]);    */
+
+
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
@@ -520,16 +527,22 @@ router.get('/pedidos/moverAEnviados/:idPedido', esComercianteAprobado, async (re
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
-        const fueEnviado = {
+        
+        const rowDatosNoti = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE pkIdVenta = ?",[idPedido]);
+
+        let notificaciones = require("../../lib/notificaciones.manager");
+        notificaciones.notificarCliente(rowDatosNoti[0].fkIdCliente,"Nuevo Pedido Enviado","Su pedido a sido enviado",97,"cliente/pedidos/detallesPedido/"+idPedido,moment,rowDatosNoti[0].correoUsuario, true);
+        /*const fueEnviado = {
             fueEnviado: 1,
             fechaHoraEnvio: moment
         };
         await pool.query("UPDATE venta SET ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEnviado, idPedido, idLocal]);
-        res.redirect("/comerciante/locales/pedidos");
+        res.redirect("/comerciante/locales/pedidos");*/
+
     } catch (error) {
         console.log(error);
         req.flash("message", "Seleccione un local de nuevo")
@@ -562,15 +575,20 @@ router.get('/pedidos/moverAEntregado/:idPedido', esComercianteAprobado, async (r
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        var moment = require("moment");
+        let moment = require("moment");
         moment = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const idLocal = req.session.idLocalActual;
         const { idPedido } = req.params;
-        const fueEntregado = {
+        
+        const rowDatosNoti = await pool.query("SELECT venta.fkIdCliente, usuario.correoUsuario FROM venta INNER JOIN cliente ON cliente.pkIdCliente = venta.fkIdCliente INNER JOIN personanatural ON personanatural.pkIdPersonaNatural = cliente.fkIdPersonaNatural INNER JOIN usuario ON usuario.pkIdUsuario = personanatural.fkIdUsuario WHERE pkIdVenta = ?",[idPedido]);
+
+        let notificaciones = require("../../lib/notificaciones.manager");
+        notificaciones.notificarCliente(rowDatosNoti[0].fkIdCliente,"Nuevo Pedido Entregado","Su pedido a sido entregado",97,"cliente/pedidos/detallesPedido/"+idPedido,moment,rowDatosNoti[0].correoUsuario, true);
+        /*const fueEntregado = {
             fueEntregado: 1,
             fechaHoraEntrega: moment
         };
-        await pool.query("UPDATE venta SET  ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);
+        await pool.query("UPDATE venta SET  ? WHERE pkIdVenta = ? AND fkIdLocalComercial = ?", [fueEntregado, idPedido, idLocal]);*/
         res.redirect("/comerciante/locales/pedidos");
     } catch (error) {
         console.log(error);
@@ -607,7 +625,7 @@ router.get('/ajustes', esComercianteAprobado, async (req, res) => {
         }
         const pkIdLocalComercial = req.session.idLocalActual;
         //ajuste de los productos
-        var rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ? ORDER BY producto.nombreProducto ASC", [pkIdLocalComercial]);
+        let rowsProductosLocal = await pool.query("SELECT productolocal.pkIdProductoLocal, productolocal.detallesProductoLocal, producto.pkIdProducto, producto.nombreProducto, imagen.rutaImagen FROM localcomercial INNER JOIN productolocal ON productolocal.fkIdLocalComercial = localcomercial.pkIdLocalComercial INNER JOIN producto ON producto.pkIdProducto = productolocal.fkIdProducto INNER JOIN imagen ON imagen.pkIdImagen = producto.fkIdImagen WHERE localcomercial.pkIdLocalComercial = ? ORDER BY producto.nombreProducto ASC", [pkIdLocalComercial]);
         for (let index = 0; index < rowsProductosLocal.length; index++) {
             const idProductoLocal = rowsProductosLocal[index].pkIdProductoLocal;
             const rowsPresentaciones = await pool.query("SELECT presentacionproducto.pkIdPresentacionProducto, presentacionproducto.nombrePresentacion, presentacionproducto.precioUnitarioPresentacion, presentacionproducto.detallesPresentacionProducto FROM productolocal INNER JOIN presentacionproducto ON presentacionproducto.fkIdProductoLocal = productoLocal.pkIdProductoLocal WHERE pkIdProductoLocal = ?", [idProductoLocal]);
@@ -664,11 +682,11 @@ router.post('/actualizarProductoLocal', esComercianteAprobado, async (req, res) 
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
+        let arrayError = error.message.toString().split("-");
         if (arrayError.length >= 3) {
-            var _imp = arrayError[0];
-            var _do = arrayError[1];
-            var _msg = arrayError[2];
+            let _imp = arrayError[0];
+            let _do = arrayError[1];
+            let _msg = arrayError[2];
             if (_imp == "impUsr") {
                 req.flash("message", _msg);
             }
@@ -689,7 +707,7 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         if (!localCargado(req)) {
             throw "Local no cargado";
         }
-        var { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
+        let { idPresentacionProducto, nombrePresentacion, precioUnitario, detallesPresentacion } = req.body;
         if (nombrePresentacion.trim() === "") {
             throw new Error("impUsr-reForm-Escriba un nombre para la presentación");
         }
@@ -707,11 +725,11 @@ router.post('/actualizarPresentacionProducto', esComercianteAprobado, async (req
         res.redirect('/comerciante/locales/ajustes');
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
+        let arrayError = error.message.toString().split("-");
         if (arrayError.length >= 3) {
-            var _imp = arrayError[0];
-            var _do = arrayError[1];
-            var _msg = arrayError[2];
+            let _imp = arrayError[0];
+            let _do = arrayError[1];
+            let _msg = arrayError[2];
 
             if (_imp === "impUsr") {
                 req.flash("message", _msg);
@@ -859,11 +877,11 @@ router.post('/actualizarDatos', esComercianteAprobado, async (req, res) => {
     } catch (error) {
         console.log(error);
 
-        var arrayError = error.message.toString().split("-");
+        let arrayError = error.message.toString().split("-");
         if (arrayError.length >= 3) {
-            var _imp = arrayError[0];
-            var _do = arrayError[1];
-            var _msg = arrayError[2];
+            let _imp = arrayError[0];
+            let _do = arrayError[1];
+            let _msg = arrayError[2];
             if (_imp === "impUsr") {
                 req.flash("message", _msg);
             }
@@ -911,10 +929,10 @@ router.post('/agregarPresentacionProductoLocal', esComercianteAprobado, async (r
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
 
         if (_imp === "impUsr") {
             req.flash("message", _msg);
@@ -937,7 +955,7 @@ router.post('/actualizarBanner', esComercianteAprobado, async (req, res) => {
             throw "Local no cargado";
         }
         const cloudinary = require("cloudinary");
-        const { cloud_name, api_key, api_secret } = require("../../environmentVars");
+        const { cloud_name, api_key, api_secret } = require("../../environmentlets");
         cloudinary.config({
             cloud_name,
             api_key,
@@ -975,10 +993,10 @@ router.post('/actualizarBanner', esComercianteAprobado, async (req, res) => {
         res.redirect("/comerciante/locales/ajustes");
     } catch (error) {
         console.log(error);
-        var arrayError = error.message.toString().split("-");
-        var _imp = arrayError[0];
-        var _do = arrayError[1];
-        var _msg = arrayError[2];
+        let arrayError = error.message.toString().split("-");
+        let _imp = arrayError[0];
+        let _do = arrayError[1];
+        let _msg = arrayError[2];
 
         if (_imp === "impUsr") {
             req.flash("message", _msg);

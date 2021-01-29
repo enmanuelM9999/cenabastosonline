@@ -2,7 +2,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const pool = require('../database');
-const helpers = require('./helpers');
 
 
 //---- Administrador ----//
@@ -307,4 +306,3 @@ passport.deserializeUser(async (id, done) => {
   const rows = await pool.query('SELECT * FROM usuario WHERE pkIdUsuario  = ?', [id]);
   done(null, rows[0]);
 });
-
