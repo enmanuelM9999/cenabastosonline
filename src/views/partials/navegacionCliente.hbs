@@ -1,25 +1,91 @@
-<nav class="navbar fixed-bottom navbar-expand-sm navbar-light bg-light border-0 shadow" style="z-index: 500000;">
-    <a class="navbar-brand  text-success" href="/"> <img src="/static/favicon_green.png" style="width: 30px; height: 30px;"> Cenabastos P.H.</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link  text-success" href="/cliente/explorar/listadoLocalesMinoristas"><i class="fas fa-store"></i> Explorar</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link  text-success" href="/cliente/pedidos/carrito"><i class="fas fa-shopping-cart"></i> {{cantItemsCarrito}} Compras </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link  text-success" href="/cliente/notificacion/listadoNotificaciones"><i class="fas fa-bell"></i> Notificaciones</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link  text-success" href="/cliente/sesion/logout"><i class="fas fa-sign-out-alt"></i> Cerrar
-                    sesión</a>
-            </li>
+<div class="app-sidebar sidebar-shadow" style="position:fixed;z-index:999;">
+    <div class="scrollbar-sidebar">
+        <div class="app-sidebar__inner">
+            <ul class="vertical-nav-menu pt-3">
 
-        </ul>
+                <li class="mm-active">
+                    <a href="#" aria-expanded="true">
+                        <i class="metismenu-icon fas fa-store"></i> Explorar
+                        <i class="metismenu-state-icon fas fa-angle-down"></i>
+                    </a>
+                    <ul class="mm-collapse mm-show">
+                        <li>
+                            <a href="elements-buttons-standard.html">
+                                <i class="metismenu-icon"></i> Minoristas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="elements-dropdowns.html">
+                                <i class="metismenu-icon">
+                                </i>Mayoristas
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="metismenu-icon fas fa-shopping-cart"></i> Compras
+                        <i class="metismenu-state-icon fas fa-angle-down"></i>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="components-tabs.html">
+                                <i class="metismenu-icon">
+                                </i>Carrito
+                            </a>
+                        </li>
+                        <li>
+                            <a href="components-accordions.html">
+                                <i class="metismenu-icon">
+                                </i>Mis compras
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li>
+                    <a href="tables-regular.html">
+                        <i class="metismenu-icon fas fa-bell">
+
+                        </i> Notificaciones
+                    </a>
+                </li>
+                <li>
+                    <a href="tables-regular.html">
+                        <i class="metismenu-icon fas fa-sign-out-alt">
+
+                        </i> Salir
+                    </a>
+                </li>
+
+            </ul>
+        </div>
     </div>
-</nav>
+
+</div>
+<div class="" style="position: fixed; top:10px; right: 10px;z-index: 9999;">
+    <a href="" class="btn btn-success rounded-pill shadow-lg" style="font-size: 18px;">
+        <i class="fas fa-shopping-cart"></i> 10
+    </a>
+</div>
+<div class="app-header header-shadow" style="z-index:999">
+
+    <div class="d-flex">
+        <div class="app-header__mobile-menu">
+            <div>
+                <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="app-header__logo">
+            <img src="/personalizated/images/logo-inverse.png" alt="">
+        </div>
+    </div>
+
+
+</div>

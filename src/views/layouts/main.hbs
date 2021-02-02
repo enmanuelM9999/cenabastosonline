@@ -18,8 +18,8 @@
     integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
     crossorigin="anonymous"></script>
   <!-- MAIN CSS & JS-->
-  <link href="personalizated/css/main.css" rel="stylesheet">
-  <script type="text/javascript" src="personalizated/scripts/main.js"></script>
+  <link href="/personalizated/css/main.css" rel="stylesheet">
+  <script type="text/javascript" src="/personalizated/scripts/main.js"></script>
   <!-- JQUERY-->
   <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
     crossorigin="anonymous"></script>
@@ -38,6 +38,10 @@
     body {
       background-color: rgb(250, 250, 250);
     }
+
+    :root {
+      --closed-navbar-height: 80px;
+    }
   </style>
 </head>
 
@@ -45,10 +49,14 @@
 
   {{>message}}
 
-  {{{ body }}}
+  <div
+    class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header closed-sidebar-mobile closed-sidebar">
+    <div class="app-main">
+      {{{ body }}}
 
+    </div>
+  </div>
   {{!-- SCRIPTS --}}
-
 
 
 

@@ -7023,11 +7023,11 @@
     n(148), n(151), n(206);
     r()(document).ready(function() {
         setTimeout(function() { r()(".vertical-nav-menu").metisMenu() }, 100), r()(".search-icon").click(function() { r()(this).parent().parent().addClass("active") }), r()(".search-wrapper .close").click(function() { r()(this).parent().removeClass("active") }), r()(".dropdown-menu").on("click", function(e) {
-            var t = r.a._data(document, "events") || {};
-            t = t.click || [];
-            for (var n = 0; n < t.length; n++) t[n].selector && (r()(e.target).is(t[n].selector) && t[n].handler.call(e.target, e), r()(e.target).parents(t[n].selector).each(function() { t[n].handler.call(this, e) }));
-            e.stopPropagation()
-        }), r()(function() { r()('[data-toggle="popover"]').popover() }), r()(function() { r()('[data-toggle="tooltip"]').tooltip() }), r()(".mobile-toggle-nav").click(function() { r()(this).toggleClass("is-active"), r()(".app-container").toggleClass("sidebar-mobile-open") }), r()(".mobile-toggle-header-nav").click(function() { r()(this).toggleClass("active"), r()(".app-header__content").toggleClass("header-mobile-open") }), r()(window).on("resize", function() { r()(this).width() < 1250 ? r()(".app-container").addClass("closed-sidebar-mobile closed-sidebar") : r()(".app-container").removeClass("closed-sidebar-mobile closed-sidebar") })
+                var t = r.a._data(document, "events") || {};
+                t = t.click || [];
+                for (var n = 0; n < t.length; n++) t[n].selector && (r()(e.target).is(t[n].selector) && t[n].handler.call(e.target, e), r()(e.target).parents(t[n].selector).each(function() { t[n].handler.call(this, e) }));
+                e.stopPropagation()
+            }), r()(function() { r()('[data-toggle="popover"]').popover() }), r()(function() { r()('[data-toggle="tooltip"]').tooltip() }), r()(".mobile-toggle-nav").click(function() { r()(this).toggleClass("is-active"), r()(".app-container").toggleClass("sidebar-mobile-open") }), r()(".mobile-toggle-header-nav").click(function() { r()(this).toggleClass("active"), r()(".app-header__content").toggleClass("header-mobile-open") }), r()(window).on("resize", function() { r()(this).width() < 1250 ? r()(".app-container").addClass("closed-sidebar-mobile closed-sidebar") : r()(".app-container").removeClass("") }) //.removeClass("closed-sidebar-mobile closed-sidebar")
     })
 }, function(e, t, n) {
     /*!

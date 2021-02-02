@@ -1,363 +1,367 @@
-<style>
-    * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        position: relative;
-        transition: 0.2s;
-    }
+{{>navegacionCliente}}
+<div class="app-main__outer">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            position: relative;
+            transition: 0.2s;
+        }
 
-    html {
-        overflow-x: hidden;
-    }
+        html {
+            overflow-x: hidden;
+        }
 
-    /*Variables*/
+        /*Variables*/
 
-    :root {
-        /*Longitudes*/
-        --header-height: 150px;
-        --icon-size: 30px;
-        --product-size: 100px;
-        /*Colores*/
-        --mega-green: rgb(2, 184, 117);
-        --mega-orange: rgb(240, 173, 78);
-        --white: rgb(255, 255, 255);
-    }
-
-
-    /* ----------- Mobile First------------------*/
-
-    body {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background-color: white;
-    }
-
-    .header {
-        width: 100%;
-        flex: 0 0 var(--header-height);
-        border-bottom-left-radius: 40%;
-        border-bottom-right-radius: 40%;
+        :root {
+            /*Longitudes*/
+            --header-height: 150px;
+            --icon-size: 30px;
+            --product-size: 100px;
+            /*Colores*/
+            --mega-green: rgb(2, 184, 117);
+            --mega-orange: rgb(240, 173, 78);
+            --white: rgb(255, 255, 255);
+        }
 
 
-    }
+        /* ----------- Mobile First------------------*/
 
-    .header .back {
-        width: 25px;
-        height: 25px;
-        position: absolute;
-        top: 15px;
-        left: 10px;
-        background-image: url("../icons/back.svg");
-        background-size: cover;
-    }
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
 
-    .header .product-img {
-        width: 50%;
-        height: 50%;
-        transform: translateX(50%) scale(1.3);
-        display: flex;
-        justify-content: center;
-        position: absolute;
-        bottom: 0;
-    }
+        .header {
+            width: 100%;
+            flex: 0 0 var(--header-height);
+            border-bottom-left-radius: 40%;
+            border-bottom-right-radius: 40%;
 
-    .product-img img {
-        width: var(--product-size);
-        height: var(--product-size);
-    }
 
-    .product-info {
-        width: 100%;
-        min-height: 200px;
-        display: flex;
-        flex-direction: column;
-        top: 40px;
-    }
+        }
 
-    .product-name {
-        width: 100%;
-        min-height: 20px;
-        display: flex;
-        justify-content: center;
-    }
+        .header .back {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            background-image: url("../icons/back.svg");
+            background-size: cover;
+        }
 
-    .product-info .product-data {
-        width: 100%;
-        min-height: 200px;
-        margin-bottom: 50px;
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-    }
+        .header .product-img {
+            width: 50%;
+            height: 50%;
+            transform: translateX(50%) scale(1.3);
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            bottom: 0;
+        }
 
-    .product-data .quantity-manager,
-    .btn-add-to-car {
-        width: 100%;
-        min-height: 50px;
-    }
+        .product-img img {
+            width: var(--product-size);
+            height: var(--product-size);
+        }
 
-    .product-data .quantity-manager {
-        width: 100%;
-        height: 200px;
-        justify-content: center;
-        align-items: center;
+        .product-info {
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            top: 40px;
+        }
 
-    }
+        .product-name {
+            width: 100%;
+            min-height: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-    .quantity {
-        width: 100%;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        margin-right: 5px;
-    }
+        .product-info .product-data {
+            width: 100%;
+            min-height: 200px;
+            margin-bottom: 50px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .quantity-manager input {
-        width: 100px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-    }
+        .product-data .quantity-manager,
+        .btn-add-to-car {
+            width: 100%;
+            min-height: 50px;
+        }
 
-    .quantity-manager select {
-        background-image: white;
-        width: 100%;
-        height: 50px;
-    }
+        .product-data .quantity-manager {
+            width: 100%;
+            height: 200px;
+            justify-content: center;
+            align-items: center;
 
-    .quantity-manager button {
-        height: 100%;
-    }
+        }
 
-    .quantity button {
-        width: 50px;
-        background-color: var(--mega-green);
-        border: 0 solid red;
-        font-size: 30px;
-        color: white;
-        cursor: pointer;
-    }
+        .quantity {
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            margin-right: 5px;
+        }
 
-    #less {
-        border-top-left-radius: 15px;
-        border-bottom-left-radius: 15px;
-        background-color: rgb(255, 123, 123);
-    }
+        .quantity-manager input {
+            width: 100px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+        }
 
-    #more {
-        border-top-right-radius: 15px;
-        border-bottom-right-radius: 15px;
-    }
+        .quantity-manager select {
+            background-image: white;
+            width: 100%;
+            height: 50px;
+        }
 
-    .details {
-        width: 100%;
-        min-height: 150px;
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        .quantity-manager button {
+            height: 100%;
+        }
 
-    }
+        .quantity button {
+            width: 50px;
+            background-color: var(--mega-green);
+            border: 0 solid red;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
 
-    .details textarea {
-        padding: 10px;
-        min-height: 100px;
-        width: 100%;
-    }
+        #less {
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            background-color: rgb(255, 123, 123);
+        }
 
-    .price {
-        width: 100%;
-        height: 30px;
-        display: flex;
-        justify-content: center;
-        color: var(--mega-green);
-        margin-bottom: 10px;
-    }
+        #more {
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
 
-    .btn-add-to-car {
-        display: flex;
-        justify-content: center;
-    }
+        .details {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
 
-    .btn-add-to-car button {
-        width: 300px;
-        background-color: var(--mega-green);
-        border: 0 solid red;
-        font-size: 15px;
-        color: white;
-        cursor: pointer;
-        border-radius: 10px;
-        padding: 5px;
-    }
-</style>
+        }
 
-<div class="header" style="{{productoLocal.cssPropertiesBg}}">
-    <a class="back p-0" style="font-size: 45px; color:rgb(37, 37, 37);"
-        href="/cliente/explorar/local/{{productoLocal.idLocal}}"><i class="fas fa-angle-left"></i></a>
-    <div class="product-img"><img src={{productoLocal.rutaImagen}} alt="{{productoLocal.nombreProducto}}"> </div>
+        .details textarea {
+            padding: 10px;
+            min-height: 100px;
+            width: 100%;
+        }
 
-</div>
-<div class="product-info">
+        .price {
+            width: 100%;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            color: var(--mega-green);
+            margin-bottom: 10px;
+        }
 
-    <div class="container mb-3">
-        <div class="product-name">
-            <h4>{{productoLocal.nombreProducto}}</h4>
-        </div>
-        <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 0px;"
-            id="detallesVendedor">
+        .btn-add-to-car {
+            display: flex;
+            justify-content: center;
+        }
 
-        </div>
+        .btn-add-to-car button {
+            width: 300px;
+            background-color: var(--mega-green);
+            border: 0 solid red;
+            font-size: 15px;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 5px;
+        }
+    </style>
 
-        <div class="details mt-2">
-            <h5>Detalles</h5> <textarea class="form-control" placeholder='Ejemplo: "La papa parejita por favor"'
-                id="detallesCliente"></textarea>
-        </div>
-        <div class="product-data" name="product" style="position: relative;">
-            <div class="row pt-2">
-                <div class="col-xs-12 col-md-6 my-auto p-3">
-                    <select class="form-control" id="selectPresentacion">
-                        {{#each productoLocal.presentaciones}}
-                        <option value="{{pkIdPresentacionProducto}}" {{inputSelected}}>{{nombrePresentacion}}</option>
-                        {{else}}
-                        Este producto no cuenta con ninguna presentacion. Si ve este mensaje notifique el error
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="col-xs-12 col-md-6 my-auto p-3">
-                    <div class="quantity">
-                        <button id="less" type="button">-</button>
-                        <input id="number" type="number" min="0" step="1" value="1">
-                        <button id="more" type="button">+</button>
+    <div class="header" style="{{productoLocal.cssPropertiesBg}}">
+        <a class="back p-0" style="font-size: 45px; color:rgb(37, 37, 37);"
+            href="/cliente/explorar/local/{{productoLocal.idLocal}}"><i class="fas fa-angle-left"></i></a>
+        <div class="product-img"><img src={{productoLocal.rutaImagen}} alt="{{productoLocal.nombreProducto}}"> </div>
+
+    </div>
+    <div class="product-info">
+
+        <div class="container mb-3">
+            <div class="product-name">
+                <h4>{{productoLocal.nombreProducto}}</h4>
+            </div>
+            <div class="detalles-vendedor p-3" style="overflow: auto; max-height: 150px;min-height: 0px;"
+                id="detallesVendedor">
+
+            </div>
+
+            <div class="details mt-2">
+                <h5>Detalles</h5> <textarea class="form-control" placeholder='Ejemplo: "La papa parejita por favor"'
+                    id="detallesCliente"></textarea>
+            </div>
+            <div class="product-data" name="product" style="position: relative;">
+                <div class="row pt-2">
+                    <div class="col-xs-12 col-md-6 my-auto p-3">
+                        <select class="form-control" id="selectPresentacion">
+                            {{#each productoLocal.presentaciones}}
+                            <option value="{{pkIdPresentacionProducto}}" {{inputSelected}}>{{nombrePresentacion}}
+                            </option>
+                            {{else}}
+                            Este producto no cuenta con ninguna presentacion. Si ve este mensaje notifique el error
+                            {{/each}}
+                        </select>
                     </div>
+                    <div class="col-xs-12 col-md-6 my-auto p-3">
+                        <div class="quantity">
+                            <button id="less" type="button">-</button>
+                            <input id="number" type="number" min="0" step="1" value="1">
+                            <button id="more" type="button">+</button>
+                        </div>
+                    </div>
+
                 </div>
 
+                <div class="price">
+                    <h4 id="price">$0</h4>
+                </div>
+                <button class="btn btn-success ml-auto mr-auto mt-2" id="btnSubmit"> <i
+                        class="fas fa-shopping-cart"></i>
+                    Agregar al carrito</button>
             </div>
-
-            <div class="price">
-                <h4 id="price">$0</h4>
-            </div>
-            <button class="btn btn-success ml-auto mr-auto mt-2" id="btnSubmit"> <i class="fas fa-shopping-cart"></i>
-                Agregar al carrito</button>
         </div>
     </div>
-</div>
 
-<script>
-    var producto = {
-            idLocal: {{productoLocal.idLocal}},
-            detallesProductoLocal:"{{productoLocal.detallesProductoLocal}}",
-            precioUnitarioSeleccionado: {{ productoLocal.precioUnitarioSeleccionado}},
-            presentaciones: {{{ productoLocal.htmlJSON }}}
+    <script>
+        var producto = {
+            idLocal: {{ productoLocal.idLocal }},
+        detallesProductoLocal: "{{productoLocal.detallesProductoLocal}}",
+            precioUnitarioSeleccionado: {{ productoLocal.precioUnitarioSeleccionado }},
+        presentaciones: {{{ productoLocal.htmlJSON }}}
     }
 
-    $less = $("#less");
-    $more = $("#more");
-    calcPrice();
-
-    $less.on("click", function () {
-        var actual = $("#number").val();
-        actual--;
-        actual = Math.abs(actual);
-        $("#number").val(actual);
+        $less = $("#less");
+        $more = $("#more");
         calcPrice();
-    })
 
-    $more.on("click", function () {
-        var vari = $("#number").val();
-        try {
-            vari = parseInt(vari);
-            vari++;
-            $("#number").val(vari);
+        $less.on("click", function () {
+            var actual = $("#number").val();
+            actual--;
+            actual = Math.abs(actual);
+            $("#number").val(actual);
             calcPrice();
+        })
 
-        } catch (error) {
-            vari = 3;
-            vari++;
-            $("#number").val(vari);
-            calcPrice();
-
-        }
-    })
-
-    $("#number").on("change input load keyup readystatechange", function () {
-        calcPrice();
-    })
-
-    function calcPrice() {
-        var newPrice = producto.precioUnitarioSeleccionado * $("#number").val();
-        $("#price").html("$" + newPrice);
-    }
-
-    $("#btnSubmit").on("click", function () {
-        var form = document.createElement("form");
-        document.body.appendChild(form);
-        form.method = "POST";
-        form.action = "/cliente/pedidos/agregarAlCarrito";
-
-        //input id local
-        var inputIdLocal = document.createElement("input");
-        inputIdLocal.setAttribute("type", "hidden");
-        inputIdLocal.setAttribute("name", "idLocal");
-        inputIdLocal.setAttribute("value", producto.idLocal);
-        form.appendChild(inputIdLocal);
-
-        //input id presentacion
-        var inputIdPresentacion = document.createElement("input");
-        inputIdPresentacion.setAttribute("type", "hidden");
-        inputIdPresentacion.setAttribute("name", "idPresentacion");
-        var select = document.getElementById("selectPresentacion");
-        inputIdPresentacion.setAttribute("value", select.value);
-        form.appendChild(inputIdPresentacion);
-
-        //input cantidad item
-        var inputCantidadItem = document.createElement("input");
-        inputCantidadItem.setAttribute("type", "hidden");
-        inputCantidadItem.setAttribute("name", "cantidadItem");
-        var cantidadItem = document.getElementById("number");
-        inputCantidadItem.setAttribute("value", cantidadItem.value);
-        form.appendChild(inputCantidadItem);
-
-        //input detallesCliente,
-        var inputDetallesCliente = document.createElement("input");
-        inputDetallesCliente.setAttribute("type", "hidden");
-        inputDetallesCliente.setAttribute("name", "detallesCliente");
-        var detallesCliente = document.getElementById("detallesCliente");
-        inputDetallesCliente.setAttribute("value", detallesCliente.value);
-        form.appendChild(inputDetallesCliente);
-
-        //Enviar formulario
-        form.submit();
-    });
-
-
-    function actualizarSelect() {
-        const idPresentacion = $("#selectPresentacion").val();
-        var detallesPresentacion = "";
-        //Buscar la presentacion
-        for (let index = 0; index < producto.presentaciones.length; index++) {
-            if (producto.presentaciones[index].idPresentacion == idPresentacion) {
-                detallesPresentacion += producto.presentaciones[index].detallesVendedor;
-                producto.precioUnitarioSeleccionado = producto.presentaciones[index].precioUnitario;
+        $more.on("click", function () {
+            var vari = $("#number").val();
+            try {
+                vari = parseInt(vari);
+                vari++;
+                $("#number").val(vari);
                 calcPrice();
+
+            } catch (error) {
+                vari = 3;
+                vari++;
+                $("#number").val(vari);
+                calcPrice();
+
             }
+        })
+
+        $("#number").on("change input load keyup readystatechange", function () {
+            calcPrice();
+        })
+
+        function calcPrice() {
+            var newPrice = producto.precioUnitarioSeleccionado * $("#number").val();
+            $("#price").html("$" + newPrice);
         }
-        var html = "-" + producto.detallesProductoLocal + "<br>";
-        html += "-" + detallesPresentacion;
-        $("#detallesVendedor").html(html);
 
-    }
-    $("#selectPresentacion").on("load change input", function () {
-        actualizarSelect();
-    });
+        $("#btnSubmit").on("click", function () {
+            var form = document.createElement("form");
+            document.body.appendChild(form);
+            form.method = "POST";
+            form.action = "/cliente/pedidos/agregarAlCarrito";
 
-    $(document).ready(function () {
-        actualizarSelect();
-    });
+            //input id local
+            var inputIdLocal = document.createElement("input");
+            inputIdLocal.setAttribute("type", "hidden");
+            inputIdLocal.setAttribute("name", "idLocal");
+            inputIdLocal.setAttribute("value", producto.idLocal);
+            form.appendChild(inputIdLocal);
+
+            //input id presentacion
+            var inputIdPresentacion = document.createElement("input");
+            inputIdPresentacion.setAttribute("type", "hidden");
+            inputIdPresentacion.setAttribute("name", "idPresentacion");
+            var select = document.getElementById("selectPresentacion");
+            inputIdPresentacion.setAttribute("value", select.value);
+            form.appendChild(inputIdPresentacion);
+
+            //input cantidad item
+            var inputCantidadItem = document.createElement("input");
+            inputCantidadItem.setAttribute("type", "hidden");
+            inputCantidadItem.setAttribute("name", "cantidadItem");
+            var cantidadItem = document.getElementById("number");
+            inputCantidadItem.setAttribute("value", cantidadItem.value);
+            form.appendChild(inputCantidadItem);
+
+            //input detallesCliente,
+            var inputDetallesCliente = document.createElement("input");
+            inputDetallesCliente.setAttribute("type", "hidden");
+            inputDetallesCliente.setAttribute("name", "detallesCliente");
+            var detallesCliente = document.getElementById("detallesCliente");
+            inputDetallesCliente.setAttribute("value", detallesCliente.value);
+            form.appendChild(inputDetallesCliente);
+
+            //Enviar formulario
+            form.submit();
+        });
 
 
-</script>
+        function actualizarSelect() {
+            const idPresentacion = $("#selectPresentacion").val();
+            var detallesPresentacion = "";
+            //Buscar la presentacion
+            for (let index = 0; index < producto.presentaciones.length; index++) {
+                if (producto.presentaciones[index].idPresentacion == idPresentacion) {
+                    detallesPresentacion += producto.presentaciones[index].detallesVendedor;
+                    producto.precioUnitarioSeleccionado = producto.presentaciones[index].precioUnitario;
+                    calcPrice();
+                }
+            }
+            var html = "-" + producto.detallesProductoLocal + "<br>";
+            html += "-" + detallesPresentacion;
+            $("#detallesVendedor").html(html);
 
-{{>navegacionCliente}}
+        }
+        $("#selectPresentacion").on("load change input", function () {
+            actualizarSelect();
+        });
+
+        $(document).ready(function () {
+            actualizarSelect();
+        });
+
+
+    </script>
+
+</div>

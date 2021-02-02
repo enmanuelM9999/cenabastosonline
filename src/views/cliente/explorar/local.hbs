@@ -1,527 +1,521 @@
-<style>
-    * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-        position: relative;
-        transition: 0.2s;
-    }
+{{>navegacionCliente}}
+<div class="app-main__outer">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            position: relative;
+            transition: 0.2s;
+        }
 
-    /*Variables*/
+        /*Variables*/
 
-    :root {
-        /*Longitudes*/
-        --header-height: 70px;
-        --nav-bar-height: 50px;
-        --icon-size: 30px;
-        --nav-icon-size: 25px;
-        --banner-height: 150px;
-        --stories-space-height: 150px;
-        --storie-height: 60px;
-        --product-height: 100px;
-        --product-width: 150px;
-        /*Colores*/
-        --mega-green: rgb(2, 184, 117);
-        --mega-orange: rgb(240, 173, 78);
-        --white: rgb(255, 255, 255);
-    }
+        :root {
+            /*Longitudes*/
+            --header-height: 70px;
+            --nav-bar-height: 50px;
+            --icon-size: 30px;
+            --nav-icon-size: 25px;
+            --banner-height: 150px;
+            --stories-space-height: 150px;
+            --storie-height: 60px;
+            --product-height: 100px;
+            --product-width: 150px;
+            /*Colores*/
+            --mega-green: rgb(2, 184, 117);
+            --mega-orange: rgb(240, 173, 78);
+            --white: rgb(255, 255, 255);
+        }
 
-    /* ----------- Mobile First------------------*/
+        /* ----------- Mobile First------------------*/
 
-    body {
+       
 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+        .header {
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--white);
+            position: relative;
+            top: 0;
+            box-shadow: 2px 26px 28px -6px rgba(0, 0, 0, 0.05);
+            display: flex;
 
-    .header {
-        width: 100%;
-        height: var(--header-height);
-        background-color: var(--white);
-        position: fixed;
-        top: 0;
-        box-shadow: 2px 26px 28px -6px rgba(0, 0, 0, 0.05);
-        display: flex;
-        z-index: 75000;
-        align-items: center;
-        border-bottom: 5px solid var(--mega-orange);
-    }
+            align-items: center;
+            border-bottom: 5px solid var(--mega-orange);
+        }
 
-    .header .title {
-        align-self: flex-start;
-        height: 100%;
-        min-width: 20px;
-        display: flex;
-    }
+        .header .title {
+            align-self: flex-start;
+            height: 100%;
+            min-width: 20px;
+            display: flex;
+        }
 
-    .header .search-icon {
-        width: var(--icon-size);
-        height: var(--icon-size);
-        background-image: url("../icons/search.svg");
-        background-repeat: no-repeat, repeat;
-        background-size: cover;
-        margin-left: auto;
-        margin-right: 20px;
-    }
+        .header .search-icon {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            background-image: url("../icons/search.svg");
+            background-repeat: no-repeat, repeat;
+            background-size: cover;
+            margin-left: auto;
+            margin-right: 20px;
+        }
 
-    .no-header {
-        width: 100%;
-        min-height: 90vh;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-    }
+        .no-header {
+            width: 100%;
+            min-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .banner {
-        width: 100%;
-        margin-top: var(--header-height);
-        position: relative;
-        z-index: 1;
-        box-shadow: inset -18px -157px 103px -169px rgba(0, 0, 0, 0.51);
-        flex: 0 0 var(--banner-height);
-    }
+        .banner {
+            width: 100%;
+            margin-top: var(--header-height);
+            position: relative;
+            z-index: 1;
+            box-shadow: inset -18px -157px 103px -169px rgba(0, 0, 0, 0.51);
+            flex: 0 0 var(--banner-height);
+        }
 
-    .banner .state {
-        position: absolute;
-        bottom: 0;
-        left: 5px;
-        color: white;
+        .banner .state {
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            color: white;
 
-        font-size: 20px;
-        z-index: 5000;
-    }
+            font-size: 20px;
+            z-index: 5000;
+        }
 
-    .banner img {
-        max-width: 100%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 2500;
-    }
+        .banner img {
+            max-width: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2500;
+        }
 
-    .seller-space {
-        width: 100%;
-        min-height: 200px;
-        margin-bottom: var(--nav-bar-height);
-        padding-top: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        position: relative;
-        z-index: 50000;
-        background-color: white;
-    }
+        .seller-space {
+            width: 100%;
+            min-height: 200px;
+            margin-bottom: var(--nav-bar-height);
+            padding-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 50000;
+            background-color: white;
+        }
 
-    .stories-space {
-        min-width: 100%;
-        height: var(--stories-space-height);
-        display: flex;
-        padding: 5px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding-left: 30px;
-    }
+        .stories-space {
+            min-width: 100%;
+            height: var(--stories-space-height);
+            display: flex;
+            padding: 5px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-left: 30px;
+        }
 
-    .stories-space .storie {
-        width: var(--storie-height);
-        height: var(--storie-height);
-        border-radius: 100%;
-        border: 3px solid var(--mega-green);
-        overflow: hidden;
-        cursor: pointer;
-        margin-right: 10px;
-        flex: 0 0 var(--storie-height)
-    }
+        .stories-space .storie {
+            width: var(--storie-height);
+            height: var(--storie-height);
+            border-radius: 100%;
+            border: 3px solid var(--mega-green);
+            overflow: hidden;
+            cursor: pointer;
+            margin-right: 10px;
+            flex: 0 0 var(--storie-height)
+        }
 
-    .storie img {
-        width: 200%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+        .storie img {
+            width: 200%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-    .stories-space::-webkit-scrollbar {
-        height: 10px;
-    }
+        .stories-space::-webkit-scrollbar {
+            height: 10px;
+        }
 
 
-    /*.stories-space::-webkit-scrollbar-track {}*/
+        /*.stories-space::-webkit-scrollbar-track {}*/
 
-    .stories-space::-webkit-scrollbar-thumb {
-        background: rgb(245, 245, 245);
-        height: 3px;
-        border-radius: 5px;
-    }
+        .stories-space::-webkit-scrollbar-thumb {
+            background: rgb(245, 245, 245);
+            height: 3px;
+            border-radius: 5px;
+        }
 
-    .seller-space .title {
+        .seller-space .title {
 
-        color: var(--mega-green);
-        width: 100%;
-        font-size: 20px;
-        padding-left: 10px;
-    }
+            color: var(--mega-green);
+            width: 100%;
+            font-size: 20px;
+            padding-left: 10px;
+        }
 
-    .seller-space .store-data {
-        width: 100%;
-        min-height: 60px;
-        padding-top: 5px;
-        font-size: 12px;
-        display: flex;
-        overflow: hidden;
-        flex-direction: column;
-        padding-left: 30px;
-        padding-right: 5px;
-    }
+        .seller-space .store-data {
+            width: 100%;
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 12px;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            padding-left: 30px;
+            padding-right: 5px;
+        }
 
-    .delivery {
-        width: 100%;
-        height: 15px;
-        display: flex;
-        color: var(--mega-green);
-    }
+        .delivery {
+            width: 100%;
+            height: 15px;
+            display: flex;
+            color: var(--mega-green);
+        }
 
-    .delivery .delivery-icon {
-        background-image: url("../icons/truck.png");
-        background-repeat: no-repeat, repeat;
-        background-size: cover;
-        height: 15px;
-        width: 15px;
-        margin-left: 5px;
-    }
+        .delivery .delivery-icon {
+            background-image: url("../icons/truck.png");
+            background-repeat: no-repeat, repeat;
+            background-size: cover;
+            height: 15px;
+            width: 15px;
+            margin-left: 5px;
+        }
 
-    .seller-info {
-        width: 100%;
-        display: flex;
-        max-height: 150px;
-        overflow-y: auto;
-        margin-bottom: 30px;
-    }
+        .seller-info {
+            width: 100%;
+            display: flex;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
 
-    .seller-info::-webkit-scrollbar {
-        width: 3px;
-        background: var(--mega-orange);
-    }
+        .seller-info::-webkit-scrollbar {
+            width: 3px;
+            background: var(--mega-orange);
+        }
 
-    .score {
-        width: 100%;
-        height: 15px;
-        display: flex;
-        position: absolute;
-        bottom: 0;
-        margin-bottom: 5px;
-    }
+        .score {
+            width: 100%;
+            height: 15px;
+            display: flex;
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 5px;
+        }
 
-    .score .score-icon {
-        width: 15px;
-        height: 15px;
-        background-image: url("../icons/star.png");
-        background-repeat: no-repeat, repeat;
-        background-size: cover;
-    }
+        .score .score-icon {
+            width: 15px;
+            height: 15px;
+            background-image: url("../icons/star.png");
+            background-repeat: no-repeat, repeat;
+            background-size: cover;
+        }
 
-    .score .score-value {
+        .score .score-value {
 
-        color: var(--mega-orange);
-        display: flex;
-        align-items: flex-end;
-    }
+            color: var(--mega-orange);
+            display: flex;
+            align-items: flex-end;
+        }
 
-    .seller-space .store-products {
-        width: 100%;
-        min-height: 100px;
-    }
+        .seller-space .store-products {
+            width: 100%;
+            min-height: 100px;
+        }
 
-    .store-products .products {
-        width: 100%;
-        min-height: var(--product-height);
-        display: flex;
-        flex-wrap: wrap;
-    }
+        .store-products .products {
+            width: 100%;
+            min-height: var(--product-height);
+            display: flex;
+            flex-wrap: wrap;
+        }
 
-    .product {
-        flex: 0 0 var(--product-width);
-        height: var(--product-height);
-        box-shadow: 11px 26px 33px 3px rgba(0, 0, 0, 0.15);
-        border-radius: 15px;
-        overflow: hidden;
-        margin-right: 15px;
-        margin-bottom: 15px;
-        cursor: pointer;
-        display: flex;
-        align-items: flex-end;
-    }
+        .product {
+            flex: 0 0 var(--product-width);
+            height: var(--product-height);
+            box-shadow: 11px 26px 33px 3px rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+        }
 
-    .producto {
-        width: 150px;
-        height: 100px;
-        overflow: hidden;
-        display: flex;
-        border-radius: 15px;
-    }
+        .producto {
+            width: 150px;
+            height: 100px;
+            overflow: hidden;
+            display: flex;
+            border-radius: 15px;
+        }
 
-    .producto .informacion {
-        height: 50%;
-        width: 50%;
-        color: white;
-        font-size: 15px;
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        display: flex;
-        align-items: flex-end;
-    }
+        .producto .informacion {
+            height: 50%;
+            width: 50%;
+            color: white;
+            font-size: 15px;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            align-items: flex-end;
+        }
 
-    .producto .imagen {
-        position: absolute;
-        top: 0;
-        width: 100px;
-        height: 100px;
-    }
+        .producto .imagen {
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 100px;
+        }
 
-    .producto .imagen img {
-        width: 100%;
-        height: 100%;
-        transform: scale(1.2) translateX(50%);
-    }
+        .producto .imagen img {
+            width: 100%;
+            height: 100%;
+            transform: scale(1.2) translateX(50%);
+        }
 
-    .store-products .products .product:hover {
-        transform: scale(1.1);
-    }
+        .store-products .products .product:hover {
+            transform: scale(1.1);
+        }
 
-    .product .product-img {
-        position: absolute;
-        right: 70px;
-    }
+        .product .product-img {
+            position: absolute;
+            right: 70px;
+        }
 
-    .product .product-img img {
-        width: var(--product-height);
-        height: var(--product-height);
-        transform: scale(1.2) translateX(50%);
-    }
+        .product .product-img img {
+            width: var(--product-height);
+            height: var(--product-height);
+            transform: scale(1.2) translateX(50%);
+        }
 
-    .product .product-info {
-        height: 50%;
-        width: 50%;
-        color: white;
-        font-size: 15px;
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        display: flex;
-        align-items: flex-end;
-    }
+        .product .product-info {
+            height: 50%;
+            width: 50%;
+            color: white;
+            font-size: 15px;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            align-items: flex-end;
+        }
 
-    .product-link:hover .img-producto-local {
-        transform: scale(1.3) rotate(-10deg);
-    }
+        .product-link:hover .img-producto-local {
+            transform: scale(1.3) rotate(-10deg);
+        }
 
-    .product-link:hover {
-        transform: rotate(10deg);
-    }
+        .product-link:hover {
+            transform: rotate(10deg);
+        }
 
-    .product-link:hover .card-body {
-        transform: rotate(-10deg);
-    }
-</style>
+        .product-link:hover .card-body {
+            transform: rotate(-10deg);
+        }
+    </style>
 
-
-
-<header class="header" style="overflow: auto;">
-    <div class="title p-2">
-        <h4>{{rowsLocalesMayoristas.nombreLocal}}</h4>
-    </div>
-</header>
-
-<div class="no-header">
-    <div class="banner">
-        <div class="state"></div>
-        <img src="{{rowsLocalesMayoristas.rutaImagen}}" class="img-banner">
-    </div>
-    <div class="seller-space">
-        <div class="title">
-            <h4>Información</h4>
+    <header class="header" style="overflow: auto;">
+        <div class="title p-2">
+            <h4>{{rowsLocalesMayoristas.nombreLocal}}</h4>
         </div>
+    </header>
 
-        <div class="justify-content-start">
-            <div id="stories" class="storiesWrapper stories"></div>
+    <div class="no-header">
+        <div class="banner">
+            <div class="state"></div>
+            <img src="{{rowsLocalesMayoristas.rutaImagen}}" class="img-banner">
         </div>
-
-        <div class="store-data container">
-
-            {{{rowsLocalesMayoristas.textoEstaAbierto}}}
-
-            <div class="text-success" style="font-size: 1.5em;">
-                <i class="fas fa-truck"></i> Domicilio Cúcuta ${{rowsLocalesMayoristas.precioDomicilio}}
-            </div>
-            <div class="text-success" style="font-size: 1.5em;">
-                <i class="fas fa-trailer"></i><i class="fas fa-truck"></i> Domicilio área metropolitana Cúcuta
-                ${{rowsLocalesMayoristas.precioDomicilioLejos}}
-            </div>
-            <div class="text-success" style="font-size: 1.5em;">
-                <i class="fas fa-shopping-bag"></i> Pedido mínimo ${{rowsLocalesMayoristas.montoPedidoMinimo}}
-            </div>
-            <div class="text-warning" style="font-size: 1.5em;">
-                <i class="fas fa-star"></i> {{rowsLocalesMayoristas.calificacionPromedio}} <small
-                    style="color:rgb(168, 168, 168); font-size:17px;"> <i class="far fa-user"></i>
-                    {{rowsLocalesMayoristas.calificacionContadorCliente}}</small>
-            </div>
-            <link rel="stylesheet" href="/StarRating/css/starrr.css">
-            <div class=" ml-3">
-                <form action="/cliente/explorar/calificarLocal" method="post">
-                    <input type="hidden" name="idLocal" value="{{localId}}">
-
-                    <br>
-                    <div class="row">
-                        <div id="estrella" style=""><input type="hidden" name="valorEstrella" id="valorEstrella"
-                                value=""></div>
-                        <button type="submit" class="btn btn-link text-warning"
-                            style="font-size:20px; position: relative; bottom:8px">Calificar</button>
-                    </div>
-                </form>
-
-            </div>
-            <div class="seller-info mt-2" style="font-size: 18px;">
-                {{rowsLocalesMayoristas.descripcionLocal}}
-            </div>
-        </div>
-
-        <div class="store-products">
+        <div class="seller-space">
             <div class="title">
-                <h4>Alimentos</h4>
-                <select name="" id="selectCategorias" class="form-control" style="width: 90%;">
-                    <option value="0">Ver todos</option>
-                    {{#each categorias}}
-                    <option value="{{id}}">Solo {{name}}</option>
-                    {{else}}
-                    No hay categorias. Si ve este mensaje por favor notifique el error.
-                    {{/each}}
-                </select>
+                <h4>Información</h4>
             </div>
 
+            <div class="justify-content-start">
+                <div id="stories" class="storiesWrapper stories"></div>
+            </div>
 
-            <div class="products">
-                <div class="container">
-                    <div class="row pt-3" id="productsFather">
+            <div class="store-data container">
 
-                        {{#each rowsProductoLocal}}
+                {{{rowsLocalesMayoristas.textoEstaAbierto}}}
 
-                        <div class="col-6 col-md-4 col-lg-3 pb-3 pl-3 pr-3 pt-4">
-                            <a href="/cliente/explorar/productoLocal/{{pkIdProductoLocal}}-{{pkIdPresentacionProducto}}"
-                                class="text-dark" style="text-decoration:none;">
-                                <div class="card mb-3 border-0 shadow-sm rounded-lg product-link"
-                                    style="{{cssPropertiesBg}}">
-                                    <div class="d-flex"
-                                        style="height: 50px;-webkit-box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);-moz-box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);">
-                                        <img src="{{rutaImagen}}" alt="{{nombreProducto}}"
-                                            style="width: 120px; height: 120px; position:relative; bottom: 40px; "
-                                            class="img-producto-local ml-auto mr-auto">
-                                    </div>
-                                    <div class="card-body mt-3">
-                                        <h5 class="card-title">{{nombreProducto}}</h5>
-                                        <div class="card-text">
-                                            {{nombrePresentacion}}
-                                            <br>
-                                            /${{precioUnitarioPresentacion}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
+                <div class="text-success" style="font-size: 1.5em;">
+                    <i class="fas fa-truck"></i> Domicilio Cúcuta ${{rowsLocalesMayoristas.precioDomicilio}}
+                </div>
+                <div class="text-success" style="font-size: 1.5em;">
+                    <i class="fas fa-trailer"></i><i class="fas fa-truck"></i> Domicilio área metropolitana Cúcuta
+                    ${{rowsLocalesMayoristas.precioDomicilioLejos}}
+                </div>
+                <div class="text-success" style="font-size: 1.5em;">
+                    <i class="fas fa-shopping-bag"></i> Pedido mínimo ${{rowsLocalesMayoristas.montoPedidoMinimo}}
+                </div>
+                <div class="text-warning" style="font-size: 1.5em;">
+                    <i class="fas fa-star"></i> {{rowsLocalesMayoristas.calificacionPromedio}} <small
+                        style="color:rgb(168, 168, 168); font-size:17px;"> <i class="far fa-user"></i>
+                        {{rowsLocalesMayoristas.calificacionContadorCliente}}</small>
+                </div>
+                <link rel="stylesheet" href="/StarRating/css/starrr.css">
+                <div class=" ml-3">
+                    <form action="/cliente/explorar/calificarLocal" method="post">
+                        <input type="hidden" name="idLocal" value="{{localId}}">
+
+                        <br>
+                        <div class="row">
+                            <div id="estrella" style=""><input type="hidden" name="valorEstrella" id="valorEstrella"
+                                    value=""></div>
+                            <button type="submit" class="btn btn-link text-warning"
+                                style="font-size:20px; position: relative; bottom:8px">Calificar</button>
                         </div>
-                        {{else}}
-                        Este local no cuenta con ningun producto.
-                        {{/each}}
+                    </form>
 
-                    </div>
+                </div>
+                <div class="seller-info mt-2" style="font-size: 18px;">
+                    {{rowsLocalesMayoristas.descripcionLocal}}
                 </div>
             </div>
 
+            <div class="store-products">
+                <div class="title">
+                    <h4>Alimentos</h4>
+                    <select name="" id="selectCategorias" class="form-control" style="width: 90%;">
+                        <option value="0">Ver todos</option>
+                        {{#each categorias}}
+                        <option value="{{id}}">Solo {{name}}</option>
+                        {{else}}
+                        No hay categorias. Si ve este mensaje por favor notifique el error.
+                        {{/each}}
+                    </select>
+                </div>
+
+
+                <div class="products">
+                    <div class="container">
+                        <div class="row pt-3" id="productsFather">
+
+                            {{#each rowsProductoLocal}}
+
+                            <div class="col-6 col-md-4 col-lg-3 pb-3 pl-3 pr-3 pt-4">
+                                <a href="/cliente/explorar/productoLocal/{{pkIdProductoLocal}}-{{pkIdPresentacionProducto}}"
+                                    class="text-dark" style="text-decoration:none;">
+                                    <div class="card mb-3 border-0 shadow-sm rounded-lg product-link"
+                                        style="{{cssPropertiesBg}}">
+                                        <div class="d-flex"
+                                            style="height: 50px;-webkit-box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);-moz-box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);box-shadow: -2px 82px 119px -60px rgba(0,0,0,0.79);">
+                                            <img src="{{rutaImagen}}" alt="{{nombreProducto}}"
+                                                style="width: 120px; height: 120px; position:relative; bottom: 40px; "
+                                                class="img-producto-local ml-auto mr-auto">
+                                        </div>
+                                        <div class="card-body mt-3">
+                                            <h5 class="card-title">{{nombreProducto}}</h5>
+                                            <div class="card-text">
+                                                {{nombrePresentacion}}
+                                                <br>
+                                                /${{precioUnitarioPresentacion}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {{else}}
+                            Este local no cuenta con ningun producto.
+                            {{/each}}
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    //----Variables
-    var categorias = {{{ htmlCategorias }}}
-    var productos = {{{ htmlProductos }}}
+    <script>
+        //----Variables
+        var categorias = {{{ htmlCategorias }}}
+        var productos = {{{ htmlProductos }}}
 
-    //----Algoritmo que se ejecuta cada vez que el select cambia
-    $("#selectCategorias").on("load change input", function () {
+        //----Algoritmo que se ejecuta cada vez que el select cambia
+        $("#selectCategorias").on("load change input", function () {
 
-        //Filtrar productos
-        var idCategoriaSeleccionada = $(this).val();
-        var productosImprimibles = productos.filter(function (producto) {
-            if (producto.categoria == idCategoriaSeleccionada || idCategoriaSeleccionada == 0) {
-                return true;
+            //Filtrar productos
+            var idCategoriaSeleccionada = $(this).val();
+            var productosImprimibles = productos.filter(function (producto) {
+                if (producto.categoria == idCategoriaSeleccionada || idCategoriaSeleccionada == 0) {
+                    return true;
+                }
+                return false;
+            });
+
+            //Imprimir
+            var productsFather = document.getElementById("productsFather");
+            $("#productsFather").html("");
+            for (index = 0; index < productosImprimibles.length; index++) {
+                //Crear elemento
+                var col = document.createElement("div");
+                col.setAttribute("class", "col-6 col-md-4 col-lg-3 pb-3 pl-3 pr-3 pt-4");
+
+                var a = document.createElement("a");
+                a.setAttribute("class", "text-dark");
+                a.setAttribute("href", "/cliente/explorar/productoLocal/" + productosImprimibles[index].id_pl + "-" + productosImprimibles[index].id_presentacion);
+                a.setAttribute("style", "text-decoration:none;");
+
+                var card = document.createElement("div");
+                card.setAttribute("class", "card mb-3 border-0 shadow-sm rounded-lg product-link");
+                card.setAttribute("style", "" + productosImprimibles[index].css + "");
+
+                var header = document.createElement("div");
+                header.setAttribute("class", "d-flex");
+                header.setAttribute("style", "height: 50px;");
+
+                var image = document.createElement("img");
+                image.setAttribute("src", "" + productosImprimibles[index].img_path);
+                image.setAttribute("alt", "" + productosImprimibles[index].nombre_producto);
+                image.setAttribute("class", "img-producto-local ml-auto mr-auto");
+                image.setAttribute("style", "width: 120px; height: 120px; position:relative; bottom: 40px;");
+
+                var bodyC = document.createElement("div");
+                bodyC.setAttribute("class", "card-body mt-3");
+
+                var title = document.createElement("h5");
+                title.setAttribute("class", "card-title");
+                title.innerHTML = "" + productosImprimibles[index].nombre_producto + "";
+
+                var text = document.createElement("div");
+                text.setAttribute("class", "card-text");
+                text.innerHTML = "" + productosImprimibles[index].nombre_presentacion + "<br> /$" + productosImprimibles[index].precio + "";
+
+                //Adjuntarlos al documento
+                bodyC.appendChild(title);
+                bodyC.appendChild(text);
+                header.appendChild(image);
+                card.appendChild(header);
+                card.appendChild(bodyC);
+                a.appendChild(card);
+                col.appendChild(a);
+                productsFather.appendChild(col);
+
             }
-            return false;
+
         });
 
-        //Imprimir
-        var productsFather = document.getElementById("productsFather");
-        $("#productsFather").html("");
-        for (index = 0; index < productosImprimibles.length; index++) {
-            //Crear elemento
-            var col = document.createElement("div");
-            col.setAttribute("class", "col-6 col-md-4 col-lg-3 pb-3 pl-3 pr-3 pt-4");
+    </script>
 
-            var a = document.createElement("a");
-            a.setAttribute("class", "text-dark");
-            a.setAttribute("href", "/cliente/explorar/productoLocal/" + productosImprimibles[index].id_pl + "-" + productosImprimibles[index].id_presentacion);
-            a.setAttribute("style", "text-decoration:none;");
+    <script src="/StarRating/js/starrr.js"></script>
 
-            var card = document.createElement("div");
-            card.setAttribute("class", "card mb-3 border-0 shadow-sm rounded-lg product-link");
-            card.setAttribute("style", "" + productosImprimibles[index].css + "");
-
-            var header = document.createElement("div");
-            header.setAttribute("class", "d-flex");
-            header.setAttribute("style", "height: 50px;");
-
-            var image = document.createElement("img");
-            image.setAttribute("src", "" + productosImprimibles[index].img_path);
-            image.setAttribute("alt", "" + productosImprimibles[index].nombre_producto);
-            image.setAttribute("class", "img-producto-local ml-auto mr-auto");
-            image.setAttribute("style", "width: 120px; height: 120px; position:relative; bottom: 40px;");
-
-            var bodyC = document.createElement("div");
-            bodyC.setAttribute("class", "card-body mt-3");
-
-            var title = document.createElement("h5");
-            title.setAttribute("class", "card-title");
-            title.innerHTML = "" + productosImprimibles[index].nombre_producto + "";
-
-            var text = document.createElement("div");
-            text.setAttribute("class", "card-text");
-            text.innerHTML = "" + productosImprimibles[index].nombre_presentacion + "<br> /$" + productosImprimibles[index].precio + "";
-
-            //Adjuntarlos al documento
-            bodyC.appendChild(title);
-            bodyC.appendChild(text);
-            header.appendChild(image);
-            card.appendChild(header);
-            card.appendChild(bodyC);
-            a.appendChild(card);
-            col.appendChild(a);
-            productsFather.appendChild(col);
-
-        }
-
-    });
-
-</script>
-
-<script src="/StarRating/js/starrr.js"></script>
-
-<script>
-    $("#estrella").starrr({
-        rating: {{ calificacion }},
-        max: 5,
-        change: function (e, valor) {
-            $("#valorEstrella").val(valor);
-        }
+    <script>
+        $("#estrella").starrr({
+            rating: {{ calificacion }},
+            max: 5,
+            change: function (e, valor) {
+                $("#valorEstrella").val(valor);
+            }
     }); 
-</script>
-
-{{>navegacionCliente}}
+    </script>
+</div>
