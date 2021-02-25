@@ -115,7 +115,7 @@ component.setEstado = async(idVenta, estadoMeta, descripcionExtra, tipoUsuarioSo
         }
         //Crear registro en bd
         let jsonString = JSON.stringify(jsonEstados);
-        await pool.query("UPDATE venta SET jsonEstados=? WHERE pkIdVenta=?", [jsonString, idVenta]);
+        await pool.query("UPDATE venta SET stringJsonEstados=? WHERE pkIdVenta=?", [jsonString, idVenta]);
     } catch (error) {
         console.log(error);
     }
@@ -144,7 +144,7 @@ let cerrarEstadoAyuda = async(jsonEstados) => {
 
 let getJsonEstados = async(idVenta) => {
     try {
-        const rowsJson = await pool.query("SELECT jsonEstados FROM venta WHERE pkIdVenta=?", [idVenta]);
+        const rowsJson = await pool.query("SELECT stringJsonEstados FROM venta WHERE pkIdVenta=?", [idVenta]);
         if (rowsJson.length != 1) {
             throw new Error("No hay registros o hay más de 1 registro");
         }
@@ -158,7 +158,7 @@ let getJsonEstados = async(idVenta) => {
 
 component.getHtmlCard = async(idVenta) => {
     try {
-        const rowsLog = await pool.query("SELECT jsonEstados FROM venta WHERE pkIdVenta=?", [idVenta]);
+        const rowsLog = await pool.query("SELECT stringJsonEstados FROM venta WHERE pkIdVenta=?", [idVenta]);
         let stringJson = rowsLog[0].jsonEstados;
         let jsonEstados = JSON.parse(stringJson);
         let historial = jsonEstados.historial;

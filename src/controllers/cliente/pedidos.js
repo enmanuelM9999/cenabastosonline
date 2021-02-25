@@ -189,7 +189,7 @@ router.post('/comprar', esCliente, async(req, res) => {
         //crear venta
         let estadosComponent = require("../../lib/estadoPedido.component");
         let jsonEstados = estadosComponent.getEstadoNuevaVenta();
-        let stringJson = JSON.stringify(jsonEstados);
+        let stringJsonEstados = JSON.stringify(jsonEstados);
 
         let moment = require("moment");
         let fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
@@ -202,7 +202,7 @@ router.post('/comprar', esCliente, async(req, res) => {
             montoTotal: datos.total,
             fkIdLocalComercial: datos.fkIdLocalSeleccionado,
             fkIdCliente: req.session.idCliente,
-            jsonEstados = stringJson
+            stringJsonEstados
         };
         const resultInsert = await pool.query("INSERT INTO venta SET ?", [newVenta]);
         //crear items-venta
