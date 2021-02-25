@@ -3,7 +3,7 @@ const router = express.Router();
 const { esCliente } = require('../../lib/auth');
 const pool = require("../../database");
 
-router.get('/listadoBuzon', esCliente, async (req, res) => {
+router.get('/listadoBuzon', esCliente, async(req, res) => {
     try {
         const idCliente = req.session.idCliente;
         //Buscar todos los buzones de un cliente
@@ -20,7 +20,6 @@ router.get('/listadoBuzon', esCliente, async (req, res) => {
                 rowsUltimoMensaje[index].nombreLocal = ultimoMensaje[j].nombreLocal;
                 rowsUltimoMensaje[index].rutaImagen = ultimoMensaje[j].rutaImagen;
             }
-
         }
         //rowsHistorialPedidos[0].fechaHoraEntrega = moment(rowsHistorialPedidos[0].fechaHoraEntrega).format("LLLL");
         res.render("cliente/buzon/listadoBuzon", { rowsUltimoMensaje });
@@ -30,7 +29,7 @@ router.get('/listadoBuzon', esCliente, async (req, res) => {
     }
 });
 
-router.get('/contacto', esCliente, async (req, res) => {
+router.get('/contacto', esCliente, async(req, res) => {
     try {
         //const idCliente = req.session.idCliente;
         res.render("cliente/buzon/contacto");

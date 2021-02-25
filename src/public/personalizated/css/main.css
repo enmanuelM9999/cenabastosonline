@@ -10239,7 +10239,11 @@ button,
     align-content: center;
     position: relative;
     z-index: 10;
-    transition: all .2s
+    transition: all .2s;
+    background-color: red;
+    background-image: url("/static/leaves-pattern.jpg");
+    background-repeat: repeat;
+    background-size: cover;
 }
 
 .app-header.header-shadow {
@@ -10252,7 +10256,7 @@ button,
     align-content: center;
     flex: 1;
     padding: 0 1.5rem;
-    height: 60px
+    height: 60px;
 }
 
 .app-header .app-header__content .app-header-left {
@@ -10902,7 +10906,8 @@ button,
 
 .fixed-sidebar .app-main .app-main__outer {
     z-index: 9;
-    padding-left: 280px
+    padding-left: 280px;
+    background-color: rgb(250, 250, 250);
 }
 
 .fixed-sidebar.fixed-header .app-sidebar .app-header__logo {

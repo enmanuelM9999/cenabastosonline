@@ -1,23 +1,25 @@
-<div class="container mt-3">
+{{>navegacionCliente}}
+<div class="app-main__outer">
+    <div class="container mt-3">
 
-    <div class="row">
+        <div class="row">
 
-        <div class="col-12 p-2">
+            <div class="col-12 p-2">
 
-            <div class="card p-2">
+                <div class="card p-2">
 
-                <h2>Realizar nuevo reclamo</h2>
+                    <h2>Realizar nuevo reclamo</h2>
 
-                <form action="/cliente/pedidos/reclamarPedido" method="post" name="form" id="form" class="mt-3">
-                    <input type="hidden" name="idVenta" id="idVenta" value="{{idVenta}}">
-                    <div class="form-group">
-                        <label for="newReclamo">Mensaje Reclamo</label>
-                        <textarea name="newReclamo" id="newReclamo" class="form-control" form="form"
-                            cols="1"></textarea>
-                    </div>
+                    <form action="/cliente/pedidos/reclamarPedido" method="post" name="form" id="form" class="mt-3">
+                        <input type="hidden" name="idVenta" id="idVenta" value="{{idVenta}}">
+                        <div class="form-group">
+                            <label for="newReclamo">Mensaje Reclamo</label>
+                            <textarea name="newReclamo" id="newReclamo" class="form-control" form="form"
+                                cols="1"></textarea>
+                        </div>
 
-                    <button type="submit" class="btn btn-success">Reclamar Pedido</button>
-                  </div>
+                        <button type="submit" class="btn btn-success">Reclamar Pedido</button>
+                </div>
                 </form>
 
             </div>
@@ -27,5 +29,4 @@
     </div>
 
 </div>
-
-{{>navegacionCliente}}
+</div>

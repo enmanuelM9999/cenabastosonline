@@ -1,3 +1,11 @@
+<style>
+    .app-header{
+       background-image: url("/static/leaves-pattern.png") !important;
+       background-repeat: repeat !important; 
+
+    }
+</style>
+
 <div class="app-sidebar sidebar-shadow" style="position:fixed;z-index:999;">
     <div class="scrollbar-sidebar">
         <div class="app-sidebar__inner">
@@ -10,12 +18,12 @@
                     </a>
                     <ul class="mm-collapse mm-show">
                         <li>
-                            <a href="elements-buttons-standard.html">
+                            <a href="/cliente/explorar/listadoLocalesMinoristas">
                                 <i class="metismenu-icon"></i> Minoristas
                             </a>
                         </li>
                         <li>
-                            <a href="elements-dropdowns.html">
+                            <a href="/cliente/explorar/listadoLocalesMayoristas">
                                 <i class="metismenu-icon">
                                 </i>Mayoristas
                             </a>
@@ -30,13 +38,13 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="components-tabs.html">
+                            <a href="/cliente/pedidos/carrito">
                                 <i class="metismenu-icon">
                                 </i>Carrito
                             </a>
                         </li>
                         <li>
-                            <a href="components-accordions.html">
+                            <a href="/cliente/pedidos/historial">
                                 <i class="metismenu-icon">
                                 </i>Mis compras
                             </a>
@@ -45,14 +53,14 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="tables-regular.html">
+                    <a href="#">
                         <i class="metismenu-icon fas fa-bell">
 
                         </i> Notificaciones
                     </a>
                 </li>
                 <li>
-                    <a href="tables-regular.html">
+                    <a href="/cliente/sesion/logout">
                         <i class="metismenu-icon fas fa-sign-out-alt">
 
                         </i> Salir
@@ -65,8 +73,8 @@
 
 </div>
 <div class="" style="position: fixed; top:10px; right: 10px;z-index: 9999;">
-    <a href="" class="btn btn-success rounded-pill shadow-lg" style="font-size: 18px;">
-        <i class="fas fa-shopping-cart"></i> 10
+    <a href="/cliente/pedidos/carrito" class="btn btn-success rounded-pill shadow-lg" style="font-size: 18px;">
+        <i class="fas fa-shopping-cart"></i> {{cantItemsCarrito}}
     </a>
 </div>
 <div class="app-header header-shadow" style="z-index:999">

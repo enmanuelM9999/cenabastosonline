@@ -1,79 +1,79 @@
-<style>
-    * {
-        transition: 0.2s;
-    }
+{{>navegacionCliente}}
+<div class="app-main__outer">
+    <style>
+        * {
+            transition: 0.2s;
+        }
 
-    .tab.active {
-        border-bottom: rgb(2, 184, 117) 5px solid;
-    }
-</style>
-<div class="container mt-3">
+        .tab.active {
+            border-bottom: rgb(2, 184, 117) 5px solid;
+        }
+    </style>
+    <div class="container mt-3">
 
-    <h2>Compras</h2>
-    <div class="mt-4 tabs d-flex w-100" style="overflow-x: auto;">
-        <a class="tab text-dark px-3 " style="text-decoration:none;" href="/cliente/pedidos/carrito">
-            <b>Carrito</b>
-        </a>
-        <a class="tab text-dark px-3 active" style="text-decoration:none;" href="/cliente/pedidos/historial">
-            <b>Mis compras </b>
-        </a>
-    </div>
+        <h2>Compras</h2>
+        <div class="mt-4 tabs d-flex w-100" style="overflow-x: auto;">
+            <a class="tab text-dark px-3 " style="text-decoration:none;" href="/cliente/pedidos/carrito">
+                <b>Carrito</b>
+            </a>
+            <a class="tab text-dark px-3 active" style="text-decoration:none;" href="/cliente/pedidos/historial">
+                <b>Mis compras </b>
+            </a>
+        </div>
 
-    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-content" id="nav-tabContent">
 
-        <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
-            <div class="card border-0 pt-3" style="background-color: rgb(250, 250, 250);">
+            <div class="tab-pane fade active show pb-3" id="nav-content" role="tabpanel">
+
 
                 <div class="row">
 
 
                     <div class="col-12 p-2">
                         <div class="card ">
-                            <div class="table-responsive-lg" style="border-top: 0;">
-                                <!--Para encerrar la tabla responsive-->
-                                <table class="table b-0">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col"># Pedido</th>
-                                            <th scope="col">Valor Total</th>
-                                            <th scope="col">Estado</th>
-                                            <th scope="col">Opciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{#each rowsHistorialPedidos}}
-                                        <tr>
-                                            <th scope="row">{{pkIdVenta}}</th>
-                                            <td>${{montoTotal}}</td>
-                                            <td>{{estado}}</td>
-                                            <td>
-                                                <a href="/cliente/pedidos/detallesPedido/{{pkIdVenta}}"
-                                                        class="btn btn-primary p-0 pr-2 pl-2" style="font-size: 20px;"
-                                                        data-toggle="tooltip" title="Ver pedido"><i
-                                                            class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        </tr>
-                                        {{else}}
-                                        <tr>
-                                            <td>No hay Pedidos</td>
-                                        </tr>
-                                        {{/each}}
 
-                                    </tbody>
-                                </table>
-                            </div>
+                            <!--Para encerrar la tabla responsive-->
+                            <table class="table b-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"># Pedido</th>
+                                        <th scope="col">Valor Total</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col">Opciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each rowsHistorialPedidos}}
+                                    <tr>
+                                        <th scope="row">{{pkIdVenta}}</th>
+                                        <td>${{montoTotal}}</td>
+                                        <td>{{estado}}</td>
+                                        <td>
+                                            <a href="/cliente/pedidos/detallesPedido/{{pkIdVenta}}"
+                                                class="btn btn-primary p-0 pr-2 pl-2" style="font-size: 20px;"
+                                                data-toggle="tooltip" title="Ver pedido"><i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tr>
+                                    {{else}}
+                                    <tr>
+                                        <td>No hay Pedidos</td>
+                                    </tr>
+                                    {{/each}}
+
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-
-
-
                 </div>
+
+
+
             </div>
+
+
         </div>
+
     </div>
-
 </div>
-
-{{>navegacionCliente}}

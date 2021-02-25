@@ -1,38 +1,48 @@
-<style>
-    .list-group-item:nth-child({{{rowNumeroNotificaciones.notificacionesSinLeer}}}){
-        border-bottom: rgb(8, 199, 104) 3px solid;
-    }
+{{>navegacionCliente}}
+<div class="app-main__outer">
+    <style>
+        .list-group-item:nth-child( {
+                    {
+                        {
+                        rowNumeroNotificaciones.notificacionesSinLeer
+                    }
+                }
+            }
 
-</style>
+        ) {
+            border-bottom: rgb(8, 199, 104) 3px solid;
+        }
+    </style>
 
-<div class="container mt-3">
-    <h3>Notificaciones <i class="fas fa-bell"></i></h3>
+    <div class="container mt-3">
+        <h3>Notificaciones <i class="fas fa-bell"></i></h3>
 
-   
-            <div class="border-0">
 
-                <div class="list-group p-0 mt-5">
-                    {{#each rowsNotificaciones}}
-                    <a href="/{{rutaRedireccionamiento}}" class="list-group-item list-group-item-action py-3">
-                        <div class="row px-2">
-                            <div class="col-2 col-md-1 p-0"><img src="{{rutaImagen}}" alt="" style="width: 100%;"></div>
-                            <div class="row col-10 col-md-11 p-0 px-3">
-                                <div class="titulo col-12"><b>{{titulo}}</b></div>
-                                <div class="descripcion col-12">{{descripcion}}</div>
-                                <div class="fecha col-12"><small class="text-muted">{{fechaHoraNotificacionCliente}}</small></div>
+        <div class="border-0">
+
+            <div class="list-group p-0 mt-5">
+                {{#each rowsNotificaciones}}
+                <a href="/{{rutaRedireccionamiento}}" class="list-group-item list-group-item-action py-3">
+                    <div class="row px-2">
+                        <div class="col-2 col-md-1 p-0"><img src="{{rutaImagen}}" alt="" style="width: 100%;"></div>
+                        <div class="row col-10 col-md-11 p-0 px-3">
+                            <div class="titulo col-12"><b>{{titulo}}</b></div>
+                            <div class="descripcion col-12">{{descripcion}}</div>
+                            <div class="fecha col-12"><small class="text-muted">{{fechaHoraNotificacionCliente}}</small>
                             </div>
                         </div>
-                    </a>
-                    {{else}}
-                    <a href="#" class="list-group-item list-group-item-action disabled" tabindex="-1" aria-disabled="true">No hay notificaciones</a>
-                    {{/each}}
-                </div>
-
-
-
+                    </div>
+                </a>
+                {{else}}
+                <a href="#" class="list-group-item list-group-item-action disabled" tabindex="-1"
+                    aria-disabled="true">No hay notificaciones</a>
+                {{/each}}
             </div>
 
 
-</div>
 
-{{>navegacionCliente}}
+        </div>
+
+
+    </div>
+</div>

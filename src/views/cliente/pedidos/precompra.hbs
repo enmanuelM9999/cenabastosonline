@@ -1,96 +1,99 @@
 {{>navegacionCliente}}
 <div class="app-main__outer">
-<div class="container pt-4">
-    <h4>Realiza tu compra</h4>
+    <div class="container pt-4">
+        <h4>Realiza tu compra</h4>
 
-    <form method="POST" action="/cliente/pedidos/comprar" class="mt-4" name="form" id="form">
+        <form method="POST" action="/cliente/pedidos/comprar" class="mt-4" name="form" id="form">
 
 
-        <div class="card border-0 shadow">
-            <div class="container p-4">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5>1. Datos de entrega</h5>
+            <div class="card border-0 shadow">
+                <div class="container p-4">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5>1. Datos de entrega</h5>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><i class="fas fa-user"></i> Recibe: {{datos.nombresPersonaNatural}}
+                            {{datos.apellidosPersonaNatural}}</li>
+                        <li class="list-group-item"><i class="fas fa-address-card"></i>
+                            {{datos.descripcionTipoDocumento}} :
+                            {{datos.numeroDocumento}}</li>
+                        <li class="list-group-item"><i class="fas fa-envelope"></i> Notificar todo a:
+                            {{datos.correoUsuario}}</li>
+                        <li class="list-group-item"><i class="fas fa-home"></i> Entregar en: {{datos.direccionCliente}}
+                        </li>
+                        <li class="list-group-item"><i class="fas fa-phone-alt"></i> En caso de no encontrar el
+                            domicilio,
+                            llamar a:
+                            {{datos.telefonoPersonaNatural}}</li>
+                    </ul>
+
+                    <div class="card-body">
+                        <a href="/cliente/perfil/editarPerfil" class="card-link text-warning">Editar mis datos</a>
                     </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><i class="fas fa-user"></i> Recibe: {{datos.nombresPersonaNatural}}
-                        {{datos.apellidosPersonaNatural}}</li>
-                    <li class="list-group-item"><i class="fas fa-address-card"></i> {{datos.descripcionTipoDocumento}} :
-                        {{datos.numeroDocumento}}</li>
-                    <li class="list-group-item"><i class="fas fa-envelope"></i> Notificar todo a:
-                        {{datos.correoUsuario}}</li>
-                    <li class="list-group-item"><i class="fas fa-home"></i> Entregar en: {{datos.direccionCliente}}</li>
-                    <li class="list-group-item"><i class="fas fa-phone-alt"></i> En caso de no encontrar el domicilio,
-                        llamar a:
-                        {{datos.telefonoPersonaNatural}}</li>
-                </ul>
-
-                <div class="card-body">
-                    <a href="/cliente/perfil/editarPerfil" class="card-link text-warning">Editar mis datos</a>
-                </div>
             </div>
-        </div>
 
-        <br>
+            <br>
 
-        <div class="card border-0 shadow">
-            <div class="container p-4">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5>2. Verifica tu pedido</h5>
+            <div class="card border-0 shadow">
+                <div class="container p-4">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5>2. Verifica tu pedido</h5>
+                        </div>
+
                     </div>
-
-                </div>
-                <a style="font-size: 18px;" class="text-dark font-weight-bold btn btn-link"
-                    href="/cliente/explorar/local/{{datos.fkIdLocalSeleccionado}}"><i class="fas fa-store"></i>
-                    {{datos.nombreLocal}} <i class="fas fa-chevron-right"></i></a>
-                <ul class="list-group list-group-flush">
-                    {{#each items}}
-                    <li class="list-group-item">
-                        <img src="{{rutaImagen}}" alt="{{nombreProducto}}-{{nombrePresentacion}}"
-                            style="width: 40px; height: 40px;">
-                        {{nombreProducto}} - {{nombrePresentacion}} [ {{detallesCarrito}} ] {{cantidadItem}} x
-                        ${{precioUnitarioPresentacion}}
-                        = ${{precioInicialCalculado}}
-                    </li>
-                    {{else}}
-                    {{/each}}
-                    <li class="list-group-item">
-                        <div class="ml-auto text-success">Subtotal : ${{datos.subtotal}}</div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="ml-auto text-success">Domicilio : ${{datos.precioDomicilio}}</div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="ml-auto text-success">Total : ${{datos.total}}</div>
-                    </li>
-                </ul>
-                <div class="card-body">
-                    <a href="/cliente/pedidos/carrito" class="card-link text-warning">Editar mi carrito</a>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="card border-0 shadow">
-            <div class="container p-4">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5>3. Pago</h5>
+                    <a style="font-size: 18px;" class="text-dark font-weight-bold btn btn-link"
+                        href="/cliente/explorar/local/{{datos.fkIdLocalSeleccionado}}"><i class="fas fa-store"></i>
+                        {{datos.nombreLocal}} <i class="fas fa-chevron-right"></i></a>
+                    <ul class="list-group list-group-flush">
+                        {{#each items}}
+                        <li class="list-group-item">
+                            <img src="{{rutaImagen}}" alt="{{nombreProducto}}-{{nombrePresentacion}}"
+                                style="width: 40px; height: 40px;">
+                            {{nombreProducto}} - {{nombrePresentacion}} [ {{detallesCarrito}} ] {{cantidadItem}} x
+                            ${{precioUnitarioPresentacion}}
+                            = ${{precioInicialCalculado}}
+                        </li>
+                        {{else}}
+                        {{/each}}
+                        <li class="list-group-item">
+                            <div class="ml-auto text-success">Subtotal : ${{datos.subtotal}}</div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="ml-auto text-success">Domicilio : ${{datos.precioDomicilio}}</div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="ml-auto text-success">Total : ${{datos.total}}</div>
+                        </li>
+                    </ul>
+                    <div class="card-body">
+                        <a href="/cliente/pedidos/carrito" class="card-link text-warning">Editar mi carrito</a>
                     </div>
                 </div>
-                <img src="https://www.ceim.edu.co/wp-content/uploads/2020/07/metodo-de-pago-wompi.png" alt=""
-                    style="width: 100%;">
+            </div>
+            <br>
+            <div class="card border-0 shadow">
+                <div class="container p-4">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5>3. Pago</h5>
+                        </div>
+                    </div>
+                    <img src="https://www.ceim.edu.co/wp-content/uploads/2020/07/metodo-de-pago-wompi.png" alt=""
+                        style="width: 100%;">
 
-                <div class="card-body">
+                    <div class="card-body">
 
+                    </div>
                 </div>
             </div>
-        </div>
 
 
-        <button type="submit" class="btn btn-success mt-4"><i class="fas fa-check"></i> Pagar y comprar</button>
-    </form>
-</div>
+            <button type="submit" class="btn btn-success mt-4"><i class="fas fa-check"></i> Pagar y comprar</button>
+        </form>
+    </div>
 
 </div>

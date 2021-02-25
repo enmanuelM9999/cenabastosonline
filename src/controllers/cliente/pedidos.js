@@ -6,7 +6,7 @@ const carrito = require("../../lib/carrito.manager");
 const notificaciones = require("../../lib/notificaciones.manager");
 
 
-router.get('/carrito', esCliente, async (req, res) => {
+router.get('/carrito', esCliente, async(req, res) => {
     try {
         const { local, cantItems, rowsItemCarrito, montoTotal } = await carrito.getCarritoCarrito(req.session.idCliente);
         res.render('cliente/pedidos/carrito', { rowsItemCarrito, cantItemsCarrito: cantItems, montoTotal, local });
@@ -29,7 +29,7 @@ router.get('/carrito', esCliente, async (req, res) => {
     }
 });
 
-router.post('/agregarAlCarrito', esCliente, async (req, res) => {
+router.post('/agregarAlCarrito', esCliente, async(req, res) => {
     try {
         const { idLocal, idPresentacion, cantidadItem, detallesCliente } = req.body;
         const resultAdd = await carrito.agregarItemCarrito(req.session.idCliente, idLocal, idPresentacion, detallesCliente, cantidadItem);
@@ -43,7 +43,7 @@ router.post('/agregarAlCarrito', esCliente, async (req, res) => {
     }
 });
 
-router.get('/carrito/borrarItemCarrito/:idItem', esCliente, async (req, res) => {
+router.get('/carrito/borrarItemCarrito/:idItem', esCliente, async(req, res) => {
     try {
         const { idItem } = req.params;
         carrito.borrarItemCarrito(req.session.idCliente, idItem, req, res);
@@ -66,7 +66,7 @@ router.get('/carrito/borrarItemCarrito/:idItem', esCliente, async (req, res) => 
     }
 });
 
-router.get('/carrito/vaciarCarrito', esCliente, async (req, res) => {
+router.get('/carrito/vaciarCarrito', esCliente, async(req, res) => {
     try {
         carrito.vaciarCarrito(req.session.idCliente);
         res.redirect("/cliente/pedidos/carrito");
@@ -85,7 +85,7 @@ router.get('/carrito/vaciarCarrito', esCliente, async (req, res) => {
     }
 });
 
-router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
+router.post('/carrito/actualizarItemCarrito/', esCliente, async(req, res) => {
     try {
         const { item, cant, detalles } = req.body;
         carrito.editarItemCarrito(req.session.idCliente, item, detalles, cant);
@@ -112,7 +112,7 @@ router.post('/carrito/actualizarItemCarrito/', esCliente, async (req, res) => {
     }
 });
 
-router.get('/precomprar', esCliente, async (req, res) => {
+router.get('/precomprar', esCliente, async(req, res) => {
     try {
 
 
@@ -158,7 +158,7 @@ router.get('/precomprar', esCliente, async (req, res) => {
     }
 });
 
-router.post('/comprar', esCliente, async (req, res) => {
+router.post('/comprar', esCliente, async(req, res) => {
     try {
         //dónde y quién recibe, del carrito viene el listado de los productos, el monto total, el id del local comercial
         let { datos, items } = await carrito.getCarritoCompra(req.session.idCliente);
@@ -187,19 +187,22 @@ router.post('/comprar', esCliente, async (req, res) => {
         console.log("los datos ", datos, " y los items ", items);
 
         //crear venta
+        let estadosComponent = require("../../lib/estadoPedido.component");
+        let jsonEstados = estadosComponent.getEstadoNuevaVenta();
+        let stringJson = JSON.stringify(jsonEstados);
+
         let moment = require("moment");
         let fechaHoraVenta = moment.utc().subtract(4, "hours").format("YYYY-MM-DD HH:mm:ss").toString();
         const newVenta = {
             fechaHoraVenta,
-            fueNoPago: 1,
-            fueNuevo: 1,
             precioDomicilioVenta: datos.precioDomicilio,
             direccionCliente: datos.direccionCliente,
             telefonoCliente: datos.telefonoPersonaNatural,
             numeroDocumentoCliente: datos.numeroDocumento,
             montoTotal: datos.total,
             fkIdLocalComercial: datos.fkIdLocalSeleccionado,
-            fkIdCliente: req.session.idCliente
+            fkIdCliente: req.session.idCliente,
+            jsonEstados = stringJson
         };
         const resultInsert = await pool.query("INSERT INTO venta SET ?", [newVenta]);
         //crear items-venta
@@ -247,7 +250,7 @@ router.post('/comprar', esCliente, async (req, res) => {
 });
 
 
-router.get('/historial', esCliente, async (req, res) => {
+router.get('/historial', esCliente, async(req, res) => {
     try {
         const idCliente = req.session.idCliente;
         //Buscar el historial de pedidos de un cliente
@@ -265,7 +268,7 @@ router.get('/historial', esCliente, async (req, res) => {
     }
 });
 
-router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
+router.get('/detallesPedido/:idPedido', esCliente, async(req, res) => {
     try {
         let moment = require("moment");
         moment.locale("es-us");
@@ -306,17 +309,6 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
             rowsBuzon[0].mensajes = rowsMensajesBuzon;
         }
 
-        //Validar si la venta fue entregada para realizar un reclamo
-
-        let htmlBotonReclamo = '';
-        
-        
-
-        //Validar si la venta fue entregada para realizar un reclamo
-
-        let htmlCancelado = '';
-        
-
         //carrito
         const cantItemsCarrito = await carrito.getLengthCarrito(req.session.idCliente);
         //Renderizar vista
@@ -327,7 +319,7 @@ router.get('/detallesPedido/:idPedido', esCliente, async (req, res) => {
     }
 });
 
-router.get('/crearBuzon/:idPedido', esCliente, async (req, res) => {
+router.get('/crearBuzon/:idPedido', esCliente, async(req, res) => {
     try {
         const { idPedido } = req.params;
         const rowsBuzon = await pool.query("SELECT buzon.pkIdBuzon FROM buzon INNER JOIN venta ON venta.pkIdVenta=buzon.fkIdVenta WHERE buzon.fkIdVenta=?", [idPedido]);
@@ -346,7 +338,7 @@ router.get('/crearBuzon/:idPedido', esCliente, async (req, res) => {
     }
 });
 
-router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
+router.post('/detallesPedido/enviarMensaje', esCliente, async(req, res) => {
     try {
         const { idVenta, idBuzon, mensaje } = req.body;
         console.log("mi mensajito es *" + mensaje.trim() + "*");
@@ -380,7 +372,7 @@ router.post('/detallesPedido/enviarMensaje', esCliente, async (req, res) => {
     }
 });
 
-router.get('/msgCarritoLocalesDiferentes', esCliente, async (req, res) => {
+router.get('/msgCarritoLocalesDiferentes', esCliente, async(req, res) => {
     try {
         res.render("cliente/pedidos/msgCarritoLocalesDiferentes");
     } catch (error) {
@@ -389,7 +381,7 @@ router.get('/msgCarritoLocalesDiferentes', esCliente, async (req, res) => {
     }
 });
 
-router.get('/reclamar/:idVenta', esCliente, async (req, res) => {
+router.get('/reclamar/:idVenta', esCliente, async(req, res) => {
     try {
         const { idVenta } = req.params;
 
@@ -401,7 +393,7 @@ router.get('/reclamar/:idVenta', esCliente, async (req, res) => {
 });
 
 
-router.post('/reclamarPedido', esCliente, async (req, res) => {
+router.post('/reclamarPedido', esCliente, async(req, res) => {
     try {
         const { idVenta, newReclamo } = req.body;
         const nuevoReclamo = {
